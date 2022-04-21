@@ -15,6 +15,12 @@ export const getCSVFiles = (dir: string, appId: string) => {
   return result;
 };
 
+/**
+ * Save csv file
+ *
+ * @param filePath
+ * @param data comma delimited csv. See conventions.
+ */
 export const saveCSV = (filePath: string, data: string) => {
   fs.writeFileSync(filePath, '');
   const fd = fs.openSync( filePath, 'w');
