@@ -1,6 +1,6 @@
-import { ScraperFn } from '../types';
+import {ScraperFn} from '../../types';
 
-export const scrapeSUUMO: ScraperFn = (page, url) => {
+export const scrapeSUUMO: ScraperFn = async (page, url) => {
 
   await page.goto('https://suumo.jp/ms/chuko/aichi/city/');
   await page.click('#sa02_sc201');
@@ -39,12 +39,11 @@ export const scrapeSUUMO: ScraperFn = (page, url) => {
 
   await page.waitForTimeout(2000);
 
-  return bukkenlists;
-};
+  // return bukkenlists;
 
-return [
-  {
+  return [
+    {
 
-  },
-];
+    },
+  ];
 };
