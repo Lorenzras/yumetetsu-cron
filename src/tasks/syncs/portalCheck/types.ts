@@ -1,3 +1,5 @@
+import {Page} from 'puppeteer';
+
 export interface ScrapeItem {
   propertyName: string,
   price: number,
@@ -5,3 +7,5 @@ export interface ScrapeItem {
   address: string,
   propertyUrl: string,
 }
+
+export type ScraperFn = (page: Page, url: string) => ScrapeItem[]
