@@ -1,15 +1,11 @@
-import {ScraperFn} from '../../types';
+import {openMockBrowserPage} from '../../../../common/browser';
+import {browserTimeOut} from '../../../../common/browser/config';
+import {scrapeHOMES} from './scrapeHOMES';
 
-export const scrapeHOMES: ScraperFn = async (page, url) => {
-  page.goto(url);
-  console.log(url);
+test('HOMES', async () => {
+  const page = await openMockBrowserPage();
+  const result = await scrapeHOMES(page);
 
-  return [{
-    propertyType: '中古マンション',
-    address: '',
-    area: '',
-    price: 2000,
-    propertyName: '',
-    propertyUrl: '',
-  }];
-};
+  page.browser().disconnect();
+  expect(result).toMatchSnapshot();
+}, browserTimeOut);

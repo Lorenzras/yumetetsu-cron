@@ -11,4 +11,4 @@ export interface ScrapeItem {
   propertyUrl: string,
 }
 
-export type ScraperFn = (page: Page, url: string) => Promise< ScrapeItem[]>
+export type ScraperFn = (page: Page) => Promise< ScrapeItem[]>
