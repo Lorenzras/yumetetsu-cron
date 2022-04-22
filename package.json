@@ -44,6 +44,7 @@
     "typescript": "^4.6.2"
   },
   "dependencies": {
+    "@geolonia/japanese-numeral": "^0.1.15",
     "@kintone/rest-api-client": "^2.0.36",
     "@slack/bolt": "^3.10.0",
     "app-root-path": "^3.0.0",
