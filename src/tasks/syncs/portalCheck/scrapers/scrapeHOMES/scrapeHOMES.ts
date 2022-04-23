@@ -24,8 +24,8 @@ export const scrapeHOMES : ScraperFn = async (page) => {
       propertyName: '',
       propertyType: '中古マンション',
       address: '',
-      area: 1000,
-      price: 90000,
+      area: '1000',
+      price: '90000',
       propertyUrl: '',
     },
   ];

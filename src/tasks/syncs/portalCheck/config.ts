@@ -1,3 +1,7 @@
+export const dirPortalCheck = __dirname;
+
+export const propertyTypes = ['中古マンション', '中古戸建', '土地'] as const;
+
 export const cityLists = {
   愛知: [
     '豊川市',

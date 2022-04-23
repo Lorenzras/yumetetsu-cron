@@ -1,5 +1,6 @@
 import {Page} from 'puppeteer';
 
+
 export const perCity = async (
   page: Page,
   cities: string[],
