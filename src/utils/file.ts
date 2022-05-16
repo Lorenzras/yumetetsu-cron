@@ -4,6 +4,7 @@ import path from 'path';
 import {dumpPath} from './paths';
 import iconv from 'iconv-lite';
 import rmfr from 'rmfr';
+import {json2csvAsync} from 'json-2-csv';
 
 export const getCSVFiles = (dir: string, appId: string) => {
   const result = fs.readdirSync(dir)
@@ -28,6 +29,13 @@ export const saveCSV = (filePath: string, data: string) => {
 
   fs.writeSync( fd, buff);
   fs.close(fd);
+};
+
+export const saveJSONToCSV = async (
+  filePath: string,
+  json: {[k: string]: any}[],
+) =>{
+  saveCSV(filePath, await json2csvAsync(json));
 };
 
 export const deleteFile = (path: string) => {

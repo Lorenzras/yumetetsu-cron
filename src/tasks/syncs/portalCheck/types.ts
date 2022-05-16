@@ -4,6 +4,13 @@ import {propertyTypes} from './config';
 
 export type PropertyType = typeof propertyTypes[number]
 
+export type PropertyActions = Array<{
+  url: string,
+  type: PropertyType,
+  handleScraper: (page: Page) => Promise<IProperty[]>,
+  submitSelector: string
+}>
+
 export interface IProperty {
   /** [site]-[propertyId] primary key if ever data will be saved to database. */
   id?: string,
