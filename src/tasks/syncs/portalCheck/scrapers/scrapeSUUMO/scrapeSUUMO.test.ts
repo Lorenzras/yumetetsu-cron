@@ -1,9 +1,11 @@
-import { openMockBrowserPage } from '../../../common/browser';
-import { scrapeSUUMO } from './scrapeSUUMO';
+import {browserTimeOut} from '../../../../common/browser/config';
+import {openMockBrowserPage} from '../../../../common/browser';
+import {scrapeSUUMO} from './scrapeSUUMO';
 
-test('main', async () => {
-  const firstPage = await openMockBrowserPage();
-  await firstPage.browser().disconnect();
-  expect(await scrapeSUUMO(firstPage, 'https://suumo.jp/ms/chuko/aichi/city/')).toMatchSnapshot();
-  
-}, 100000);
+test('SUUMO', async () => {
+  const page = await openMockBrowserPage();
+  const result = await scrapeSUUMO(page);
+
+  await page.browser().disconnect();
+  expect(result).toMatchSnapshot();
+}, browserTimeOut);

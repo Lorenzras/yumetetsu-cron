@@ -1,49 +1,32 @@
+import {Page} from 'puppeteer';
+import {cityLists as location} from '../../config';
 import {ScraperFn} from '../../types';
+import {perCity} from './perCity';
 
-export const scrapeSUUMO: ScraperFn = async (page, url) => {
+const suumoURL = 'https://suumo.jp/ms/chuko/tokai/';
 
-  await page.goto('https://suumo.jp/ms/chuko/aichi/city/');
-  await page.click('#sa02_sc201');
+/**
+ * スーモサイトのスクレイピング設定
+ * citylistから抽出した県の検索ページを開き、市毎の検索処理に情報を受け渡す
+ * @param page : ウェブページ
+ */
+export const scrapeSUUMO: ScraperFn = async (page: Page) => {
+  // citylistのkey(県)毎に処理を繰り返す
+  let idx = 0;
+  for (const [pref, cities] of Object.entries(location)) {
+    console.log(pref, cities);
 
-  await Promise.all([
-    page.click('.js-searchBtn'),
-    page.waitForNavigation(),
-  ]);
+    // メモ：networkidle2=最後に通信が発生してから500ms待つ
+    await page.goto(suumoURL, {waitUntil: 'networkidle2'});
+    const targetPref = pref === '愛知' ? 'aichi' : 'gifu';
 
-  await Promise.all([
-    page.click('.ui-icon--tabview'),
-    page.waitForNavigation(),
-  ]);
+    // 県(prefecture)を選択する
+    await Promise.all([
+      page.click(`.areabox--${targetPref}`),
+      page.waitForNavigation(),
+    ]);
 
-
-  const bukkenlists = await page.$$eval(
-    '.property_unit.property_unit--osusume2',
-    (el: any) => el.map((data: any) => {
-      console.log('data', data);
-      console.log(data.getElementsByClassName('property_unit-title_wide')[0]
-        .getElementsByTagName('a')[0].href);
-
-      return {
-        bukkenmei: data
-          .getElementsByClassName('property_unit-title_wide')[0].innerText,
-        kakaku: data.getElementsByClassName('dottable-value--2')[0].innerText,
-        shozaichi: data.getElementsByTagName('dd')[2].innerText,
-        menseki: data.getElementsByTagName('dd')[1].innerText,
-        URL: data.getElementsByClassName('property_unit-title_wide')[0]
-          .getElementsByTagName('a')[0].href,
-      };
-    }));
-
-
-  console.log(bukkenlists.length);
-
-  await page.waitForTimeout(2000);
-
-  // return bukkenlists;
-
-  return [
-    {
-
-    },
-  ];
+    await perCity(page, cities);
+    idx += 1;
+  }
 };
