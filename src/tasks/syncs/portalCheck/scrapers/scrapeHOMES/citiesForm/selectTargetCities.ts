@@ -13,7 +13,7 @@ export const selectTargetCities = async (
         if (isInCityList && !checkboxEl.is(':checked')) {
           checkboxEl.trigger('click');
           // Following is more efficient,
-          // but click event needs to triggered to fire background process.
+          // but click event needs to be triggered to fire background process.
           // checkboxEl.prop('checked', isInCityList)
         }
       });
