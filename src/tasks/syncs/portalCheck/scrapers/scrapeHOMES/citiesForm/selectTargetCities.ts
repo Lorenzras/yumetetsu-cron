@@ -5,7 +5,7 @@ export const selectTargetCities = async (
   cities: string[],
 ) => {
   await page.evaluate((cities)=>{
-    $('input[id*=\'city\'] ~ label')
+    $('input[id*="city"] ~ label')
       .each((_, item)=>{
         const isInCityList = cities.includes($(item).children('a').text());
         const checkboxEl = $(item).siblings('input');
