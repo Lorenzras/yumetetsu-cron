@@ -1,7 +1,10 @@
-import puppeteer, {Browser} from 'puppeteer';
+import {Browser} from 'puppeteer';
 import {logger} from '../../../utils';
 import {browserURL} from './config';
 import UserAgent from 'user-agents';
+import puppeteer from 'puppeteer-extra';
+import stealthPlugin from 'puppeteer-extra-plugin-stealth';
+puppeteer.use(stealthPlugin());
 
 interface OpenBrowserParam {
   loadImages?: boolean,
