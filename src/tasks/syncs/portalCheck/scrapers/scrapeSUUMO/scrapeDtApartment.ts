@@ -1,10 +1,20 @@
 import {Page} from 'puppeteer';
-import {IHouse} from '../../types';
+import {IHouse, IMansion} from '../../types';
 
 export const scrapeDtApartment = async (
   page: Page,
-  result?: IHouse[] | [],
-) : Promise<IHouse[]> => {
+  result?: IMansion[] | [],
+) : Promise<IMansion[]> => {
+  /*
+    処理
+  */
+  return [{
+    address: '仮',
+    floorArea: '仮',
+    layout: '仮',
+    price: '仮',
+    propertyName: '仮',
+    propertyUrl: '仮',
 
-
+  }];
 };

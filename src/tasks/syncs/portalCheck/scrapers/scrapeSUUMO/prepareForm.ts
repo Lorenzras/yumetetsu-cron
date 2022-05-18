@@ -29,11 +29,12 @@ export const prepareForm = async (
   // [,...args]に渡せば、アクセスが与えられます。
 
   await page.evaluate(
-    (cities: string[])=>{ //
+    (cities: string[])=>{ // 渡された変数を関数の引きすにすれば、使用出来ます。
       cities
-        .forEach((city) => { //
-          $(`input[name="sc"] ~ label:contains("${city}")`)
-            .trigger('click');
+        .forEach((city) => { // 各都市
+          // サイトはJQueryがあるので、それを利用します
+          $(`input[name="sc"] ~ label:contains("${city}")`) // ラベルのセレクター
+            .trigger('click'); // clickをラベルに発火させます。
         });
     },
     cities, // evaluate内のコードにcitiesにアクセスを与える
