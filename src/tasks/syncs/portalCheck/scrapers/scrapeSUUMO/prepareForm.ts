@@ -52,7 +52,7 @@ export const prepareForm = async (
   ]);
 
   // シンプル一覧表示をクリックする
-  logger.info('検索をクリックする');
+  logger.info('シンプル一覧表示をクリックする');
   await Promise.all([
     page.click('.ui-icon--tabview'),
     page.waitForNavigation(),
