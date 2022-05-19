@@ -12,9 +12,9 @@ export const scrapeDtApartment = async (
     address: '仮',
     floorArea: '仮',
     layout: '仮',
-    price: '仮',
+    price: 0,
     propertyName: '仮',
     propertyUrl: '仮',
-
+    rawPrice: '仮',
   }];
 };
