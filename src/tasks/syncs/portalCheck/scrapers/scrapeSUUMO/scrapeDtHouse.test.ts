@@ -1,13 +1,11 @@
 import {openMockBrowserPage} from '../../../../common/browser';
 import {browserTimeOut} from '../../../../common/browser/config';
-import {cityLists} from '../../config';
-import {prepareForm} from './prepareForm';
+import {scrapeDtHouse} from './scrapeDtHouse';
 
-/* https://suumo.jp/ms/chuko/aichi/city/ */
-
-test(('prepareForm'), async ()=>{
+test(('scrapeDtHouse'), async ()=>{
   const page = await openMockBrowserPage();
-  await prepareForm(page, cityLists.愛知);
+  const result = await scrapeDtHouse(page);
 
+  expect(result).toMatchSnapshot();
   page.browser().disconnect();
 }, browserTimeOut);

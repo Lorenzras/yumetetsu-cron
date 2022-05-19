@@ -1,6 +1,5 @@
 import {Page} from 'puppeteer';
 import {setTimeout} from 'timers';
-import {logger} from '../../../../../utils';
 import {scrapeDtApartment} from './scrapeDtApartment';
 
 const sleep = async (delay: number) => {
@@ -44,23 +43,9 @@ export const prepareForm = async (
 
   await page.click('#kki102');
 
-  // 検索をクリックする
-  logger.info('検索をクリックする');
-  await Promise.all([
-    page.click('.js-searchBtn'),
-    page.waitForNavigation(),
-  ]);
-
-  // シンプル一覧表示をクリックする
-  logger.info('シンプル一覧表示をクリックする');
-  await Promise.all([
-    page.click('.ui-icon--tabview'),
-    page.waitForNavigation(),
-  ]);
 
   // await sleep(3000);
 
-  // 裏に上と一緒ですが、複数ページを同時に動かすとき、以下は他ページの処理がブロックしません。
-  await page.waitForTimeout(3000);
+
   // スクレイピング処理
 };
