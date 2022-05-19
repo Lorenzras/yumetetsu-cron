@@ -3,7 +3,7 @@ import {cityLists as location} from '../../config';
 import {ScraperFn} from '../../types';
 import {perCity} from './perCity';
 
-const suumoURL = 'https://suumo.jp/ms/chuko/tokai/';
+const suumoURL = 'https://suumo.jp/ms/chuko/';
 
 /**
  * スーモサイトのスクレイピング設定
@@ -12,21 +12,15 @@ const suumoURL = 'https://suumo.jp/ms/chuko/tokai/';
  */
 export const scrapeSUUMO: ScraperFn = async (page: Page) => {
   // citylistのkey(県)毎に処理を繰り返す
-  let idx = 0;
   for (const [pref, cities] of Object.entries(location)) {
     console.log(pref, cities);
+    const targetPref = pref === '愛知' ?
+      suumoURL + 'aichi/city/' : suumoURL + 'gifu/city/';
 
+    // 検索サイトへ移動する
     // メモ：networkidle2=最後に通信が発生してから500ms待つ
-    await page.goto(suumoURL, {waitUntil: 'networkidle2'});
-    const targetPref = pref === '愛知' ? 'aichi' : 'gifu';
+    await page.goto(targetPref, {waitUntil: 'networkidle2'});
 
-    // 県(prefecture)を選択する
-    await Promise.all([
-      page.click(`.areabox--${targetPref}`),
-      page.waitForNavigation(),
-    ]);
-
-    await perCity(page, cities);
-    idx += 1;
+    await perCity(page, cities); // 市毎の検索処理
   }
 };

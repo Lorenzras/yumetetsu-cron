@@ -32,7 +32,7 @@ export interface IHouse extends IProperty {
   /** 土地面積 */
   lotArea: string,
   /** 建物面積 */
-  buildingArea: string,
+  buildingArea?: string,
 }
 
 export interface ILot extends IProperty {

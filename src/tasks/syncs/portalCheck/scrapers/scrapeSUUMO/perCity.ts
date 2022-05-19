@@ -1,5 +1,10 @@
 import {Page} from 'puppeteer';
+import {setTimeout} from 'timers';
 import {scrapeDtApartment} from './scrapeDtApartment';
+
+const sleep = async (delay: number) => {
+  return new Promise((resolve) => setTimeout(resolve, delay));
+};
 
 /**
  * 市毎のページを表示する
@@ -13,21 +18,26 @@ export const perCity = async (
   // 対象の市にすべてチェックを入れる
   for (const city of cities) {
     console.log('City', city);
-    await Promise.all([
-      page.$x(`//label[text()="${city}"]`)
-        .then(([cityLink]) => cityLink.click()),
-      page.waitForNavigation(),
-    ]);
+    await page.$x(`//label[contains(text(),"${city}")]`)
+      .then(([cityLink]) => cityLink.click());
+    await sleep(800);
   }
 
   // 3日以内に更新されたものに絞り込み
-  await page.click('.kki102');
+  await page.click('#kki102');
 
   // 検索をクリックする
   await Promise.all([
     page.click('.js-searchBtn'),
     page.waitForNavigation(),
   ]);
+
+  // シンプル一覧表示をクリックする
+  await Promise.all([
+    page.click('.ui-icon--tabview'),
+    page.waitForNavigation(),
+  ]);
+  await sleep(3000);
 
   // スクレイピング処理
 };
