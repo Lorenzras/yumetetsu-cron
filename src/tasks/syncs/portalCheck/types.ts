@@ -18,8 +18,10 @@ export interface IProperty {
   propertyType?: PropertyType,
   /** 物件名 */
   propertyName: string,
+  /** 価格生値 */
+  rawPrice: string,
   /** 価格 */
-  price: string,
+  price: number,
   /** 所在地 */
   address: string,
   /** リンク */
@@ -29,19 +31,19 @@ export interface IProperty {
 }
 
 export interface IHouse extends IProperty {
+  /** 土地面積生値 */
+  rawLotArea: string,
   /** 土地面積 */
-  lotArea: string,
+  lotArea: number,
   /** 建物面積 */
   buildingArea?: string,
 }
 
 export interface ILot extends IProperty {
+  /** 土地面積生値 */
+  rawLotArea: string,
   /** 土地面積 */
   lotArea: string,
-  /** 土地面積上限 */
-  lotAreaMax?: string,
-  /** 価格上限 */
-  priceMax?: string,
 }
 
 export interface IMansion extends IProperty {
