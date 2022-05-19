@@ -47,10 +47,10 @@ export interface ILot extends IProperty {
 }
 
 export interface IMansion extends IProperty {
-  /** 間取り */
-  layout: string,
+  /** 専有面積生値 */
+  rawFloorArea: string,
   /** 専有面積 */
-  floorArea: string,
+  floorArea: number,
 }
 
 /**
