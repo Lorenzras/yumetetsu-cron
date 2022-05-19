@@ -36,7 +36,7 @@ export const scrapeDtHouse = async (
 
   const newdatas = datas.map<IHouse>((val) => {
     const price = extractPrice(val.rawPrice);
-    const area = val.rawLotArea.substring(0, val.rawLotArea.indexOf('m2'));
+    const area = val.rawLotArea.split('m')[0];
     return {
       ...val,
       price: price,
