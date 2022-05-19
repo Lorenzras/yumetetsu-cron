@@ -41,6 +41,7 @@ export const scrapeHOMES = async (page: Page) => {
       ]);
 
       const result = await actions.handleScraper(page);
+
       await saveJSONToCSV(
         path.join(dirPortalCheck, 'data', pref + '.csv'),
         result,

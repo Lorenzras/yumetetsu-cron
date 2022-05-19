@@ -1,4 +1,5 @@
 import {Page} from 'puppeteer';
+import {extractNumber, extractPrice} from '../../../../../utils';
 import {ILot} from '../../types';
 
 export const scrapeDtLot = async (
@@ -7,12 +8,13 @@ export const scrapeDtLot = async (
 ) : Promise<ILot[]> => {
   const data = await page.$$eval('.mod-mergeBuilding--sale', (els) => {
     return els.map<ILot>((el) => {
-      const [price, priceMax] = $(el)
+      const [rawPrice] = $(el)
         .find('.priceLabel').text().split('〜', 2);
 
-      const location = $(el).find('.bukkenSpec td')
+      const location = $(el).find('.bukkenSpec .verticalTable td')
         .first().html().split('<br>');
 
+      console.log(location.at(-1));
       const propUrl: string = $(el).find('.prg-bukkenNameAnchor')
         .prop('href');
 
@@ -31,22 +33,30 @@ export const scrapeDtLot = async (
       }
 
 
-      const [lotArea, lotAreaMax] = areas;
+      const [rawLotArea] = areas;
       return {
         id: 'homes-' + propUrl.split('/')
           .reduce((accu, curr) => curr ? curr : accu),
         propertyName: $(el).find('.bukkenName').text(),
-        price,
-        priceMax,
-        address: location[location.length - 1],
-        lotArea,
-        lotAreaMax,
+        rawPrice: rawPrice,
+        price: 0,
+        address: location.at(-1)?.trim() || '',
+        lotArea: 0,
+        rawLotArea: rawLotArea,
         propertyUrl: propUrl,
       };
     });
   });
 
-  const cummulativeResult = [...(result ?? []), ...data];
+  const populateNumbers = data
+    .map(((item)=>({
+      ...item,
+      price: extractPrice(item.rawPrice),
+      lotArea: extractNumber(item.rawLotArea),
+    })));
+
+
+  const cummulativeResult = [...(result ?? []), ...populateNumbers];
 
   if (await page.$('.nextPage')) {
     await Promise.all([
