@@ -43,7 +43,7 @@ export interface ILot extends IProperty {
   /** 土地面積生値 */
   rawLotArea: string,
   /** 土地面積 */
-  lotArea: string,
+  lotArea: number,
 }
 
 export interface IMansion extends IProperty {

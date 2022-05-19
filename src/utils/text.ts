@@ -18,6 +18,6 @@ export const extractNumber = (str: string): number => {
  * @returns {number} 数字
  */
 export const extractPrice = (str: string, digits = 2): number => {
-  return +((kanji2number(str.replace('円', '')) / 10000)
+  return +((kanji2number(str.replace(/[円,]/g, '')) / 10000)
     .toFixed(digits)) || 0;
 };
