@@ -2,11 +2,8 @@ import {Page} from 'puppeteer';
 import {extractNumber, extractPrice} from '../../../../../utils';
 import {IHouse} from '../../types';
 
-export const scrapeDtHouse = async (
-  page: Page,
-  result?: IHouse[] | [],
-) : Promise<IHouse[]> => {
-  const data = await page.$$eval(
+export const scrapePage = async (page: Page) => {
+  return await page.$$eval(
     '.mod-mergeBuilding--sale',
     (els) => {
       const currDateTime = new Date().toISOString()
@@ -39,7 +36,13 @@ export const scrapeDtHouse = async (
       });
     },
   );
+};
 
+export const scrapeDtHouse = async (
+  page: Page,
+  result?: IHouse[] | [],
+) : Promise<IHouse[]> => {
+  const data = await scrapePage(page);
   const populateNumbers = data
     .map(((item)=>({
       ...item,

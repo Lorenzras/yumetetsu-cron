@@ -2,23 +2,20 @@ import {Page} from 'puppeteer';
 import {extractNumber, extractPrice} from '../../../../../utils';
 import {ILot} from '../../types';
 
-export const scrapeDtLot = async (
-  page: Page,
-  result?: ILot[],
-) : Promise<ILot[]> => {
+export const scrapePage = async (page: Page) => {
   const data = await page.$$eval('.mod-mergeBuilding--sale', (els) => {
     return els.map<ILot>((el) => {
-      const [rawPrice] = $(el)
-        .find('.priceLabel').text().split('〜', 2);
+      const rawPrice = $(el)
+        .find('.priceLabel').text();
 
-      const location = $(el).find('.bukkenSpec .verticalTable td')
-        .first().html().split('<br>');
+      const address = $(el)
+        .find('.bukkenSpec .verticalTable th:contains(所在地) ~ td')
+        .html().split('<br>').at(-1)?.trim() || '';
 
-      console.log(location.at(-1));
       const propUrl: string = $(el).find('.prg-bukkenNameAnchor')
         .prop('href');
 
-      let areas: string[] = []; // will store lot area and floor area
+      let areas: string[] = [];
       /* Some properties have their details listed at the bottom of the card */
       const unitSummary = $(el).find('.unitSummary');
 
@@ -40,7 +37,7 @@ export const scrapeDtLot = async (
         propertyName: $(el).find('.bukkenName').text(),
         rawPrice: rawPrice,
         price: 0,
-        address: location.at(-1)?.trim() || '',
+        address: address,
         lotArea: 0,
         rawLotArea: rawLotArea,
         propertyUrl: propUrl,
@@ -48,15 +45,24 @@ export const scrapeDtLot = async (
     });
   });
 
-  const populateNumbers = data
-    .map(((item)=>({
-      ...item,
-      price: extractPrice(item.rawPrice),
-      lotArea: extractNumber(item.rawLotArea),
-    })));
+  return data
+    .map(((item)=>{
+      console.log(item.rawPrice);
+      return ({
+        ...item,
+        price: extractPrice(item.rawPrice.split('円')[0]),
+        lotArea: extractNumber(item.rawLotArea),
+      });
+    }));
+};
 
+export const scrapeDtLot = async (
+  page: Page,
+  result?: ILot[],
+) : Promise<ILot[]> => {
+  const data = await scrapePage(page);
 
-  const cummulativeResult = [...(result ?? []), ...populateNumbers];
+  const cummulativeResult = [...(result ?? []), ...data];
 
   if (await page.$('.nextPage')) {
     await Promise.all([

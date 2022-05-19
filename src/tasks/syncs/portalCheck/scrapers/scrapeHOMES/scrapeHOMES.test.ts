@@ -6,6 +6,6 @@ test('HOMES', async () => {
   const page = await openBrowserPage();
   const result = await scrapeHOMES(page);
 
-  page.browser().disconnect();
+  page.browser().close();
   expect(result).toMatchSnapshot();
 }, browserTimeOut);

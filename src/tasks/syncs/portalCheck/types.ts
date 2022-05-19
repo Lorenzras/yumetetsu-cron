@@ -8,7 +8,7 @@ export type PropertyActions = Array<{
   url: string,
   type: PropertyType,
   handleScraper: (page: Page) => Promise<IProperty[]>,
-  submitSelector: string
+  submitSelector?: string
 }>
 
 export interface IProperty {
