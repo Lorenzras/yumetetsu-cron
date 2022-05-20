@@ -7,7 +7,10 @@ const submitSelector = '.prg-goToList:not(:disabled)';
 export const changePublishedRange = async (page: Page) => {
   await Promise.all([
     // page.waitForResponse((r) => r.url() === 'https://www.homes.co.jp/_ajax/kksearch/' && r.status() === 200),
-    page.waitForSelector('#prg-loadingIcon', {visible: true}),
+    page.waitForSelector(
+      '#prg-loadingIcon',
+      {visible: true, timeout: 2000})
+      .catch(()=>logger.error('Loading icon did not appear')),
     page.select('#cond_newdate', '3'),
   ]);
 

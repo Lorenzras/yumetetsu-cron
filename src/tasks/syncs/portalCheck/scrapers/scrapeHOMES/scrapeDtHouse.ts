@@ -43,6 +43,7 @@ export const scrapeDtHouse = async (
   result?: IHouse[] | [],
 ) : Promise<IHouse[]> => {
   const data = await scrapePage(page);
+
   const populateNumbers = data
     .map<IHouse>(((item)=>({
     ...item,
@@ -59,6 +60,7 @@ export const scrapeDtHouse = async (
     ]);
     return await scrapeDtHouse(page, cummulativeResult);
   }
+
 
   return cummulativeResult;
 };
