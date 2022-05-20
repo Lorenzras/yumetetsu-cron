@@ -1,22 +1,21 @@
 import {Page} from 'puppeteer';
+import {extractNumber, extractPrice} from '../../../../../utils';
 import {ILot} from '../../types';
 
-export const scrapeDtLot = async (
-  page: Page,
-  result?: ILot[],
-) : Promise<ILot[]> => {
+export const scrapePage = async (page: Page) => {
   const data = await page.$$eval('.mod-mergeBuilding--sale', (els) => {
     return els.map<ILot>((el) => {
-      const [price, priceMax] = $(el)
-        .find('.priceLabel').text().split('〜', 2);
+      const rawPrice = $(el)
+        .find('.priceLabel').text();
 
-      const location = $(el).find('.bukkenSpec td')
-        .first().html().split('<br>');
+      const address = $(el)
+        .find('.bukkenSpec .verticalTable th:contains(所在地) ~ td')
+        .html().split('<br>').at(-1)?.trim() || '';
 
       const propUrl: string = $(el).find('.prg-bukkenNameAnchor')
         .prop('href');
 
-      let areas: string[] = []; // will store lot area and floor area
+      let areas: string[] = [];
       /* Some properties have their details listed at the bottom of the card */
       const unitSummary = $(el).find('.unitSummary');
 
@@ -31,20 +30,37 @@ export const scrapeDtLot = async (
       }
 
 
-      const [lotArea, lotAreaMax] = areas;
+      const [rawLotArea] = areas;
       return {
         id: 'homes-' + propUrl.split('/')
           .reduce((accu, curr) => curr ? curr : accu),
         propertyName: $(el).find('.bukkenName').text(),
-        price,
-        priceMax,
-        address: location[location.length - 1],
-        lotArea,
-        lotAreaMax,
+        rawPrice: rawPrice,
+        price: 0,
+        address: address,
+        lotArea: 0,
+        rawLotArea: rawLotArea,
         propertyUrl: propUrl,
       };
     });
   });
+
+  return data
+    .map(((item)=>{
+      console.log(item.rawPrice);
+      return ({
+        ...item,
+        price: extractPrice(item.rawPrice.split('円')[0]),
+        lotArea: extractNumber(item.rawLotArea),
+      });
+    }));
+};
+
+export const scrapeDtLot = async (
+  page: Page,
+  result?: ILot[],
+) : Promise<ILot[]> => {
+  const data = await scrapePage(page);
 
   const cummulativeResult = [...(result ?? []), ...data];
 
