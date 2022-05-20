@@ -40,21 +40,4 @@ export interface IMansion extends IProperty {
   面積: number,
 }
 
-/**
- * @deprecated in favor of more specific typings
- */
-export interface ScrapeItem {
-  propertyType?: PropertyType,
-  propertyName: string,
-  price: string,
-  lotArea?: string,
-  buildingArea?: string,
-  floorArea?: string,
-  address: string,
-  propertyUrl: string,
-}
 
-/**
- * @deprecated in favor of more specific typings
- */
-export type ScraperFn = (page: Page) => Promise< ScrapeItem[]>
