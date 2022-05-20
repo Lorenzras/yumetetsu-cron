@@ -1,5 +1,21 @@
 import {kanji2number} from '@geolonia/japanese-numeral';
 
+type NumHash = {
+  [key: string]: number;
+}
+
+const jaNumbers : NumHash = {
+  '兆': 1000000000000,
+  '億': 100000000,
+  '万': 10000,
+};
+
+const jaUnits = ['億', '千万', '百万', '万', '千', '百', ''];
+
+export const countLeadingZero = (strWithZero: string) => {
+  return (strWithZero.match(/^0+/) || [''])[0].length;
+};
+
 export const decodeToSJIS = (buffer: Buffer) => {
   const decoder = new TextDecoder('shift_jis');
   return decoder.decode(buffer);
@@ -11,9 +27,16 @@ export const extractNumber = (str: string): number => {
 };
 
 const getCleanNumStr = (dirtyStr: string) => {
-  const jaUnits = ['億', '万', '千'];
-  const cleanStr = dirtyStr.replace(/[円,]/g, '');
-  const decimal = cleanStr.indexOf('.');
+  let cleanStr = dirtyStr.replace(/[円,]/g, '');
+  const decimals = cleanStr.split('.');
+
+  console.log('decimals', decimals);
+
+  if (decimals.length === 1) return cleanStr;
+
+  cleanStr = decimals.join('');
+
+  console.log('cleanStr', cleanStr);
 
 
   return cleanStr;
