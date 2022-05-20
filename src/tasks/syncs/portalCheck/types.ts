@@ -12,45 +12,32 @@ export type PropertyActions = Array<{
 }>
 
 export interface IProperty {
-  /** [site]-[propertyId] primary key if ever data will be saved to database. */
-  id?: string,
-  /** 物件種別 */
-  propertyType?: PropertyType,
-  /** 物件名 */
-  propertyName: string,
-  /** 価格生値 */
-  rawPrice: string,
-  /** 価格 */
-  price: number,
-  /** 所在地 */
-  address: string,
-  /** リンク */
-  propertyUrl: string,
-  /** 取得した時点 */
-  retrievedDate?: string
+  物件番号?: string,
+  物件種別?: PropertyType,
+  物件名: string,
+  価格生値: string,
+  価格: number,
+  所在地: string,
+  リンク: string,
+  取得した日時?: string
 }
 
 export interface IHouse extends IProperty {
-  /** 土地面積生値 */
-  rawLotArea: string,
-  /** 土地面積 */
-  lotArea: number,
+  土地面積生値: string,
+  土地面積: number,
   /** 建物面積 */
-  buildingArea?: string,
+  建物面積?: string,
 }
 
 export interface ILot extends IProperty {
-  /** 土地面積生値 */
-  rawLotArea: string,
-  /** 土地面積 */
-  lotArea: number,
+  土地面積生値: string,
+  土地面積: number,
 }
 
 export interface IMansion extends IProperty {
-  /** 専有面積生値 */
-  rawFloorArea: string,
-  /** 専有面積 */
-  floorArea: number,
+  間取り: string,
+  専有面積生値: string,
+  面積: number,
 }
 
 /**
