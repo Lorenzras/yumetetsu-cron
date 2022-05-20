@@ -33,7 +33,6 @@ export interface ILot extends IProperty {
 }
 
 export interface IMansion extends IProperty {
-  間取り: string,
   専有面積: string,
   比較用専有面積: number,
 }
