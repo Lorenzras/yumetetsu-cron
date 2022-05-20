@@ -51,7 +51,6 @@ const getCleanJaPrice = (
       computedDecimal += +('.' + val.replace(unit, '')) * multiplyer;
     });
     cleanStr = splitByDecimal.join('');
-    console.log(cleanStr);
   }
 
   return {
