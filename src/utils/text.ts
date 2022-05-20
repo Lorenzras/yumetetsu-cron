@@ -27,16 +27,12 @@ export const extractNumber = (str: string): number => {
 };
 
 const getCleanNumStr = (dirtyStr: string) => {
-  let cleanStr = dirtyStr.replace(/[円,]/g, '');
-  const decimals = cleanStr.split('.');
+  const cleanStr = dirtyStr.replace(/[円,]/g, '');
+  const isWithDecimal = cleanStr.includes('.');
 
-  console.log('decimals', decimals);
+  if (!isWithDecimal) return cleanStr;
 
-  if (decimals.length === 1) return cleanStr;
-
-  cleanStr = decimals.join('');
-
-  console.log('cleanStr', cleanStr);
+  /** Todo: 小数点がある時の処理 */
 
 
   return cleanStr;
