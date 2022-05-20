@@ -10,12 +10,12 @@ export const scrapeContacts = async (page: Page, data: IProperty[]) => {
 
   try {
     for (const [idx, val] of data.entries()) {
-      await page.goto(val.リンク);
       let isLotPage = false;
-
+      console.log(val.リンク, 'link');
+      await newPage.goto(val.リンク);
       await Promise.race([
-        page.waitForSelector('p.attention a'),
-        page.waitForNetworkIdle(),
+        newPage.waitForSelector('p.attention a'),
+        newPage.waitForNetworkIdle(),
       ]).catch(()=> isLotPage = true);
 
       const companyContact = isLotPage ?
@@ -24,7 +24,7 @@ export const scrapeContacts = async (page: Page, data: IProperty[]) => {
       result[idx] = {...result[idx], ...companyContact};
     }
 
-    newPage.close();
+    await newPage.close();
   } catch {
     logger.info('Failed to get contact');
     return result;
