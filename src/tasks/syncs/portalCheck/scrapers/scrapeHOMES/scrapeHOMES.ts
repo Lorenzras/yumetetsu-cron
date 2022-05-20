@@ -50,7 +50,7 @@ export const scrapeHOMES = async (page: Page) => {
         path.join(
           dirPortalCheck,
           'data',
-          `${kintoneAppId}-${actions.type}-${pref}.csv'`),
+          `${kintoneAppId}-${actions.type}-${pref}.csv`),
         result,
       );
     }
