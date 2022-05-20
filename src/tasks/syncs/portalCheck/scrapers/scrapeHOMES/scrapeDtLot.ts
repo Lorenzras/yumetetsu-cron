@@ -32,26 +32,25 @@ export const scrapePage = async (page: Page) => {
 
       const [rawLotArea] = areas;
       return {
-        id: 'homes-' + propUrl.split('/')
+        物件番号: 'homes-' + propUrl.split('/')
           .reduce((accu, curr) => curr ? curr : accu),
-        propertyName: $(el).find('.bukkenName').text(),
-        rawPrice: rawPrice,
-        price: 0,
-        address: address,
-        lotArea: 0,
-        rawLotArea: rawLotArea,
-        propertyUrl: propUrl,
+        物件名: $(el).find('.bukkenName').text(),
+        販売価格: rawPrice,
+        比較用価格: 0,
+        所在地: address,
+        比較用土地面積: 0,
+        土地面積: rawLotArea,
+        リンク: propUrl,
       };
     });
   });
 
   return data
     .map(((item)=>{
-      console.log(item.rawPrice);
       return ({
         ...item,
-        price: extractPrice(item.rawPrice.split('円')[0]),
-        lotArea: extractNumber(item.rawLotArea),
+        比較用価格: extractPrice(item.販売価格.split('円')[0]),
+        比較用土地面積: extractNumber(item.土地面積),
       });
     }));
 };
