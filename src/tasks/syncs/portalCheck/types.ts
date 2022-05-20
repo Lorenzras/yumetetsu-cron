@@ -19,7 +19,9 @@ export interface IProperty {
   比較用価格: number,
   所在地: string,
   リンク: string,
-  取得した日時?: string
+  取得した日時?: string,
+  掲載企業TEL?:string,
+  掲載企業?:string,
 }
 
 export interface IHouse extends IProperty {

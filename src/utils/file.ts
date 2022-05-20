@@ -24,8 +24,12 @@ export const getCSVFiles = (dir: string, appId: string) => {
  */
 export const saveCSV = (filePath: string, data: string) => {
   fs.writeFileSync(filePath, '');
+
   const fd = fs.openSync( filePath, 'w');
-  const buff = iconv.encode( data, 'Shift_JIS' );
+  const buff = iconv.encode(
+    data.replace(/²/g, '2'),
+    'Shift_JIS',
+  );
 
   fs.writeSync( fd, buff);
   fs.close(fd);
