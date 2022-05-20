@@ -1,9 +1,9 @@
 import {Page} from 'puppeteer';
-import {IHouse} from '../../types';
-import {scrapeDtHouse} from './scrapeDtHouse';
+import {IProperty} from '../../types';
 
-export const scrapeLoop = async (page: Page) => {
-  let result: IHouse[] | [] = [];
+export const scrapeLoop =
+async (page: Page, func:(page: Page) => Promise<IProperty[]>) => {
+  let result: IProperty[] | [] = [];
 
   /* const nextButton = await page.$$eval('.pagination-parts', (list) =>{
     return list.filter((item) => $(item).text() === '次へ').length;
@@ -14,7 +14,7 @@ export const scrapeLoop = async (page: Page) => {
   do {
     nextButton = await page.$x(`//a[contains(text(), "次へ")]`)
       .then(([next]) => next);
-    result = [...result, ...await scrapeDtHouse(page)];
+    result = [...result, ...await func(page)];
     // 次へをクリックする
     if (nextButton) {
       await Promise.all([

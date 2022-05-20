@@ -7,7 +7,7 @@ const sleep = async (delay: number) => {
 };
 
 /**
- * 市毎のページを表示する
+ * 検索条件を設定する
  * @param page 対象の県の初期ページ
  * @param cities 対象の県に含まれる検索対象の市の配列
  */
@@ -40,12 +40,7 @@ export const prepareForm = async (
   );
 
   // 3日以内に更新されたものに絞り込み
-
   await page.click('#kki102');
 
-
   // await sleep(3000);
-
-
-  // スクレイピング処理
 };
