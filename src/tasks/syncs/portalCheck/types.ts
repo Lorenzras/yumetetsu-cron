@@ -24,6 +24,8 @@ export interface IProperty {
   掲載企業?:string,
 }
 
+export type TCompanyContact = Pick<IProperty, '掲載企業TEL' | '掲載企業'>
+
 export interface IHouse extends IProperty {
   土地面積: string,
   比較用土地面積: number,
