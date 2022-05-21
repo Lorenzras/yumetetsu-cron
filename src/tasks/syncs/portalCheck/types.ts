@@ -4,12 +4,13 @@ import {propertyTypes} from './config';
 
 export type PropertyType = typeof propertyTypes[number]
 
-export type PropertyActions = Array<{
+export interface IPropertyAction {
   url: string,
   type: PropertyType,
   handleScraper: (page: Page) => Promise<IProperty[]>,
   submitSelector?: string
-}>
+}
+export type PropertyActions = Array<IPropertyAction>
 
 export interface IProperty {
   物件番号?: string,
