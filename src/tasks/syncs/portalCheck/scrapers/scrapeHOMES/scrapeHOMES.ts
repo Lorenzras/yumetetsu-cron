@@ -10,6 +10,8 @@ import path from 'path';
 import {scrapeDtMansion} from './scrapeDtMansion';
 import {scrapeDtLot} from './scrapeDtLot';
 
+import {scrapeContacts} from './scrapeContact/scrapeContacts';
+
 
 const propertyActions: PropertyActions = [
   {
@@ -44,7 +46,10 @@ export const scrapeHOMES = async (page: Page) => {
 
       await prepareForm(page, cities);
 
-      const result = await actions.handleScraper(page);
+      const result = await scrapeContacts(
+        page,
+        await actions.handleScraper(page),
+      );
 
       await saveJSONToCSV(
         path.join(
