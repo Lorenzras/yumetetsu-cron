@@ -1,5 +1,7 @@
+import {dirPortalCheck} from './../../config';
+import path from 'path';
 import {Page} from 'puppeteer';
-import {extractNumber, extractPrice} from '../../../../../utils';
+import {extractNumber, extractPrice, logger} from '../../../../../utils';
 import {ILot} from '../../types';
 
 export const scrapePage = async (page: Page) => {
@@ -45,6 +47,8 @@ export const scrapePage = async (page: Page) => {
     });
   });
 
+  logger.info(`Scraped lot page ${data.length}`);
+
   return data
     .map(((item)=>{
       return ({
@@ -64,12 +68,18 @@ export const scrapeDtLot = async (
   const cummulativeResult = [...(result ?? []), ...data];
 
   if (await page.$('.nextPage')) {
+    logger.info(`Scrape Lot => Clicking nextPage ${page.url()}`);
+
     await Promise.all([
-      page.click('.nextPage'),
       page.waitForNavigation(),
+      page.evaluate(()=>{
+        $('.nextPage a')[0].click(); // force click next
+      }),
     ]);
+    logger.info(`Scrape Lot => Goto nextPage success. `);
     return await scrapeDtLot(page, cummulativeResult);
   }
 
+  logger.info(`Done scraping lot ${cummulativeResult.length}`);
   return cummulativeResult;
 };
