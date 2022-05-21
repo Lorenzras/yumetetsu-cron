@@ -1,3 +1,4 @@
+import {logger} from './../../../../../utils/logger';
 import {Page} from 'puppeteer';
 import {extractNumber, extractPrice} from '../../../../../utils';
 import {IHouse} from '../../types';
@@ -42,7 +43,10 @@ export const scrapeDtHouse = async (
   page: Page,
   result?: IHouse[] | [],
 ) : Promise<IHouse[]> => {
+  logger.info(`Scraping kodate. `);
   const data = await scrapePage(page);
+
+  logger.info(`Scraped page ${data.length} `);
 
   const populateNumbers = data
     .map<IHouse>(((item)=>({
@@ -53,14 +57,19 @@ export const scrapeDtHouse = async (
 
   const cummulativeResult = [...(result ?? []), ...populateNumbers];
 
+  logger.info(`Scraped kodate cumm ${cummulativeResult.length} `);
+
   if (await page.$('.nextPage')) {
+    logger.info('Clicking next page.');
     await Promise.all([
-      page.click('.nextPage'),
       page.waitForNavigation(),
+      page.click('.nextPage'),
     ]);
+
+
     return await scrapeDtHouse(page, cummulativeResult);
   }
 
-
+  logger.info('Done scraping kodate');
   return cummulativeResult;
 };

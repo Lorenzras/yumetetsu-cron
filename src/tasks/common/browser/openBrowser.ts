@@ -9,7 +9,10 @@ puppeteer.use(stealthPlugin());
 interface OpenBrowserParam {
   loadImages?: boolean,
   slowMo?: number
+  headless?: boolean,
 }
+
+export const getExtraPuppeteer = ()=> puppeteer;
 
 const getPage = async (browser: Browser) => {
   const pages = await browser.pages();
@@ -20,12 +23,13 @@ logger.info(`Running in ${process.env.NODE_ENV}`);
 
 export const launchBrowser = ({
   slowMo = 0,
+  headless = process.env.BROWSER_TYPE === 'HEADLESS',
 }) => {
   logger.info(`Launching browser. `);
   return puppeteer.launch({
     slowMo,
     defaultViewport: null,
-    headless: process.env.BROWSER_TYPE === 'HEADLESS',
+    headless: headless,
   });
 };
 
@@ -33,6 +37,7 @@ export const openBrowserPage = async (opt?: OpenBrowserParam) => {
   logger.info('Opening page.');
   const browser = await launchBrowser({
     slowMo: opt?.slowMo,
+    headless: opt?.headless,
   });
   const page = await getPage(browser);
 

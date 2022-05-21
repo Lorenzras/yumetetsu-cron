@@ -107,8 +107,8 @@ export const extractTel = (dirtySource: string) => {
     dirtySource,
     {
       defaultCountry: 'JP',
-    } );
-  console.log(result);
+    },
+  );
   return result
     .map((i) => parsePhoneNumber(i.number.number)
       .formatNational(),

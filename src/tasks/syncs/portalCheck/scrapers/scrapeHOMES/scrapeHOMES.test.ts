@@ -3,7 +3,7 @@ import {browserTimeOut} from '../../../../common/browser/config';
 import {scrapeHOMES} from './scrapeHOMES';
 
 test('HOMES', async () => {
-  const page = await openBrowserPage();
+  const page = await openBrowserPage({headless: true});
   const result = await scrapeHOMES(page);
 
   page.browser().close();

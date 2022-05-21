@@ -4,11 +4,14 @@ import {cityLists as location,
   kintoneAppId} from '../../config';
 import {prepareForm} from './citiesForm/prepareForm';
 import {PropertyActions} from '../../types';
-import {scrapeDtHouse} from './scrapeDtHouse';
 import {logger, saveJSONToCSV} from '../../../../../utils';
 import path from 'path';
+
 import {scrapeDtMansion} from './scrapeDtMansion';
 import {scrapeDtLot} from './scrapeDtLot';
+import {scrapeDtHouse} from './scrapeDtHouse';
+
+import {scrapeContacts} from './scrapeContact/scrapeContacts';
 
 import {scrapeContacts} from './scrapeContact/scrapeContacts';
 

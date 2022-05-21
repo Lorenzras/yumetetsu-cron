@@ -1,6 +1,6 @@
 import {IMansion} from '../../types';
 import {Page} from 'puppeteer';
-import {extractNumber, extractPrice} from '../../../../../utils';
+import {extractNumber, extractPrice, logger} from '../../../../../utils';
 
 export const scrapeDtMansion = async (
   page: Page,
@@ -57,5 +57,6 @@ export const scrapeDtMansion = async (
     return await scrapeDtMansion(page, cummulativeResult);
   }
 
+  logger.info('Done scraping mansion');
   return cummulativeResult;
 };

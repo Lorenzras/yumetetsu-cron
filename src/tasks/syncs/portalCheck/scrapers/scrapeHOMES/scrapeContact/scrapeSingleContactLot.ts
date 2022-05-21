@@ -1,3 +1,4 @@
+import {logger} from './../../../../../../utils/logger';
 import {Page} from 'puppeteer';
 import {extractTel} from '../../../../../../utils';
 import {TCompanyContact} from '../../../types';
@@ -8,16 +9,17 @@ export const scrapeSingleContactLot = async (page: Page) => {
     掲載企業TEL: '',
   };
 
-  await page.waitForSelector('.inquireTell');
+  const mainSelector = '.realestate .inquire';
+
+
   const dirtyResult = await page.$eval(
-    '.inquireTell',
+    mainSelector,
     (el) : TCompanyContact => {
-      const companyName = $(el).find('p.name').text();
       const companyTel = $(el).find('span.tellNumber').text();
-      const alternateTel = $(el).find('ul.annotation').text();
+      const alternateTel = $(el).find('ul.annotation li').eq(1).text();
 
       return {
-        掲載企業: companyName,
+        掲載企業: $(el).find('th:contains(会社名) ~ td').text(),
         掲載企業TEL: alternateTel ? alternateTel : companyTel,
       };
     },

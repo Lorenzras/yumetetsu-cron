@@ -3,33 +3,69 @@ import {logger} from '../../../../../../utils';
 import {IProperty} from '../../../types';
 import {scrapeSingleContact} from './scrapeSingleContact';
 import {scrapeSingleContactLot} from './scrapeSingleContactLot';
+import {produce} from 'immer';
+
+
+export const getContactByLink = async (page: Page, url: string) => {
+  let isLotPage = false;
+  try {
+    await page.goto(url, {waitUntil: 'domcontentloaded'});
+    logger.info('link : ' + url);
+
+    await Promise.race([
+      page.waitForSelector('p.attention a')
+        .then(()=> isLotPage = false),
+      page.waitForSelector('.realestate .inquire')
+        .then(()=>isLotPage = true),
+    ]);
+
+    return isLotPage ?
+      await scrapeSingleContactLot(page) :
+      await scrapeSingleContact(page);
+  } catch {
+    logger.error(`getContactByLink Failed ${page.url()}`);
+  }
+
+  return {
+    掲載企業: '',
+    掲載企業TEL: '',
+  };
+};
 
 export const scrapeContacts = async (page: Page, data: IProperty[]) => {
-  const newPage = await page.browserContext().newPage();
-  const result = [...data];
+  // const newPage = await page.browserContext().newPage();
+  let nextState: IProperty[] = [...data];
 
   try {
     for (const [idx, val] of data.entries()) {
-      let isLotPage = false;
-      console.log(val.リンク, 'link');
-      await newPage.goto(val.リンク);
+      /* let isLotPage = false;
+      await page.goto(val.リンク, {waitUntil: 'domcontentloaded'});
+
+      logger.info('link : ' + val.リンク);
+
       await Promise.race([
-        newPage.waitForSelector('p.attention a'),
-        newPage.waitForNetworkIdle(),
-      ]).catch(()=> isLotPage = true);
+        page.waitForSelector('p.attention a').then(()=> isLotPage = false),
+        page.waitForSelector('.realestate .inquire').then(()=>isLotPage = true),
+      ]).catch(()=> logger.error('Failed'));
 
-      const companyContact = isLotPage ?
-        await scrapeSingleContactLot(newPage) :
-        await scrapeSingleContact(newPage);
-      result[idx] = {...result[idx], ...companyContact};
+      logger.info(
+        'navigating to ' + isLotPage ? ' lot page ' : ' ordinary page.');
+
+      const {掲載企業, 掲載企業TEL} = isLotPage ?
+        await scrapeSingleContactLot(page) :
+        await scrapeSingleContact(page); */
+
+      const {掲載企業, 掲載企業TEL} = await getContactByLink(page, val.リンク);
+
+      nextState = produce(nextState, (draft: IProperty[]) => {
+        draft[idx].掲載企業 = 掲載企業;
+        draft[idx].掲載企業TEL = 掲載企業TEL;
+      });
     }
-
-    await newPage.close();
   } catch {
-    logger.info('Failed to get contact');
-    return result;
+    logger.error('Failed to get contact.');
+    return nextState;
   }
 
-  console.log(result);
-  return result;
+  return nextState;
 };
