@@ -8,64 +8,35 @@ export type PropertyActions = Array<{
   url: string,
   type: PropertyType,
   handleScraper: (page: Page) => Promise<IProperty[]>,
-  submitSelector: string
+  submitSelector?: string
 }>
 
 export interface IProperty {
-  /** [site]-[propertyId] primary key if ever data will be saved to database. */
-  id?: string,
-  /** 物件種別 */
-  propertyType?: PropertyType,
-  /** 物件名 */
-  propertyName: string,
-  /** 価格 */
-  price: string,
-  /** 所在地 */
-  address: string,
-  /** リンク */
-  propertyUrl: string,
-  /** 取得した時点 */
-  retrievedDate?: string
+  物件番号?: string,
+  物件種別?: PropertyType,
+  物件名: string,
+  販売価格: string,
+  比較用価格: number,
+  所在地: string,
+  リンク: string,
+  取得した日時?: string,
+  掲載企業TEL?:string,
+  掲載企業?:string,
 }
 
 export interface IHouse extends IProperty {
-  /** 土地面積 */
-  lotArea: string,
-  /** 建物面積 */
-  buildingArea: string,
+  土地面積: string,
+  比較用土地面積: number,
 }
 
 export interface ILot extends IProperty {
-  /** 土地面積 */
-  lotArea: string,
-  /** 土地面積上限 */
-  lotAreaMax?: string,
-  /** 価格上限 */
-  priceMax?: string,
+  土地面積: string,
+  比較用土地面積: number,
 }
 
 export interface IMansion extends IProperty {
-  /** 間取り */
-  layout: string,
-  /** 専有面積 */
-  floorArea: string,
+  専有面積: string,
+  比較用専有面積: number,
 }
 
-/**
- * @deprecated in favor of more specific typings
- */
-export interface ScrapeItem {
-  propertyType?: PropertyType,
-  propertyName: string,
-  price: string,
-  lotArea?: string,
-  buildingArea?: string,
-  floorArea?: string,
-  address: string,
-  propertyUrl: string,
-}
 
-/**
- * @deprecated in favor of more specific typings
- */
-export type ScraperFn = (page: Page) => Promise< ScrapeItem[]>

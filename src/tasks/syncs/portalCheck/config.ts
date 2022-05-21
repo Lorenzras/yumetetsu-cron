@@ -1,9 +1,11 @@
 export const dirPortalCheck = __dirname;
 
+export const kintoneAppId = 0;
+
 export const propertyTypes = ['中古マンション', '中古戸建', '土地'] as const;
 
 export const cityLists = {
-  愛知: [
+  愛知県: [
     '豊川市',
     '豊橋市',
     '蒲郡市',
@@ -21,7 +23,7 @@ export const cityLists = {
     '名古屋市中村区',
     '名古屋市熱田区',
   ],
-  岐阜: [
+  岐阜県: [
     '大垣市',
   ],
 };
