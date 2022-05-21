@@ -1,13 +1,13 @@
 import {Page} from 'puppeteer';
 import {extractPrice} from '../../../../../utils';
-import {IHouse} from '../../types';
+import {ILot} from '../../types';
 
-export const scrapeDtHouse = async (
+export const scrapeDtLot = async (
   page: Page,
-): Promise<IHouse[] | []> => {
-  let datas: IHouse[] = await page.$$eval('.property_unit--osusume2',
+): Promise<ILot[] | []> => {
+  let datas: ILot[] = await page.$$eval('.property_unit--osusume2',
     (list) => {
-      return list.map<IHouse>((el) => {
+      return list.map<ILot>((el) => {
         const title = $(el).find('.property_unit-title_wide').text().trim();
         const url = 'https://suumo.jp' + $(el).find('.property_unit-title_wide a').attr('href');
         const rawPrice = $(el).find('.dottable-value--2').text().trim();
@@ -15,7 +15,7 @@ export const scrapeDtHouse = async (
         const rawArea = $(el).find('dt:contains("土地面積") ~ dd').text();
 
         return {
-          物件種別: '中古戸建',
+          物件種別: '土地',
           物件名: title,
           リンク: url,
           所在地: address,
@@ -27,7 +27,7 @@ export const scrapeDtHouse = async (
       });
     });
 
-  datas = datas.map<IHouse>((val) => {
+  datas = datas.map<ILot>((val) => {
     const price = extractPrice(val.販売価格.split('円')[0]);
     const area = val.土地面積.split('m')[0];
     return {
