@@ -1,7 +1,7 @@
 
 import {Page} from 'puppeteer';
 import {logger} from '../../../../../utils';
-import selectors from './selectors';
+import {selectors} from './selectors';
 
 interface Options {
   chkStatus : boolean,

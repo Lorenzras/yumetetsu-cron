@@ -1,6 +1,6 @@
 import {Page} from 'puppeteer';
 import {getSelectOptions} from '../../../browser/helpers/content';
-import selectors from './selectors';
+import {selectors} from './selectors';
 import {logger} from '../../../../../utils';
 
 export const getOptionsStore = async ( page: Page) => {
