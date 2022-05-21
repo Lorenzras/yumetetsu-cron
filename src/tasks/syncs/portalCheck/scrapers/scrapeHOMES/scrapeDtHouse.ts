@@ -22,16 +22,16 @@ export const scrapePage = async (page: Page) => {
         const rawPrice = $(el).find('.priceLabel').text();
 
         return {
-          id: 'homes-' + propUrl.split('/')
+          物件番号: 'homes-' + propUrl.split('/')
             .reduce((accu, curr) => curr ? curr : accu),
-          retrievedDate: currDateTime,
-          propertyName: $(el).find('.bukkenName').text(),
-          rawPrice: rawPrice,
-          price: 0,
-          propertyUrl: propUrl,
-          rawLotArea: lotArea,
-          lotArea: 0,
-          address: location[location.length - 1],
+          取得した日時: currDateTime,
+          物件名: $(el).find('.bukkenName').text(),
+          販売価格: rawPrice,
+          比較用価格: 0,
+          リンク: propUrl,
+          土地面積: lotArea,
+          比較用土地面積: 0,
+          所在地: location[location.length - 1],
         };
       });
     },
@@ -43,12 +43,13 @@ export const scrapeDtHouse = async (
   result?: IHouse[] | [],
 ) : Promise<IHouse[]> => {
   const data = await scrapePage(page);
+
   const populateNumbers = data
-    .map(((item)=>({
-      ...item,
-      price: extractPrice(item.rawPrice),
-      lotArea: extractNumber(item.rawLotArea),
-    })));
+    .map<IHouse>(((item)=>({
+    ...item,
+    比較用価格: extractPrice(item.販売価格),
+    比較用土地面積: extractNumber(item.土地面積),
+  })));
 
   const cummulativeResult = [...(result ?? []), ...populateNumbers];
 
@@ -59,6 +60,7 @@ export const scrapeDtHouse = async (
     ]);
     return await scrapeDtHouse(page, cummulativeResult);
   }
+
 
   return cummulativeResult;
 };
