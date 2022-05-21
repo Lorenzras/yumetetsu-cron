@@ -3,7 +3,7 @@ import {logger} from '../../../../../utils/logger';
 import {IConcurrentData} from './types';
 import {Page} from 'puppeteer';
 import {login} from '../../login';
-import {selectors} from './selectors';
+import {prepareForm} from './prepareForm';
 import {handleDownload} from '../../helpers/handleDownload';
 import {appIdProperty, dlPathDonetProperty, dlReqProperty} from './config';
 
@@ -13,28 +13,6 @@ export interface IPropForm {
   count: number
 }
 
-export const prepareForm = async (
-  page: Page,
-  {
-    store, agent,
-  }: IConcurrentData,
-) => {
-  // Store select
-  await page.waitForSelector(`${selectors.storeSelect} option`);
-  await page.select(selectors.storeSelect, store);
-
-  // Agent select
-  if (typeof agent === 'string') {
-    await page.waitForSelector(`${selectors.agentsSelect} option`);
-    await page.select(selectors.agentsSelect, agent);
-  }
-
-  // Press search
-  await Promise.all([
-    page.waitForNavigation(),
-    page.click(selectors.searchButton),
-  ]);
-};
 
 export const downloadTask = async (
   {page, data: formSetting} :

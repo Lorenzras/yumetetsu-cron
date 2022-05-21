@@ -8,7 +8,6 @@ import {format} from 'date-fns';
 
 import iconv from 'iconv-lite';
 import {nanoid} from 'nanoid/non-secure';
-import encoding from 'encoding-japanese';
 
 export const handleDownload = async (
   {
@@ -62,8 +61,6 @@ export const handleDownload = async (
       `Finished file download with ${result?.split(/\r\n|\r|\n/).length || 0} lines. `,
     );
 
-    console.log(result);
-
     if (!result) return;
 
     const filePath = path.join(
@@ -79,6 +76,6 @@ export const handleDownload = async (
     return filePath;
   } catch (err: any) {
     logger.error('Failed saving file. ' + err.message);
-    notifyDev('Error downloading files' + err.message);
+    await notifyDev('Error downloading files' + err.message);
   }
 };

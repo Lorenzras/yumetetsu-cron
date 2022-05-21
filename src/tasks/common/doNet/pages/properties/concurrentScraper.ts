@@ -7,6 +7,7 @@ export const concurrentScrapper = async () => {
   const cluster: Cluster<IConcurrentData> = await Cluster.launch({
     concurrency: Cluster.CONCURRENCY_CONTEXT,
     maxConcurrency: 7,
+    timeout: 600000,
     puppeteerOptions: {
       headless: false,
     },
