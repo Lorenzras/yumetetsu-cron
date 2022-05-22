@@ -1,13 +1,18 @@
 import {
   IConcurrentData,
-  IPropForm,
   downloadTask,
-  downloadPerStore} from '../../common/doNet/pages/properties/';
+  downloadPerStore,
+  dlPathDonetProperty,
+} from '../../common/doNet/pages/properties/';
 import {Cluster} from 'puppeteer-cluster';
 import {getExtraPuppeteer} from '../../common/browser';
+import chokidar from 'chokidar';
+import {Page} from 'puppeteer';
+import {uploadSingleCSVSmart} from '../../common/kintone/uploadCSV';
+import {deleteFile} from '../../../utils';
 
-export const syncDoNetProperties = async () => {
-  const cluster: Cluster<IConcurrentData, IPropForm> = await Cluster.launch({
+const initCluster = async () => {
+  return await Cluster.launch({
     puppeteer: getExtraPuppeteer(),
     concurrency: Cluster.CONCURRENCY_CONTEXT,
     maxConcurrency: 8,
@@ -17,6 +22,34 @@ export const syncDoNetProperties = async () => {
       defaultViewport: null,
       // args: ['--start-maximized'],
     },
+  }) as Cluster<IConcurrentData>;
+};
+
+const initFileWatcher = () => {
+  return chokidar.watch(dlPathDonetProperty, {
+    ignored: /(^|[/\\])\../, // ignore dotfiles
+    ignoreInitial: true,
+    persistent: true,
+    depth: 0,
+  });
+};
+
+const uploadTask = async (page: Page, file: string) => {
+  await uploadSingleCSVSmart({
+    page,
+    fileWithAppId: file,
+    keyField: 'propertyId',
+  });
+
+  await deleteFile(file);
+};
+
+export const syncDoNetProperties = async () => {
+  const cluster = await initCluster();
+  const watcher = initFileWatcher();
+
+  watcher.on('add', (path)=>{
+    cluster.queue(({page})=> uploadTask(page, path));
   });
 
   await cluster.task(downloadTask);
@@ -25,4 +58,6 @@ export const syncDoNetProperties = async () => {
 
   await cluster.idle();
   await cluster.close();
+
+  await watcher.close();
 };
