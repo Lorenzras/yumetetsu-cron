@@ -1,10 +1,8 @@
 import {archivePath, dumpPath, getCSVFiles, logger} from '../../../utils';
-import {selectors as loginSels, login} from './login';
+import {login} from './login';
 import {Page} from 'puppeteer';
 import path from 'path';
 import fs from 'fs';
-
-const timeout = 600000;
 
 export const selectors = {
   inputFile: 'input[type=file]',
@@ -22,17 +20,11 @@ export const goToImportPage = async (page: Page, appId: string) => {
 
   await page.goto(uploadUrl);
 
-  const btnLogin = (await page.$(loginSels.btnLogin)) || '';
-  if (btnLogin) {
-    await login(page);
-  }
-
-  await page.waitForSelector(
-    '.button-submit-cybozu.button-disabled-cybozu',
-    {timeout})
-    .catch((err) => {
-      throw new Error('Failed to navigate to import page. ' + err.message);
-    });
+  await Promise.race([
+    login(page).catch(),
+    page.waitForSelector(
+      '.button-submit-cybozu.button-disabled-cybozu').catch(),
+  ]);
 
   logger.info(`Successfully navigated to ${appId}`);
 };
@@ -40,22 +32,15 @@ export const goToImportPage = async (page: Page, appId: string) => {
 export const attachFile = async (page: Page, filePath: string) => {
   logger.info(`Attaching ${filePath}`);
 
-  await page.waitForSelector(selectors.inputFile, {timeout});
+  await page.waitForSelector(selectors.inputFile);
   const inputUploadHandle = await page.$(selectors.inputFile);
 
   await inputUploadHandle?.uploadFile(filePath);
 
   logger.info(`Attempting to click yes.`);
-  await page.waitForSelector(
-    selectors.headerYes,
-    {
-      visible: true,
-      timeout,
-    },
-  );
-
+  await page.waitForSelector(selectors.headerYes, {visible: true});
   await page.click(selectors.headerYes);
-  logger.info(`Succesfully clicked yes.`);
+  logger.info(`Succesfully to clicked yes.`);
 };
 
 export const handleUpload = async (
@@ -65,14 +50,12 @@ export const handleUpload = async (
   await page.waitForNetworkIdle();
   await page.waitForSelector(`input[id^='${keyField}']`, {
     visible: true,
-    timeout,
   });
   await page.click(`input[id^='${keyField}']`);
 
-  logger.info(`Pressing import.`);
-  await page.waitForSelector(selectors.btnImport, {timeout});
+  logger.info(`Start upload.`);
+  await page.waitForSelector(selectors.btnImport);
   await page.click(selectors.btnImport);
-  logger.info(`Succesfully pressed import.`);
 };
 
 const moveFileToArchive = (filePath: string) => {
@@ -99,38 +82,6 @@ export const uploadSingleCSV = async (
   await goToImportPage(page, appId);
   await attachFile(page, file);
   await handleUpload(page, keyField);
-};
-
-
-/**
- * Upload CSV to kintone based on the appId in the filename.
- *
- * Filename format : [appId]-***.csv
- */
-export const uploadSingleCSVSmart = async (
-
-
-  {page, keyField = 'レコード番号', fileWithAppId}
-  : {
-    page: Page,
-    keyField?: string,
-    fileWithAppId: string
-  },
-) => {
-  try {
-    const fileName = path.parse(fileWithAppId).base;
-    const appId = fileName.split('-', 1)[0];
-    if (isNaN(+appId)) {
-      throw new Error(
-        `${appId} is not a valid appId.`);
-    }
-    await goToImportPage(page, appId);
-    await attachFile(page, fileWithAppId);
-    await handleUpload(page, keyField);
-  } catch (err : any) {
-    logger.error(`Error uploading to kintone. ${err.message}`);
-    throw new Error(err.message);
-  }
 };
 
 /**

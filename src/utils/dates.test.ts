@@ -1,6 +1,6 @@
 import {format} from 'date-fns';
 import {APP_IDS, kintoneClient} from '../api/kintone';
-import {getYearDiffFromToday, isSameMonthDay, getDateYesterday} from './dates';
+import {getYearDiffFromToday, isSameMonthDay} from './dates';
 
 describe('Date', <
   U extends LongTermCustomerType,
@@ -49,9 +49,5 @@ describe('Date', <
         };
       }).filter((res) => res.ans);
     expect(result).toMatchSnapshot();
-  });
-
-  it('yesterday', ()=>{
-    expect(getDateYesterday()).toMatchSnapshot();
   });
 });

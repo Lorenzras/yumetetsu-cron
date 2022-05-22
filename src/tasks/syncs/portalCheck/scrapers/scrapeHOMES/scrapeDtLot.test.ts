@@ -1,6 +1,6 @@
 import {openMockBrowserPage} from '../../../../common/browser';
 import {browserTimeOut} from '../../../../common/browser/config';
-import {scrapeDtLot, scrapeDtLotPage} from './scrapeDtLot';
+import {scrapeDtLot, scrapePage} from './scrapeDtLot';
 
 // sample link: https://www.homes.co.jp/tochi/aichi/toyokawa-city/list/
 
@@ -15,7 +15,7 @@ describe('scrapeDtLot', ()=>{
 
   test('single page', async ()=>{
     const page = await openMockBrowserPage();
-    const result = await scrapeDtLotPage(page);
+    const result = await scrapePage(page);
 
     page.browser().disconnect();
     expect(result).toMatchSnapshot();

@@ -1,4 +1,4 @@
-import {extractNumber, extractPrice, extractTel, spreadAddress} from './text';
+import {extractNumber, extractPrice, spreadAddress} from './text';
 
 describe(('stringManipulation'), ()=>{
   test('extractNumber', ()=>{
@@ -46,21 +46,6 @@ describe(('stringManipulation'), ()=>{
 
     const testResults = testVals.map((i)=>{
       return [i, spreadAddress(i)];
-    });
-
-    expect(testResults).toMatchSnapshot();
-  });
-
-  test('extractTel', ()=>{
-    const testVals = [
-      '※光IP電話、及びIP電話をご利用のお客様はTEL:052-361-0034へご連絡ください',
-      '※携帯電話からお問合せいただいた方には、ショートメッセージ（SMS）またはLINE通知メッセージによるお問合せ内容に',
-      'なんとかテクスト052-361-0034なんとかテクスト07014529707',
-      '0037-633-38948',
-    ];
-
-    const testResults = testVals.map((i)=>{
-      return [i, extractTel(i)];
     });
 
     expect(testResults).toMatchSnapshot();

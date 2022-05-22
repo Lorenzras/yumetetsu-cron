@@ -1,6 +1,5 @@
 import {kanji2number} from '@geolonia/japanese-numeral';
 import {cityLists} from '../tasks/syncs/portalCheck/config';
-import {findPhoneNumbersInText, parsePhoneNumber} from 'libphonenumber-js';
 
 type NumHash = {
   [key: string]: number;
@@ -100,17 +99,4 @@ export const spreadAddress = (
     市区: city,
     町域: newAddress,
   };
-};
-
-export const extractTel = (dirtySource: string) => {
-  const result = findPhoneNumbersInText(
-    dirtySource,
-    {
-      defaultCountry: 'JP',
-    },
-  );
-  return result
-    .map((i) => parsePhoneNumber(i.number.number)
-      .formatNational(),
-    ).join(' または ');
 };

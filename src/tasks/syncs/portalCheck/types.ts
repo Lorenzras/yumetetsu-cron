@@ -4,13 +4,12 @@ import {propertyTypes} from './config';
 
 export type PropertyType = typeof propertyTypes[number]
 
-export interface IPropertyAction {
+export type PropertyActions = Array<{
   url: string,
   type: PropertyType,
   handleScraper: (page: Page) => Promise<IProperty[]>,
   submitSelector?: string
-}
-export type PropertyActions = Array<IPropertyAction>
+}>
 
 export interface IProperty {
   物件番号?: string,
@@ -20,12 +19,8 @@ export interface IProperty {
   比較用価格: number,
   所在地: string,
   リンク: string,
-  取得した日時?: string,
-  掲載企業TEL?:string,
-  掲載企業?:string,
+  取得した日時?: string
 }
-
-export type TCompanyContact = Pick<IProperty, '掲載企業TEL' | '掲載企業'>
 
 export interface IHouse extends IProperty {
   土地面積: string,

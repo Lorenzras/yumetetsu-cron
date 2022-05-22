@@ -1,5 +1,5 @@
 import {Page, ElementHandle} from 'puppeteer';
-import {selectors} from './selectors';
+import selectors from './selectors';
 import {scrollToEl} from '../../../browser/helpers/scrollToEl';
 import {
   clickWithReload,

@@ -1,9 +1,9 @@
-import {setFieldValue} from './../../../utils/field';
 import {Page} from 'puppeteer';
 import {logger} from '../../../utils';
+import {clear} from '../../../utils/field';
 
 
-export const selectors = {
+const selectors = {
   user: '[name="username"]',
   pass: '[name="password"]',
   btnLogin: '.login-button',
@@ -15,7 +15,7 @@ export const login = async (page: Page) => {
 
   if (!username || !password) {
     logger.error('Please set environment\'s username and password.');
-    throw new Error('Failed to login kintone.');
+    return;
   }
 
   await page.waitForSelector(selectors.btnLogin);
@@ -24,22 +24,12 @@ export const login = async (page: Page) => {
   await page.goto(url); */
 
   logger.info('Trying to login to kintone.');
+  await clear(page, selectors.user);
+  await page.type(selectors.user, username);
 
-  // await clearField(page, selectors.user);
-  await setFieldValue({
-    page,
-    selector: selectors.user,
-    newValue: username,
-  });
-
-  // await clearField(page, selectors.pass);
-  await setFieldValue({
-    page,
-    selector: selectors.pass,
-    newValue: password,
-  });
-  // await page.type(selectors.pass, password);
+  await clear(page, selectors.pass);
+  await page.type(selectors.pass, password);
 
   logger.info('Pressing enter to confirm login.');
-  await page.click(selectors.btnLogin);
+  await page.keyboard.type('\n');
 };

@@ -1,5 +1,4 @@
-
-export const selectors = {
+export default {
   custNav: '.sidebar-customer',
   ddStores: '#m_customer_filters_fc_shop_id',
   ddAgents: '.clone_user_id',

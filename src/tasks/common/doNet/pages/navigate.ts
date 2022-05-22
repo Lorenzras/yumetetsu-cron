@@ -10,6 +10,7 @@ import {homeSelectors} from '../config';
   return page;
 }; */
 
+
 export const navigateToCustPage = async (page: Page) => {
   logger.info('Navigating to customer page.');
 
@@ -21,16 +22,3 @@ export const navigateToCustPage = async (page: Page) => {
   return page;
 };
 
-
-export const navigateToPropertyPage = async (page: Page) => {
-  logger.info('Navigating to property page.');
-
-  await page.waitForSelector(homeSelectors.propNav),
-  await Promise.all([
-    await page.waitForNetworkIdle(),
-    page.click(homeSelectors.propNav),
-  ]);
-
-
-  return page;
-};

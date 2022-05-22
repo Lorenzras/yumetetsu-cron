@@ -13,7 +13,6 @@ export const selectors = {
 
 export const homeSelectors = {
   custNav: '.sidebar-customer',
-  propNav: '.sidebar-estate a',
 };
 
 export const downloadLimit = 4000;

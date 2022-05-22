@@ -1,11 +1,9 @@
-import {logger} from './../../../../../../utils/logger';
 import {Page} from 'puppeteer';
 
 export const selectTargetCities = async (
   page: Page,
   cities: string[],
 ) => {
-  logger.info('Selecting cities ' + cities);
   await page.evaluate((cities)=>{
     $('input[id*="city"] ~ label')
       .each((_, item)=>{

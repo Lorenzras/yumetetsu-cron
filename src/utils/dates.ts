@@ -1,12 +1,7 @@
 import {
   differenceInMonths,
   differenceInYears,
-  getYear,
-  isSameDay,
-  parseISO,
-  subDays,
-  setYear,
-  format} from 'date-fns';
+  getYear, isSameDay, parseISO, setYear} from 'date-fns';
 
 
 export const getYearDiffFromToday = (dateStr : string) : number => {
@@ -26,12 +21,4 @@ export const isSameMonthDay = (dateStr: string): boolean => {
   const result = isSameDay(adjustedYear, new Date());
   // logger.info(`Same Day? ${dateStr} ${result}`);
   return result;
-};
-
-export const getDateYesterday = (dateFormat = 'yyyy-MM-dd') => {
-  const nowDate = new Date();
-  const dateYesterday = subDays(nowDate, 1);
-
-
-  return format(dateYesterday, dateFormat);
 };

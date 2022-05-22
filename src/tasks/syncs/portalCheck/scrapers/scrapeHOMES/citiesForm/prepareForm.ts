@@ -5,22 +5,13 @@ import {selectTargetCities} from './selectTargetCities';
 const submitSelector = '.prg-goToList:not(:disabled)';
 
 export const changePublishedRange = async (page: Page) => {
-  const getTotalNum = async () => await page
-    .$eval('.totalNum', (el) => $(el).eq(0).text());
-
-  logger.info(`Waiting for loading icon to appear. ${await getTotalNum()}件`);
   await Promise.all([
-
-    page.waitForSelector(
-      '#prg-loadingIcon', {visible: true, timeout: 2000})
-      .catch(()=>logger.error('Loading icon did not appear')),
+    // page.waitForResponse((r) => r.url() === 'https://www.homes.co.jp/_ajax/kksearch/' && r.status() === 200),
+    page.waitForSelector('#prg-loadingIcon', {visible: true}),
     page.select('#cond_newdate', '3'),
-    page.waitForResponse((r) => r.url() === 'https://t.karte.io/track' && r.status() === 200),
   ]);
 
-  logger.info(`Waiting for loading icon to hide. ${await getTotalNum()}件`);
-  await page.waitForSelector('#prg-loadingIcon', {hidden: true});
-  await page.waitForSelector('.homes-ui-notifier-totalhits', {hidden: true});
+  return page.waitForSelector('#prg-loadingIcon', {hidden: true});
 };
 
 export const prepareForm = async (
@@ -30,16 +21,13 @@ export const prepareForm = async (
   /* ステップ１ */
   await selectTargetCities(page, cities);
 
-  logger.info('Looking for submit.');
+
   await page.waitForSelector(submitSelector);
 
-
   await Promise.all([
-    page.waitForNavigation({waitUntil: 'domcontentloaded'}),
     page.click(submitSelector),
+    page.waitForNavigation({waitUntil: 'networkidle2'}),
   ]);
 
-
-  logger.info('Changing Publish range.');
   await changePublishedRange(page);
 };

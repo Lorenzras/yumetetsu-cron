@@ -7,7 +7,7 @@ import {getOptionsStore} from './content';
 import {clickSearch} from './clickSearch';
 import {handleDownload} from './handleDownload';
 import {downloadPerAgent} from './downloadPerAgent';
-import {selectors} from './selectors';
+import selectors from './selectors';
 
 import {navigateToCustPage} from '../navigate';
 import {login} from '../../login';
