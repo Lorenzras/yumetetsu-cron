@@ -1,8 +1,8 @@
 
-import {IConcurrentData} from './types';
+import {IConcurrentData} from '../types';
 import {Page} from 'puppeteer';
 
-import {selectors} from './selectors';
+import {selectors} from '../selectors';
 
 /**
  * Sets agent
@@ -38,11 +38,16 @@ const setPropertyTypes = async (page: Page, propTypes : string[] = [] ) =>{
  */
 const setPropertyStatus = async (page: Page, propStatuses : string[] = [] ) =>{
   await page.evaluate((propStatuses: string[])=>{
-    $('th:contains(ステータス) ~ td input').prop('checked', false);
-    for (const item of propStatuses) {
-      console.log('item', item);
-      $(`th:contains(ステータス) ~ td div div:contains(${item}) input`)
-        .prop('checked', true);
+    const inputs = $('th:contains(ステータス) ~ td input');
+    const cleanStatused = propStatuses.filter(Boolean);
+    if (cleanStatused.length === 0) {
+      inputs.prop('checked', true );
+    } else {
+      inputs.each((_, el) => {
+        $(el).prop(
+          'checked',
+          cleanStatused.includes($(el).val()?.toString() || ''));
+      });
     }
   }, propStatuses);
 };
@@ -61,30 +66,21 @@ export const prepareForm = async (
     propType, status,
   }: IConcurrentData,
 ) => {
-  // 店舗 select
   await page.waitForSelector(`${selectors.storeSelect} option`);
+  await page.select(selectors.storeSelect, store);
 
-  await Promise.all([
-    page.select(selectors.storeSelect, store),
-    setAgent(page, agent),
-    setPropertyTypes(page, propType),
-    setPropertyStatus(page, status),
-  ]);
-  /*   await page.select(selectors.storeSelect, store);
-
-  // 担当者 select
   await setAgent(page, agent);
 
-  // 物件種別 checkboxes
   await setPropertyTypes(page, propType);
 
-  // ステータス checkboxes
-  await setPropertyStatus(page, status);
- */
 
-  // Press search
-  await Promise.all([
+  await setPropertyStatus(page, status);
+
+
+  return Promise.all([
     page.waitForNavigation(),
-    page.click(selectors.searchButton),
+    page.evaluate((btnSearchSel)=>{
+      $(btnSearchSel).trigger('click');
+    }, selectors.searchButton),
   ]);
 };

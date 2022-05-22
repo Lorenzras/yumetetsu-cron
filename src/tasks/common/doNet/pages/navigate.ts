@@ -27,8 +27,8 @@ export const navigateToPropertyPage = async (page: Page) => {
 
   await page.waitForSelector(homeSelectors.propNav),
   await Promise.all([
-    page.click(homeSelectors.propNav),
     await page.waitForNetworkIdle(),
+    page.click(homeSelectors.propNav),
   ]);
 
 

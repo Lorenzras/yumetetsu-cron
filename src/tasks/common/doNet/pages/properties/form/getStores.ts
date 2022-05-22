@@ -1,7 +1,7 @@
 import {Page} from 'puppeteer';
-import {login} from '../../login';
-import {navigateToPropertyPage} from '../navigate';
-import {selectors} from './selectors';
+import {login} from '../../../login';
+import {navigateToPropertyPage} from '../../navigate';
+import {selectors} from './../selectors';
 
 export const getStores = async ({page}:{page: Page}) => {
   await login(page);

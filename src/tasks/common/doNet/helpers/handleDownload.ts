@@ -20,7 +20,7 @@ export const handleDownload = async (
     appId: string,
   },
 ) => {
-  logger.info(`Download dir is ${downloadDir}`);
+  logger.info(`Executing fetch.`);
 
   try {
     const result = await page.evaluate((requestURL)=>{
@@ -39,21 +39,6 @@ export const handleDownload = async (
           return text;
         });
     }, requestURL);
-
-    /* .then((res) => {
-          return res.arrayBuffer();
-        })
-        .then((buffer) => {
-          const decoder = new TextDecoder('shift-jis');
-          // eslint-disable-next-line max-len
-          const text =
-          decoder.decode(buffer)
-          .replace(/([0-5]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9])/g, '$1:$2');
-          return text;
-        }).catch((err)=>{
-          console.error(err.message);
-          return '';
-        }); */
 
 
     logger.info(
