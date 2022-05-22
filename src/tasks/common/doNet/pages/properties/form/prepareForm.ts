@@ -1,8 +1,10 @@
+import {getAgents} from './getAgents';
 
 import {IConcurrentData} from '../types';
 import {Page} from 'puppeteer';
 
 import {selectors} from '../selectors';
+import {getStores} from './getStores';
 
 /**
  * Sets agent
@@ -52,6 +54,15 @@ const setPropertyStatus = async (page: Page, propStatuses : string[] = [] ) =>{
   }, propStatuses);
 };
 
+const setDates = async ({page, fromDate}: {
+  page: Page,
+  fromDate: string
+}) =>{
+  await page.evaluate((fromDate = '')=>{
+    $('#m_estate_filters_modify_datetime_from').val(fromDate);
+  }, fromDate);
+};
+
 
 /**
  * Sets the form
@@ -62,8 +73,10 @@ const setPropertyStatus = async (page: Page, propStatuses : string[] = [] ) =>{
 export const prepareForm = async (
   page: Page,
   {
-    store, agent,
+    store = '',
+    agent,
     propType, status,
+    fromDate = '',
   }: IConcurrentData,
 ) => {
   await page.waitForSelector(`${selectors.storeSelect} option`);
@@ -73,14 +86,19 @@ export const prepareForm = async (
 
   await setPropertyTypes(page, propType);
 
-
   await setPropertyStatus(page, status);
 
+  await setDates({page, fromDate});
 
-  return Promise.all([
+  await Promise.all([
     page.waitForNavigation(),
     page.evaluate((btnSearchSel)=>{
       $(btnSearchSel).trigger('click');
     }, selectors.searchButton),
   ]);
+
+  return {
+    stores: await getStores({page}),
+    agents: await getAgents({page}),
+  };
 };

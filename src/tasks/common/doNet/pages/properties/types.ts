@@ -28,8 +28,9 @@ export type TPropStatus =
 
 
 export interface IConcurrentData {
-  store: string,
+  store?: string,
   agent?: string,
   propType?: TPropTypes[]
   status?: TPropStatus[]
+  fromDate?: string,
 }

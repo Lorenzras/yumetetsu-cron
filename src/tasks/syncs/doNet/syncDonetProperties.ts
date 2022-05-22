@@ -44,7 +44,7 @@ const uploadTask = async (page: Page, file: string) => {
   await deleteFile(file);
 };
 
-export const syncDoNetProperties = async () => {
+export const syncDoNetProperties = async (isFullSync = false) => {
   const cluster = await initCluster();
   const watcher = initFileWatcher();
 
@@ -54,7 +54,7 @@ export const syncDoNetProperties = async () => {
 
   await cluster.task(downloadTask);
 
-  await downloadPerStore(cluster);
+  await downloadPerStore(cluster, isFullSync);
 
   await cluster.idle();
   await cluster.close();

@@ -4,6 +4,8 @@ import {Page} from 'puppeteer';
 import path from 'path';
 import fs from 'fs';
 
+const timeout = 300000;
+
 export const selectors = {
   inputFile: 'input[type=file]',
   btnUploadFile: '#fileKey-browse',
@@ -38,9 +40,16 @@ export const attachFile = async (page: Page, filePath: string) => {
   await inputUploadHandle?.uploadFile(filePath);
 
   logger.info(`Attempting to click yes.`);
-  await page.waitForSelector(selectors.headerYes, {visible: true});
+  await page.waitForSelector(
+    selectors.headerYes,
+    {
+      visible: true,
+      timeout,
+    },
+  );
+
   await page.click(selectors.headerYes);
-  logger.info(`Succesfully to clicked yes.`);
+  logger.info(`Succesfully clicked yes.`);
 };
 
 export const handleUpload = async (
@@ -50,12 +59,14 @@ export const handleUpload = async (
   await page.waitForNetworkIdle();
   await page.waitForSelector(`input[id^='${keyField}']`, {
     visible: true,
+    timeout,
   });
   await page.click(`input[id^='${keyField}']`);
 
-  logger.info(`Start upload.`);
+  logger.info(`Pressing import.`);
   await page.waitForSelector(selectors.btnImport);
   await page.click(selectors.btnImport);
+  logger.info(`Succesfully pressed import.`);
 };
 
 const moveFileToArchive = (filePath: string) => {

@@ -12,7 +12,8 @@ import {appIdProperty, dlPathDonetProperty, dlReqProperty} from './config';
 export interface IPropForm {
   store: string,
   agents?: string[]
-  count?: number
+  count?: number,
+  stores: string[]
 }
 
 
@@ -27,7 +28,8 @@ export const downloadTask = async (
 
   await navigateToPropertyPage(page);
 
-  await prepareForm(page, formSetting);
+  const {agents, stores} = await prepareForm(page, formSetting);
+
 
   const resultCount = await page.$eval(
     '#kensakukekka .big',
@@ -48,13 +50,10 @@ export const downloadTask = async (
     logger.info('Finished download store: ' + formSetting.store);
   }
 
-  const agents = await getAgents(page);
-
-
   return {
     store: formSetting.store,
     agents: agents,
     count: resultCount,
-
+    stores: stores,
   } as IPropForm;
 };

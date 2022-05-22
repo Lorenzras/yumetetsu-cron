@@ -1,3 +1,4 @@
+import {getDateYesterday} from './../../../../../../utils/dates';
 /* eslint-disable max-len */
 import {downloadLimit} from './../../../config';
 import {logger} from './../../../../../../utils/logger';
@@ -18,8 +19,14 @@ import {getStores} from '../form';
 
 export const downloadPerStore = async (
   cluster: Cluster<IConcurrentData>,
+  isFullSync = false,
 ) => {
-  const stores: string[] = await cluster.execute(getStores);
+  const initialForm : IConcurrentData = {
+    store: '',
+    fromDate: isFullSync ? getDateYesterday() : undefined,
+  };
+
+  // const stores: string[] = await cluster.execute(getStores);
 
   const handleDlByAgent = async (
     formSetting: IConcurrentData,
@@ -73,9 +80,7 @@ export const downloadPerStore = async (
   };
 
   const handleDlByStore = async (store: string) => {
-    const formSetting : IConcurrentData = {
-      store: store,
-    };
+    const formSetting : IConcurrentData = {...initialForm ?? {}, store};
     const {count = 0} = await cluster.execute(formSetting) as IPropForm;
 
     if (count > downloadLimit) {
@@ -86,5 +91,13 @@ export const downloadPerStore = async (
     }
   };
 
-  stores.forEach(handleDlByStore);
+  // stores.forEach(handleDlByStore);
+  console.log(initialForm);
+  const {stores, count = 0} = await cluster.execute(initialForm) as IPropForm;
+  if (count > downloadLimit) {
+    logger.error(
+      `INITIAL: Found ${count} items at options : ${JSON.stringify(initialForm)}`,
+    );
+    stores.forEach(handleDlByStore);
+  }
 };
