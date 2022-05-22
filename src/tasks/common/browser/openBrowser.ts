@@ -1,9 +1,10 @@
-import {Browser} from 'puppeteer';
+import {Browser, Page} from 'puppeteer';
 import {logger} from '../../../utils';
 import {browserURL} from './config';
 import UserAgent from 'user-agents';
 import puppeteer from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
+
 puppeteer.use(stealthPlugin());
 
 interface OpenBrowserParam {
@@ -30,6 +31,23 @@ export const launchBrowser = ({
     slowMo,
     defaultViewport: null,
     headless: headless,
+  });
+};
+
+/**
+ * Dynamically block images
+ * Do not forget to call removeAlllisteners for cleanup.
+ * @param page
+ * @returns {EventEmitter} The event emitter
+ */
+export const blockImages = async (page: Page) =>{
+  await page.setRequestInterception(true);
+  page.on('request', (req) => {
+    if (req.resourceType() === 'image') {
+      req.abort();
+    } else {
+      req.continue();
+    }
   });
 };
 

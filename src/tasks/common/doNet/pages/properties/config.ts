@@ -5,6 +5,6 @@ export const dlPathDonetProperty = path.join(
   rootDonetPropertyPage,
   'downloads',
 );
-export const appIdProperty = '999';
+export const appIdProperty = '137';
 
 export const dlReqProperty = ' https://manage.do-network.com/estate/ListCsvDownload';

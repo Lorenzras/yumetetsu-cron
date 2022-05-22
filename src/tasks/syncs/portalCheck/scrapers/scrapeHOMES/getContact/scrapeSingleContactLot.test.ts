@@ -1,5 +1,5 @@
 import {scrapeContacts} from './scrapeContacts';
-import {scrapeDtLot} from './../scrapeDtLot';
+import {scrapeDtLot} from '../scrapeDtLot';
 import {openMockBrowserPage} from '../../../../../common/browser';
 import {browserTimeOut} from '../../../../../common/browser/config';
 import {scrapeSingleContactLot} from './scrapeSingleContactLot';
