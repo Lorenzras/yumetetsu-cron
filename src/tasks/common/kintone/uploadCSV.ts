@@ -84,6 +84,31 @@ export const uploadSingleCSV = async (
   await handleUpload(page, keyField);
 };
 
+
+/**
+ * Upload CSV to kintone based on the appId in the filename.
+ *
+ * Filename format : [appId]-***.csv
+ */
+export const uploadSingleCSVSmart = async (
+  {page, keyField = 'レコード番号', fileWithAppId}
+  : {
+    page: Page,
+    keyField?: string,
+    fileWithAppId: string
+  },
+) => {
+  const fileName = path.parse(fileWithAppId).base;
+  const appId = fileName.split('-', 1)[0];
+  if (isNaN(+appId)) {
+    throw new Error(
+      `${appId} is not a valid appId.`);
+  }
+  await goToImportPage(page, appId);
+  await attachFile(page, fileWithAppId);
+  await handleUpload(page, keyField);
+};
+
 /**
  * Uploads all processed csv.
  *
