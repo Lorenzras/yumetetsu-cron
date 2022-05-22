@@ -1,3 +1,4 @@
+import {blockImages} from './../../../browser/openBrowser';
 import {getAgents} from './form/getAgents';
 import {navigateToPropertyPage} from './../navigate';
 import {logger} from '../../../../../utils/logger';
@@ -22,6 +23,7 @@ export const downloadTask = async (
   {page: Page, data: IConcurrentData},
 ) => {
   logger.info('Starting download.');
+  await blockImages(page);
 
   const stringifiedSettings = JSON.stringify(formSetting);
   await login(page);
@@ -49,6 +51,9 @@ export const downloadTask = async (
     });
     logger.info('Finished download store: ' + formSetting.store);
   }
+
+  // clean up
+  page.removeAllListeners();
 
   return {
     store: formSetting.store,

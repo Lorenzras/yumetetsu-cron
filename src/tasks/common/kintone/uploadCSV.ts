@@ -1,10 +1,10 @@
 import {archivePath, dumpPath, getCSVFiles, logger} from '../../../utils';
-import {login} from './login';
+import {selectors as loginSels, login} from './login';
 import {Page} from 'puppeteer';
 import path from 'path';
 import fs from 'fs';
 
-const timeout = 300000;
+const timeout = 600000;
 
 export const selectors = {
   inputFile: 'input[type=file]',
@@ -22,11 +22,17 @@ export const goToImportPage = async (page: Page, appId: string) => {
 
   await page.goto(uploadUrl);
 
-  await Promise.race([
-    login(page).catch(),
-    page.waitForSelector(
-      '.button-submit-cybozu.button-disabled-cybozu').catch(),
-  ]);
+  const btnLogin = (await page.$(loginSels.btnLogin)) || '';
+  if (btnLogin) {
+    await login(page);
+  }
+
+  await page.waitForSelector(
+    '.button-submit-cybozu.button-disabled-cybozu',
+    {timeout})
+    .catch((err) => {
+      throw new Error('Failed to navigate to import page. ' + err.message);
+    });
 
   logger.info(`Successfully navigated to ${appId}`);
 };
@@ -34,7 +40,7 @@ export const goToImportPage = async (page: Page, appId: string) => {
 export const attachFile = async (page: Page, filePath: string) => {
   logger.info(`Attaching ${filePath}`);
 
-  await page.waitForSelector(selectors.inputFile);
+  await page.waitForSelector(selectors.inputFile, {timeout});
   const inputUploadHandle = await page.$(selectors.inputFile);
 
   await inputUploadHandle?.uploadFile(filePath);
@@ -64,7 +70,7 @@ export const handleUpload = async (
   await page.click(`input[id^='${keyField}']`);
 
   logger.info(`Pressing import.`);
-  await page.waitForSelector(selectors.btnImport);
+  await page.waitForSelector(selectors.btnImport, {timeout});
   await page.click(selectors.btnImport);
   logger.info(`Succesfully pressed import.`);
 };

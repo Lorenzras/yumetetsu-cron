@@ -6,19 +6,22 @@ import {
   dlPathDonetProperty,
 } from '../../common/doNet/pages/properties/';
 import {Cluster} from 'puppeteer-cluster';
-import {getExtraPuppeteer} from '../../common/browser';
+import {blockImages, getExtraPuppeteer} from '../../common/browser';
 import chokidar from 'chokidar';
 import {Page} from 'puppeteer';
 import {uploadSingleCSVSmart} from '../../common/kintone/uploadCSV';
 import {deleteFile} from '../../../utils';
 import path from 'path';
 
-const initCluster = async () => {
+const initCluster = async (
+  maxConcurrency = 8,
+  concurrency = Cluster.CONCURRENCY_CONTEXT) => {
   return await Cluster.launch({
     puppeteer: getExtraPuppeteer(),
-    concurrency: Cluster.CONCURRENCY_CONTEXT,
-    maxConcurrency: 8,
+    concurrency,
+    maxConcurrency,
     timeout: 6000000,
+    retryLimit: 2,
     puppeteerOptions: {
       headless: false,
       defaultViewport: null,
@@ -36,18 +39,21 @@ const initFileWatcher = () => {
 };
 
 const uploadTask = async (page: Page, file: string) => {
+  await blockImages(page);
   await uploadSingleCSVSmart({
     page,
     fileWithAppId: file,
     keyField: 'propertyId',
   });
 
+  // Clean up
+  page.removeAllListeners();
   await deleteFile(file);
   logger.info('Finished upload task for ' + path.basename(file));
 };
 
 export const syncDoNetProperties = async (isFullSync = false) => {
-  const cluster = await initCluster();
+  const cluster = await initCluster(8);
   const watcher = initFileWatcher();
 
   watcher.on('add', (path)=>{
@@ -56,7 +62,7 @@ export const syncDoNetProperties = async (isFullSync = false) => {
 
   await cluster.task(downloadTask);
 
-  await downloadPerStore(cluster, isFullSync);
+  downloadPerStore(cluster, isFullSync);
 
   await cluster.idle();
   await cluster.close();

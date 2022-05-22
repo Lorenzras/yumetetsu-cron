@@ -3,7 +3,7 @@ import {Page} from 'puppeteer';
 import {logger} from '../../../utils';
 
 
-const selectors = {
+export const selectors = {
   user: '[name="username"]',
   pass: '[name="password"]',
   btnLogin: '.login-button',
