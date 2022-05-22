@@ -9,6 +9,6 @@ import {selectTargetCities} from './selectTargetCities';
 test('target cities selected', async ()=>{
   const page = await openMockBrowserPage();
 
-  await selectTargetCities(page, cityLists['愛知']);
+  await selectTargetCities(page, cityLists.愛知県);
   page.browser().disconnect();
 }, browserTimeOut);

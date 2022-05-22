@@ -1,15 +1,19 @@
-import {Browser} from 'puppeteer';
+import {Browser, Page} from 'puppeteer';
 import {logger} from '../../../utils';
 import {browserURL} from './config';
 import UserAgent from 'user-agents';
 import puppeteer from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
+
 puppeteer.use(stealthPlugin());
 
 interface OpenBrowserParam {
   loadImages?: boolean,
   slowMo?: number
+  headless?: boolean,
 }
+
+export const getExtraPuppeteer = ()=> puppeteer;
 
 const getPage = async (browser: Browser) => {
   const pages = await browser.pages();
@@ -20,12 +24,30 @@ logger.info(`Running in ${process.env.NODE_ENV}`);
 
 export const launchBrowser = ({
   slowMo = 0,
+  headless = process.env.BROWSER_TYPE === 'HEADLESS',
 }) => {
   logger.info(`Launching browser. `);
   return puppeteer.launch({
     slowMo,
     defaultViewport: null,
-    headless: process.env.BROWSER_TYPE === 'HEADLESS',
+    headless: headless,
+  });
+};
+
+/**
+ * Dynamically block images
+ * Do not forget to call removeAlllisteners for cleanup.
+ * @param page
+ * @returns {EventEmitter} The event emitter
+ */
+export const blockImages = async (page: Page) =>{
+  await page.setRequestInterception(true);
+  page.on('request', (req) => {
+    if (req.resourceType() === 'image') {
+      req.abort();
+    } else {
+      req.continue();
+    }
   });
 };
 
@@ -33,6 +55,7 @@ export const openBrowserPage = async (opt?: OpenBrowserParam) => {
   logger.info('Opening page.');
   const browser = await launchBrowser({
     slowMo: opt?.slowMo,
+    headless: opt?.headless,
   });
   const page = await getPage(browser);
 

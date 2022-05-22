@@ -24,8 +24,12 @@ export const getCSVFiles = (dir: string, appId: string) => {
  */
 export const saveCSV = (filePath: string, data: string) => {
   fs.writeFileSync(filePath, '');
+
   const fd = fs.openSync( filePath, 'w');
-  const buff = iconv.encode( data, 'Shift_JIS' );
+  const buff = iconv.encode(
+    data.replace(/²/g, '2'),
+    'Shift_JIS',
+  );
 
   fs.writeSync( fd, buff);
   fs.close(fd);
@@ -38,6 +42,12 @@ export const saveJSONToCSV = async (
   saveCSV(filePath, await json2csvAsync(json));
 };
 
-export const deleteFile = (path: string) => {
-  return rmfr(path);
+export const deleteFile = (file: string) => {
+  try {
+    logger.info(`Deleting file ${path.basename(file)}`);
+    return rmfr(file);
+  } catch (err: any) {
+    logger.error('Failed to delete file.');
+    throw new Error('Failed to delete file ' + err.message);
+  }
 };
