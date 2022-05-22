@@ -1,4 +1,4 @@
-import {getContactByLink} from './scrapeContact/scrapeContacts';
+import {getContactByLink} from './getContact/';
 import {IProperty, IPropertyAction, PropertyActions} from './../../types';
 import {getExtraPuppeteer} from './../../../../common/browser/openBrowser';
 import {browserTimeOut} from './../../../../common/browser/config';

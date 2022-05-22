@@ -1,8 +1,10 @@
+import {getAgents} from './getAgents';
 
-import {IConcurrentData} from './types';
+import {IConcurrentData} from '../types';
 import {Page} from 'puppeteer';
 
-import {selectors} from './selectors';
+import {selectors} from '../selectors';
+import {getStores} from './getStores';
 
 /**
  * Sets agent
@@ -38,13 +40,27 @@ const setPropertyTypes = async (page: Page, propTypes : string[] = [] ) =>{
  */
 const setPropertyStatus = async (page: Page, propStatuses : string[] = [] ) =>{
   await page.evaluate((propStatuses: string[])=>{
-    $('th:contains(ステータス) ~ td input').prop('checked', false);
-    for (const item of propStatuses) {
-      console.log('item', item);
-      $(`th:contains(ステータス) ~ td div div:contains(${item}) input`)
-        .prop('checked', true);
+    const inputs = $('th:contains(ステータス) ~ td input');
+    const cleanStatused = propStatuses.filter(Boolean);
+    if (cleanStatused.length === 0) {
+      inputs.prop('checked', true );
+    } else {
+      inputs.each((_, el) => {
+        $(el).prop(
+          'checked',
+          cleanStatused.includes($(el).val()?.toString() || ''));
+      });
     }
   }, propStatuses);
+};
+
+const setDates = async ({page, fromDate}: {
+  page: Page,
+  fromDate: string
+}) =>{
+  await page.evaluate((fromDate = '')=>{
+    $('#m_estate_filters_modify_datetime_from').val(fromDate);
+  }, fromDate);
 };
 
 
@@ -57,34 +73,32 @@ const setPropertyStatus = async (page: Page, propStatuses : string[] = [] ) =>{
 export const prepareForm = async (
   page: Page,
   {
-    store, agent,
+    store = '',
+    agent,
     propType, status,
+    fromDate = '',
   }: IConcurrentData,
 ) => {
-  // 店舗 select
   await page.waitForSelector(`${selectors.storeSelect} option`);
+  await page.select(selectors.storeSelect, store);
 
-  await Promise.all([
-    page.select(selectors.storeSelect, store),
-    setAgent(page, agent),
-    setPropertyTypes(page, propType),
-    setPropertyStatus(page, status),
-  ]);
-  /*   await page.select(selectors.storeSelect, store);
-
-  // 担当者 select
   await setAgent(page, agent);
 
-  // 物件種別 checkboxes
   await setPropertyTypes(page, propType);
 
-  // ステータス checkboxes
   await setPropertyStatus(page, status);
- */
 
-  // Press search
+  await setDates({page, fromDate});
+
   await Promise.all([
     page.waitForNavigation(),
-    page.click(selectors.searchButton),
+    page.evaluate((btnSearchSel)=>{
+      $(btnSearchSel).trigger('click');
+    }, selectors.searchButton),
   ]);
+
+  return {
+    stores: await getStores({page}),
+    agents: await getAgents({page}),
+  };
 };

@@ -42,6 +42,12 @@ export const saveJSONToCSV = async (
   saveCSV(filePath, await json2csvAsync(json));
 };
 
-export const deleteFile = (path: string) => {
-  return rmfr(path);
+export const deleteFile = (file: string) => {
+  try {
+    logger.info(`Deleting file ${path.basename(file)}`);
+    return rmfr(file);
+  } catch (err: any) {
+    logger.error('Failed to delete file.');
+    throw new Error('Failed to delete file ' + err.message);
+  }
 };

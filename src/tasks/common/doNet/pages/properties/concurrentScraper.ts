@@ -1,15 +1,19 @@
+import {getExtraPuppeteer} from './../../../browser/openBrowser';
 import {IConcurrentData} from './types';
-import {downloadTask} from './downloadTask';
+import {downloadTask, IPropForm} from './downloadTask';
 import {Cluster} from 'puppeteer-cluster';
 import {downloadPerStore} from './queues/downloadPerStore';
 
 export const concurrentScrapper = async () => {
-  const cluster: Cluster<IConcurrentData> = await Cluster.launch({
+  const cluster: Cluster<IConcurrentData, IPropForm> = await Cluster.launch({
+    puppeteer: getExtraPuppeteer(),
     concurrency: Cluster.CONCURRENCY_CONTEXT,
-    maxConcurrency: 7,
-    timeout: 600000,
+    maxConcurrency: 8,
+    timeout: 6000000,
     puppeteerOptions: {
       headless: false,
+      defaultViewport: null,
+      args: ['--start-maximized'],
     },
   });
 
