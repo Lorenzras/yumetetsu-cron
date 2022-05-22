@@ -1,3 +1,4 @@
+import {logger} from './../../../utils/logger';
 import {
   IConcurrentData,
   downloadTask,
@@ -10,6 +11,7 @@ import chokidar from 'chokidar';
 import {Page} from 'puppeteer';
 import {uploadSingleCSVSmart} from '../../common/kintone/uploadCSV';
 import {deleteFile} from '../../../utils';
+import path from 'path';
 
 const initCluster = async () => {
   return await Cluster.launch({
@@ -29,7 +31,6 @@ const initFileWatcher = () => {
   return chokidar.watch(dlPathDonetProperty, {
     ignored: /(^|[/\\])\../, // ignore dotfiles
     ignoreInitial: true,
-    persistent: true,
     depth: 0,
   });
 };
@@ -42,6 +43,7 @@ const uploadTask = async (page: Page, file: string) => {
   });
 
   await deleteFile(file);
+  logger.info('Finished upload task for ' + path.basename(file));
 };
 
 export const syncDoNetProperties = async (isFullSync = false) => {
@@ -58,6 +60,5 @@ export const syncDoNetProperties = async (isFullSync = false) => {
 
   await cluster.idle();
   await cluster.close();
-
   await watcher.close();
 };
