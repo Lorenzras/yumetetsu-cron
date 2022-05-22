@@ -2,7 +2,7 @@
   "name": "yumetetsu-cron",
   "version": "1.0.0",
   "description": "Cron jobs for yumetetsu",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "test": "jest",
     "start:dev": "cross-env NODE_ENV=dev nodemon",

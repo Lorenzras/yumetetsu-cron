@@ -1,7 +1,7 @@
 import {Page} from 'puppeteer';
 import {getOptionsEmployee} from './content';
 import {logger} from '../../../../../utils';
-import selectors from './selectors';
+import {selectors} from './selectors';
 import {clickSearch} from './clickSearch';
 import {handleDownload} from './handleDownload';
 

@@ -3,7 +3,7 @@ import {Page} from 'puppeteer';
 import {extractNumber, extractPrice} from '../../../../../utils';
 import {IHouse} from '../../types';
 
-export const scrapePage = async (page: Page) => {
+export const scrapeDtHousePage = async (page: Page) => {
   return await page.$$eval(
     '.mod-mergeBuilding--sale',
     (els) => {
@@ -44,7 +44,7 @@ export const scrapeDtHouse = async (
   result?: IHouse[] | [],
 ) : Promise<IHouse[]> => {
   logger.info(`Scraping kodate. `);
-  const data = await scrapePage(page);
+  const data = await scrapeDtHousePage(page);
 
   logger.info(`Scraped page ${data.length} `);
 
