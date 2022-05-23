@@ -47,9 +47,4 @@ export interface IMansion extends IProperty {
   比較用専有面積: number,
 }
 
-export interface ILocations {
-  [p: string] : {
-    [c: string]: string
-  }
-}
 

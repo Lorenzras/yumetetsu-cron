@@ -88,8 +88,7 @@ export const spreadAddress = (
 } => {
   let newAddress = address;
   const pref = Object.keys(cityLists).find((i) => address.includes(i)) || '';
-  const cities = Object.keys(cityLists[pref as keyof typeof cityLists]);
-  const city = cities
+  const city = cityLists[pref as keyof typeof cityLists]
     .find((i) => address.includes(i)) || '';
 
   newAddress = newAddress
