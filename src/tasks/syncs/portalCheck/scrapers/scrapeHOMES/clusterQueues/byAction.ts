@@ -45,13 +45,17 @@ export const byAction = async (
     return await Promise.all(Object.entries(cityLists).map(
       async ([pref, cities]) => {
         const results = await cluster
-          .execute({...action, ...{pref, cities}}) as IProperty[];
+          .execute({
+            ...action,
+            ...{pref, cities: Object.keys(cities)},
+          }) as IProperty[];
         const resultWithContact = await handleGetContact(results);
 
         return resultWithContact;
       }));
   };
 
+  /* Main Process */
   propertyActions.forEach(async (action) => {
     const finalResults = await byPrefecture(action);
     finalResults.forEach((result) => {

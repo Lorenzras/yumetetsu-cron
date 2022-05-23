@@ -1,4 +1,5 @@
 import path from 'path';
+import {ILocations} from './types';
 
 export const dirPortalCheck = __dirname;
 export const dlPortalCheck = path.join(dirPortalCheck, 'data');
@@ -7,7 +8,7 @@ export const kintoneAppId = 199;
 
 export const propertyTypes = ['中古マンション', '中古戸建', '土地'] as const;
 
-export const cityLists = {
+export const cityLists : ILocations = {
   愛知県:
   {
     豊川市: '豊川中央',
