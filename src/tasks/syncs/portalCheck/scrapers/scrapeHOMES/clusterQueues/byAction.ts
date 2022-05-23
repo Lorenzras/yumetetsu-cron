@@ -8,7 +8,6 @@ import {cityLists, dlPortalCheck, kintoneAppId} from '../../../config';
 import {IClusterTaskData} from '../clusterScraper';
 import {getContactByLink} from '../getContact';
 import {getFileName, saveJSONToCSV} from '../../../../../../utils';
-import path from 'path';
 
 const propertyActions: PropertyActions = [
   {
