@@ -4,9 +4,11 @@ import {IProperty} from '../../../types';
 import {scrapeSingleContact} from './scrapeSingleContact';
 import {scrapeSingleContactLot} from './scrapeSingleContactLot';
 import {produce} from 'immer';
+import {blockImages} from '../../../../../common/browser';
 
 
 export const getContactByLink = async (page: Page, url: string) => {
+  await blockImages(page);
   let isLotPage = false;
   try {
     await page.goto(url, {waitUntil: 'domcontentloaded'});
@@ -26,6 +28,9 @@ export const getContactByLink = async (page: Page, url: string) => {
     logger.error(`getContactByLink Failed ${page.url()}`);
   }
 
+  // Clean up
+  page.removeAllListeners();
+
   return {
     掲載企業: '',
     掲載企業TEL: '',
@@ -38,23 +43,6 @@ export const scrapeContacts = async (page: Page, data: IProperty[]) => {
 
   try {
     for (const [idx, val] of data.entries()) {
-      /* let isLotPage = false;
-      await page.goto(val.リンク, {waitUntil: 'domcontentloaded'});
-
-      logger.info('link : ' + val.リンク);
-
-      await Promise.race([
-        page.waitForSelector('p.attention a').then(()=> isLotPage = false),
-        page.waitForSelector('.realestate .inquire').then(()=>isLotPage = true),
-      ]).catch(()=> logger.error('Failed'));
-
-      logger.info(
-        'navigating to ' + isLotPage ? ' lot page ' : ' ordinary page.');
-
-      const {掲載企業, 掲載企業TEL} = isLotPage ?
-        await scrapeSingleContactLot(page) :
-        await scrapeSingleContact(page); */
-
       const {掲載企業, 掲載企業TEL} = await getContactByLink(page, val.リンク);
 
       nextState = produce(nextState, (draft: IProperty[]) => {
