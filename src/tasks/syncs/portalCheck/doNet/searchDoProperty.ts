@@ -1,16 +1,20 @@
 import {Page} from 'puppeteer';
 import {logger, spreadAddress} from '../../../../utils';
+import {login} from '../../../common/doNet';
+import {navigateToPropertyPage} from '../../../common/doNet/pages/navigate';
 import {
+  setPropertyStatus,
   setPropertyTypes,
   TPropTypes} from '../../../common/doNet/pages/properties';
 import {cityLists} from '../config';
-import {IProperty, PropertyType} from '../types';
+import {PropertyType} from '../types';
+import {compareData} from './compareData';
 
-interface ISearchData {
+export interface IPropSearchData {
   propertyType: PropertyType,
   address: string,
-  price: number,
-  area: number,
+  price: string,
+  area: string,
 }
 
 enum propTypeVals {
@@ -44,16 +48,23 @@ export const setLocation = async (
   }) => {
   const {pref, city, town} = data;
   try {
-    console.log(data);
+    /* Open modal */
     await page.waitForSelector('#select_button_city1');
     await page.click('#select_button_city1');
 
-    // await page.waitForSelector('#select_pref_id option');
+
     await selectByText(page, '#select_pref_id', pref );
+
     await page.type('#modal_city_name_autocomplete', city);
 
-    await page.waitForSelector('#modal_town_name_autocomplete:not(:disabled)');
+    /* Town field is disabled until city
+    is selected and attempted focus on it. */
+    await page.click('#modal_town_name_autocomplete', {clickCount: 2});
+    await page.waitForSelector('#modal_town_name_autocomplete ~ ul');
     await page.type('#modal_town_name_autocomplete', town);
+
+    await page.click('#modal_ok_button');
+    await page.waitForSelector('#select_pref_id', {hidden: true});
   } catch (err: any) {
     const errMessage = 'setLocation failed ' + err.message;
     logger.error(errMessage);
@@ -61,24 +72,34 @@ export const setLocation = async (
   }
 };
 
+const setLotArea = async (page: Page, area: string) => {
+  await page.evaluate((area)=> {
+    $('#m_estate_filters_floor_space_lower').val(area);
+    $('#m_estate_filters_floor_space_upper').val(area);
+  }, area);
+};
 
-export const searchProperty = async ({
+
+export const searchDoProperty = async ({
   page, data,
 }:{
   page: Page,
-  data: ISearchData
+  data: IPropSearchData
 }) => {
-  const {address, area, price, propertyType} = data;
+  const {address, area, propertyType} = data;
   const {都道府県: pref, 市区: city, 町域: town} = spreadAddress(address);
   const shopName = cityLists[pref][city];
   const propType : TPropTypes = propTypeVals[propertyType];
 
+  await login(page);
+  await navigateToPropertyPage(page);
   await page.waitForSelector('#m_estate_filters_fc_shop_id option');
 
   /* Select store */
   await selectByText(page, '#m_estate_filters_fc_shop_id', shopName);
 
   await setPropertyTypes(page, [propType]);
+  await setPropertyStatus(page);
 
   await setLocation({
     page,
@@ -86,4 +107,13 @@ export const searchProperty = async ({
       pref, city, town,
     }},
   );
+
+  await setLotArea(page, area);
+
+  await Promise.all([
+    page.waitForNavigation(),
+    page.click('#btn_search'),
+  ]);
+
+  return await compareData(page, data);
 };

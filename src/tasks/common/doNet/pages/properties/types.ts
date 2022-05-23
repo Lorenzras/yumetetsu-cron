@@ -31,6 +31,6 @@ export interface IConcurrentData {
   store?: string,
   agent?: string,
   propType?: TPropTypes[]
-  status?: TPropStatus[]
+  status?: TPropStatusText[]
   fromDate?: string,
 }
