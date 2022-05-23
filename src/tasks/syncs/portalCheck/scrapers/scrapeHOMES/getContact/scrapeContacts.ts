@@ -4,9 +4,11 @@ import {IProperty} from '../../../types';
 import {scrapeSingleContact} from './scrapeSingleContact';
 import {scrapeSingleContactLot} from './scrapeSingleContactLot';
 import {produce} from 'immer';
+import {blockImages} from '../../../../../common/browser';
 
 
 export const getContactByLink = async (page: Page, url: string) => {
+  await blockImages(page);
   let isLotPage = false;
   try {
     await page.goto(url, {waitUntil: 'domcontentloaded'});
@@ -25,6 +27,9 @@ export const getContactByLink = async (page: Page, url: string) => {
   } catch {
     logger.error(`getContactByLink Failed ${page.url()}`);
   }
+
+  // Clean up
+  page.removeAllListeners();
 
   return {
     掲載企業: '',
