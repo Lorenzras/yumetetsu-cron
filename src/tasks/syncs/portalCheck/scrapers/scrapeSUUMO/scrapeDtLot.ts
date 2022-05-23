@@ -1,6 +1,7 @@
 import {Page} from 'puppeteer';
 import {extractPrice} from '../../../../../utils';
 import {ILot} from '../../types';
+import {getCompanyInfo} from './getCompanyInfo';
 
 export const scrapeDtLot = async (
   page: Page,
@@ -30,6 +31,7 @@ export const scrapeDtLot = async (
   datas = datas.map<ILot>((val) => {
     const price = extractPrice(val.販売価格.split('円')[0]);
     const area = val.土地面積.split('m')[0];
+    getCompanyInfo(page, val.リンク);
     return {
       ...val,
       比較用価格: price,
