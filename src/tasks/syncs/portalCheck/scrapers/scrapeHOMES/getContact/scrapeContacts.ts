@@ -38,23 +38,6 @@ export const scrapeContacts = async (page: Page, data: IProperty[]) => {
 
   try {
     for (const [idx, val] of data.entries()) {
-      /* let isLotPage = false;
-      await page.goto(val.リンク, {waitUntil: 'domcontentloaded'});
-
-      logger.info('link : ' + val.リンク);
-
-      await Promise.race([
-        page.waitForSelector('p.attention a').then(()=> isLotPage = false),
-        page.waitForSelector('.realestate .inquire').then(()=>isLotPage = true),
-      ]).catch(()=> logger.error('Failed'));
-
-      logger.info(
-        'navigating to ' + isLotPage ? ' lot page ' : ' ordinary page.');
-
-      const {掲載企業, 掲載企業TEL} = isLotPage ?
-        await scrapeSingleContactLot(page) :
-        await scrapeSingleContact(page); */
-
       const {掲載企業, 掲載企業TEL} = await getContactByLink(page, val.リンク);
 
       nextState = produce(nextState, (draft: IProperty[]) => {
