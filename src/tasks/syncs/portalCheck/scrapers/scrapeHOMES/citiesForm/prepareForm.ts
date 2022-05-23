@@ -12,7 +12,7 @@ export const changePublishedRange = async (page: Page) => {
       return 'error';
     });
 
-  logger.info(`Waiting for loading icon to appear. ${await getTotalNum()}件`);
+
   await Promise.all([
 
     page.waitForSelector(
@@ -21,6 +21,7 @@ export const changePublishedRange = async (page: Page) => {
     page.select('#cond_newdate', '3'),
     page.waitForResponse((r) => r.url() === 'https://t.karte.io/track' && r.status() === 200),
   ]);
+
 
   logger.info(`Waiting for loading icon to hide. ${await getTotalNum()}件`);
   await page.waitForSelector('#prg-loadingIcon', {hidden: true});

@@ -11,8 +11,8 @@ import {getContactByLink} from '../getContact';
 import {getFileName, logger, saveJSONToCSV} from '../../../../../../utils';
 import {
   IPropSearchData,
-  searchDoProperty} from '../../../doNet/searchDoProperty';
-import {TSearchResult} from '../../../doNet/compareData';
+  searchDoProperty} from '../../../doNetCompare/searchDoProperty';
+import {TSearchResult} from '../../../doNetCompare/compareData';
 
 const propertyActions: PropertyActions = [
   {
@@ -71,15 +71,15 @@ export const byAction = async (
     };
     const result = (await cluster.execute(async ({page}) =>{
       return searchDoProperty({page, data});
-    }))[0] as TSearchResult[];
+    }))[0] as TSearchResult;
 
     return result;
   };
 
   /* Get contacts for each link */
-  const handleGetContact = async (properties: IProperty[]) =>{
+  const handleGetCompleteData = async (properties: IProperty[]) =>{
     return await Promise.all(properties.map(async (prop) => {
-      return await cluster.execute(async ({page}) => {
+      const propWithContact = await cluster.execute(async ({page}) => {
         const contact = await getContactByLink(page, prop.リンク);
         const completeData = {
           ...prop,
@@ -87,6 +87,10 @@ export const byAction = async (
         };
         return completeData;
       }) as IProperty;
+
+      const propDoCompared = await handleDoNetCompare(prop);
+      const completeData = {...prop, ...propWithContact, ...propDoCompared};
+      return completeData;
     }));
   };
 
@@ -107,10 +111,10 @@ export const byAction = async (
         const addedPropType = results
           .map((item) => ({...item, 物件種別: action.type}));
 
-        const resultWithContact = await handleGetContact(addedPropType);
+        const resultCompleteData = await handleGetCompleteData(addedPropType);
 
 
-        return resultWithContact;
+        return resultCompleteData;
       }));
   };
 
@@ -119,11 +123,14 @@ export const byAction = async (
     const finalResults = await byPrefecture(action);
 
 
-    finalResults.forEach((result) => {
-      saveJSONToCSV(getFileName({
-        appId: kintoneAppId,
-        dir: dlPortalCheck,
-      }), result);
-    });
+    finalResults
+      .filter((d)=>d.length)
+      .forEach((result) => {
+        saveJSONToCSV(getFileName({
+          appId: kintoneAppId,
+          dir: dlPortalCheck,
+          suffix: action.type,
+        }), result);
+      });
   });
 };

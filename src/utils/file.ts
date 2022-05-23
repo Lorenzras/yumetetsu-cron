@@ -58,12 +58,15 @@ export const getFileName = (
   {
     dir = './',
     appId,
-    suffix = format(new Date(), `yyyyMMdd-HHmmss`) + `-${nanoid(5)}.csv`,
-    ext = 'csv',
+    suffix,
   }:
   {
     dir: string,
     appId: string | number,
     suffix?: string,
     ext?: string
-  }) => path.join(dir, `${appId}-${suffix}.${ext}`);
+  }) => {
+  const randomize = format(new Date(), `yyyyMMdd-HHmmss`) + `-${nanoid(5)}`;
+
+  return path.join(dir, `${[appId, randomize, suffix].join('-')}.csv`);
+};
