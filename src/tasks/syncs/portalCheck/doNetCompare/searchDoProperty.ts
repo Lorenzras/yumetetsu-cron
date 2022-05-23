@@ -1,3 +1,4 @@
+import retry from 'async-retry';
 import {Page} from 'puppeteer';
 import {logger, spreadAddress} from '../../../../utils';
 import {login} from '../../../common/doNet';
@@ -30,10 +31,14 @@ export const selectByText = async (
 ) => {
   await page.waitForSelector(`${selector} option`);
   await page.$eval(selector, (el, text) => {
-    const shopStoreId = $(el)
-      .children(`option:contains(${text})`).val();
-    $(el).val(shopStoreId as string);
+    const prefId = $(el)
+      .children(`option:contains(${text})`).val() as string;
+    $(el).val(prefId);
+    $(el).trigger('change');
+    return prefId;
   }, text);
+
+  // await page.select(selector, shopStoreId);
 };
 
 export const setLocation = async (
@@ -47,32 +52,37 @@ export const setLocation = async (
     }
   }) => {
   const {pref, city, town} = data;
-  try {
-    logger.info(`Setting location. ${pref} ${city} ${town}`);
-    /* Open modal */
-    await page.waitForSelector('#select_button_city1');
-    await page.click('#select_button_city1');
+
+  logger.info(`Setting location. ${pref} ${city} ${town}`);
+  /* Open modal */
+  await page.waitForSelector('#select_button_city1');
+  await page.click('#select_button_city1');
 
 
-    await selectByText(page, '#select_pref_id', pref );
+  await selectByText(page, '#select_pref_id', pref );
 
-    await page.type('#modal_city_name_autocomplete', city);
+  await page.type('#modal_city_name_autocomplete', city);
 
-    /* Town field is disabled until city
-    is selected and attempted focus on it. */
-    // await page.click('#modal_town_name_autocomplete', {clickCount: 2});
+  /* Town field is disabled until triggering blur event on city field */
+  await page.$eval(
+    '#modal_city_name_autocomplete', (e ) => (e as HTMLInputElement).blur());
 
-    await page.waitForSelector('#modal_town_name_autocomplete ~ ul');
+  if (town) {
+    await page.waitForSelector(
+      '#modal_town_name_autocomplete ~ ul',
+      {timeout: 5000});
+
+    await page.waitForSelector(
+      '#modal_town_name_autocomplete:not(:disabled)',
+      {timeout: 5000},
+    );
+
     await page.type('#modal_town_name_autocomplete', town);
-
-    await page.click('#modal_ok_button');
-    await page.waitForSelector('#select_pref_id', {hidden: true});
-  } catch (err: any) {
-    const errMessage =
-    `setLocation failed ${err.message} ${JSON.stringify(data)}`;
-    logger.error(errMessage);
-    throw new Error(errMessage);
   }
+
+
+  await page.click('#modal_ok_button');
+  await page.waitForSelector('#select_pref_id', {hidden: true});
 };
 
 const setLotArea = async (page: Page, area: string) => {
@@ -94,7 +104,7 @@ export const searchDoProperty = async ({
   const shopName = cityLists[pref][city];
   const propType : TPropTypes = propTypeVals[propertyType];
 
-  try {
+  const result = await retry(async () => {
     logger.info('Starting search ' + JSON.stringify(data));
     await login(page);
     await navigateToPropertyPage(page);
@@ -121,9 +131,9 @@ export const searchDoProperty = async ({
     ]);
 
     return await compareData(page, data);
-  } catch (err: any) {
-    logger.error(
-      'Error comparing to do-net ' + err.message + JSON.stringify(data));
-    throw new Error(err.message);
-  }
+  }, {
+    retries: 3,
+  });
+
+  return result;
 };

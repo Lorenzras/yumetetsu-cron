@@ -10,10 +10,19 @@ export const scrapeSingleContact = async (page: Page ) => {
   let getKochiraLink: string;
 
   try {
+    await page.waitForSelector('p.attention a', {timeout: 60000})
+      .catch((err: any)=>{
+        logger.error('scrapeSingleContact failed ' + err.message);
+        throw new Error(err.message);
+      });
+
     getKochiraLink = await page.$eval(
       'p.attention a',
       (el) => $(el).attr('href') || '',
-    ).catch(()=>'');
+    ).catch(()=>{
+      logger.error(`getKochiralink failed at ${page.url}`);
+      return '';
+    });
 
     logger.info('Kochiralink ' + getKochiraLink);
 
@@ -35,9 +44,9 @@ export const scrapeSingleContact = async (page: Page ) => {
       logger.info(`Scraped companyName ${scrapedResult.掲載企業}`);
       result = {...result, ...scrapedResult};
     }
-  } catch (error) {
-    logger.error(`Error Link ${page.url()} ${error} }`);
+    return result;
+  } catch (err: any) {
+    logger.error(`scrapeSingleContact ${page.url()} ${err.message}`);
+    return result;
   }
-
-  return result;
 };

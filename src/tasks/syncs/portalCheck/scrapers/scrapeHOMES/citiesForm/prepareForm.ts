@@ -5,27 +5,33 @@ import {selectTargetCities} from './selectTargetCities';
 const submitSelector = '.prg-goToList:not(:disabled)';
 
 export const changePublishedRange = async (page: Page) => {
-  const getTotalNum = async () => await page
-    .$eval('.totalNum', (el) => $(el).eq(0).text())
-    .catch(()=> {
-      logger.error(`Failed to find .totalnum at ${page.url()}`);
-      return 'error';
-    });
+  try {
+    const getTotalNum = async () => await page
+      .$eval('.totalNum', (el) => $(el).eq(0).text())
+      .catch(()=> {
+        logger.error(`No result at ${page.url()}`);
+        return '0';
+      });
 
 
-  await Promise.all([
+    await Promise.all([
 
-    page.waitForSelector(
-      '#prg-loadingIcon', {visible: true, timeout: 2000})
-      .catch(()=>logger.error('Loading icon did not appear.')),
-    page.select('#cond_newdate', '3'),
-    page.waitForResponse((r) => r.url() === 'https://t.karte.io/track' && r.status() === 200),
-  ]);
+      page.waitForSelector(
+        '#prg-loadingIcon', {visible: true, timeout: 2000})
+        .catch(()=>logger.error('Loading icon did not appear.')),
+      page.select('#cond_newdate', '3'),
+      page.waitForResponse((r) => r.url() === 'https://t.karte.io/track' && r.status() === 200),
+    ]);
 
+    await page.waitForSelector('#prg-loadingIcon', {hidden: true});
+    await page.waitForSelector('.homes-ui-notifier-totalhits', {hidden: true});
 
-  logger.info(`Waiting for loading icon to hide. ${await getTotalNum()}件`);
-  await page.waitForSelector('#prg-loadingIcon', {hidden: true});
-  await page.waitForSelector('.homes-ui-notifier-totalhits', {hidden: true});
+    logger.info(`Loading icon is gone.`);
+    return await getTotalNum();
+  } catch (err: any) {
+    logger.error(`changePublishedRange ${err.message}`);
+    throw new Error(err.message);
+  }
 };
 
 export const prepareForm = async (

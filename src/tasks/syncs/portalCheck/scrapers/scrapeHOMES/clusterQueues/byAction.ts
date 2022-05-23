@@ -7,7 +7,7 @@ import {IHouse, ILot, IMansion, IProperty,
 import {Cluster} from 'puppeteer-cluster';
 import {cityLists, dlPortalCheck, kintoneAppId} from '../../../config';
 import {IClusterTaskData} from '../clusterScraper';
-import {getContactByLink} from '../getContact';
+import {getContactByLink} from '../getContact/';
 import {getFileName, logger, saveJSONToCSV} from '../../../../../../utils';
 import {
   IPropSearchData,
@@ -76,20 +76,24 @@ export const byAction = async (
     return result;
   };
 
-  /* Get contacts for each link */
+  /* Get contact */
+  const handleGetContact = async (prop: IProperty) => {
+    return await cluster.execute(async ({page}) => {
+      const contact = await getContactByLink(page, prop.リンク);
+      const withContact = {
+        ...prop,
+        ...contact,
+      };
+      return withContact;
+    }) as IProperty;
+  };
+
+  /* Get complete data */
   const handleGetCompleteData = async (properties: IProperty[]) =>{
     return await Promise.all(properties.map(async (prop) => {
-      const propWithContact = await cluster.execute(async ({page}) => {
-        const contact = await getContactByLink(page, prop.リンク);
-        const completeData = {
-          ...prop,
-          ...contact,
-        };
-        return completeData;
-      }) as IProperty;
-
+      const propWithContact = await handleGetContact(prop);
       const propDoCompared = await handleDoNetCompare(prop);
-      const completeData = {...prop, ...propWithContact, ...propDoCompared};
+      const completeData = {...propWithContact, ...propDoCompared};
       return completeData;
     }));
   };
@@ -113,7 +117,6 @@ export const byAction = async (
 
         const resultCompleteData = await handleGetCompleteData(addedPropType);
 
-
         return resultCompleteData;
       }));
   };
@@ -126,6 +129,7 @@ export const byAction = async (
     finalResults
       .filter((d)=>d.length)
       .forEach((result) => {
+        logger.info(`Saving file with ${result.length} lines. ${action.type}`);
         saveJSONToCSV(getFileName({
           appId: kintoneAppId,
           dir: dlPortalCheck,

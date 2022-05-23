@@ -27,9 +27,11 @@ export const clusterScraper = async () => {
     concurrency: Cluster.CONCURRENCY_CONTEXT,
     maxConcurrency: 5,
     retryLimit: 2,
+    retryDelay: 2000,
     puppeteerOptions: {
       headless: false,
-
+      defaultViewport: null,
+      args: ['--start-maximized'],
     },
     timeout: browserTimeOut,
   });

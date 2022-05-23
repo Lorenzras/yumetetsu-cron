@@ -11,7 +11,7 @@ describe('form', ()=>{
     ]);
 
     const result = (await searchDoProperty({page, data: {
-      address: '愛知県豊田市水源町６丁目1-65　',
+      address: '岐阜県大垣市水源町６丁目1-65　',
       area: '76.83',
       price: '1600',
       propertyType: '中古マンション',
@@ -24,8 +24,7 @@ describe('form', ()=>{
   test('selectPref', async ()=>{
     // location modal must be open.
     const page = await openMockBrowserPage();
-    // await selectByText(page, '#select_pref_id', '愛知県');
-    await page.select('#select_pref_id', '05');
+    await selectByText(page, '#select_pref_id', '岐阜県');
     page.browser().disconnect();
   });
 });

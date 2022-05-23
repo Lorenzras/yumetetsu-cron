@@ -1,41 +1,11 @@
+
 import {Page} from 'puppeteer';
 import {logger} from '../../../../../../utils';
 import {IProperty} from '../../../types';
-import {scrapeSingleContact} from './scrapeSingleContact';
-import {scrapeSingleContactLot} from './scrapeSingleContactLot';
+
 import {produce} from 'immer';
-import {blockImages} from '../../../../../common/browser';
+import {getContactByLink} from './getContactByLink';
 
-
-export const getContactByLink = async (page: Page, url: string) => {
-  await blockImages(page);
-  let isLotPage = false;
-  try {
-    await page.goto(url, {waitUntil: 'domcontentloaded'});
-    logger.info('link : ' + url);
-
-    await Promise.race([
-      page.waitForSelector('p.attention a')
-        .then(()=> isLotPage = false),
-      page.waitForSelector('.realestate .inquire')
-        .then(()=>isLotPage = true),
-    ]);
-
-    return isLotPage ?
-      await scrapeSingleContactLot(page) :
-      await scrapeSingleContact(page);
-  } catch {
-    logger.error(`getContactByLink Failed ${page.url()}`);
-  }
-
-  // Clean up
-  page.removeAllListeners();
-
-  return {
-    掲載企業: '',
-    掲載企業TEL: '',
-  };
-};
 
 export const scrapeContacts = async (page: Page, data: IProperty[]) => {
   // const newPage = await page.browserContext().newPage();
