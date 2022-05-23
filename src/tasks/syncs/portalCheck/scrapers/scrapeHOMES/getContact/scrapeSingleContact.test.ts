@@ -1,4 +1,4 @@
-import {openMockBrowserPage} from '../../../../../common/browser';
+import {blockImages, openBrowserPage} from '../../../../../common/browser';
 import {browserTimeOut} from '../../../../../common/browser/config';
 import {scrapeSingleContact} from './scrapeSingleContact';
 
@@ -6,8 +6,12 @@ import {scrapeSingleContact} from './scrapeSingleContact';
 // tochi: https://www.homes.co.jp/tochi/b-17069260000119/
 
 test('scrapeContact', async ()=>{
-  const page = await openMockBrowserPage();
+  const page = await openBrowserPage();
+  await blockImages(page);
+  await page.goto('https://www.homes.co.jp/tochi/b-17069260000119/');
+
   const result = await scrapeSingleContact(page);
-  page.browser().disconnect();
+  // page.browser().disconnect();
+  await page.close();
   expect(result).toMatchSnapshot();
 }, browserTimeOut);
