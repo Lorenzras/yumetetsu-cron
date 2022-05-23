@@ -4,9 +4,11 @@ import {scrapeDtMansion} from '../scrapeDtMansion';
 import {scrapeDtLot} from '../scrapeDtLot';
 import {IProperty, IPropertyAction, PropertyActions} from '../../../types';
 import {Cluster} from 'puppeteer-cluster';
-import {cityLists} from '../../../config';
+import {cityLists, dlPortalCheck, kintoneAppId} from '../../../config';
 import {IClusterTaskData} from '../clusterScraper';
 import {getContactByLink} from '../getContact';
+import {getFileName, saveJSONToCSV} from '../../../../../../utils';
+import path from 'path';
 
 const propertyActions: PropertyActions = [
   {
@@ -40,18 +42,24 @@ export const byAction = async (
     }));
   };
 
-  const byPrefecture = (action: IPropertyAction) => {
-    Object.entries(cityLists).forEach(
+  const byPrefecture = async (action: IPropertyAction) => {
+    return await Promise.all(Object.entries(cityLists).map(
       async ([pref, cities]) => {
         const results = await cluster
           .execute({...action, ...{pref, cities}}) as IProperty[];
         const resultWithContact = await handleGetContact(results);
 
-        console.log(resultWithContact);
-      });
+        return resultWithContact;
+      }));
   };
 
-  for (const action of propertyActions) {
-    byPrefecture(action);
-  }
+  propertyActions.forEach(async (action) => {
+    const finalResults = await byPrefecture(action);
+    finalResults.forEach((result) => {
+      saveJSONToCSV(getFileName({
+        appId: kintoneAppId,
+        dir: dlPortalCheck,
+      }), result);
+    });
+  });
 };
