@@ -1,4 +1,4 @@
-import {getContactByLink} from './getContact/';
+import {getContactByLink} from './getContact';
 import {IProperty, IPropertyAction, PropertyActions} from './../../types';
 import {getExtraPuppeteer} from './../../../../common/browser/openBrowser';
 import {browserTimeOut} from './../../../../common/browser/config';
@@ -45,7 +45,7 @@ export const advancedScraper = async () => {
     concurrency: Cluster.CONCURRENCY_CONTEXT,
     maxConcurrency: 5,
     puppeteerOptions: {
-      headless: true,
+      headless: false,
 
     },
     timeout: browserTimeOut,
