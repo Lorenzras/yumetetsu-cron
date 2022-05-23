@@ -22,7 +22,9 @@ const setAgent = async (page: Page, agent = '') => {
  * @param page Page
  * @param propTypes property type array
  */
-const setPropertyTypes = async (page: Page, propTypes : string[] = [] ) =>{
+export const setPropertyTypes = async (
+  page: Page, propTypes : string[] = [],
+) =>{
   await page.evaluate((propTypes: string[])=>{
     const inputs = $('th:contains(物件種別) ~ td input');
     inputs.each((_, el) => {

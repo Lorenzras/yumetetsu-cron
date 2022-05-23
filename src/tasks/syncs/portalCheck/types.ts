@@ -20,9 +20,14 @@ export interface IProperty {
   比較用価格: number,
   所在地: string,
   リンク: string,
-  取得した日時?: string,
   掲載企業TEL?:string,
   掲載企業?:string,
+  DO管理有無?:string,
+  DO物件番号?:string,
+  DOステータス?:string,
+  DO登録価格?:string,
+  DO価格差?:string,
+  DO検索結果件数?:string,
 }
 
 export type TCompanyContact = Pick<IProperty, '掲載企業TEL' | '掲載企業'>
@@ -42,4 +47,9 @@ export interface IMansion extends IProperty {
   比較用専有面積: number,
 }
 
+export interface ILocations {
+  [p: string] : {
+    [c: string]: string
+  }
+}
 
