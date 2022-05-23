@@ -6,14 +6,18 @@ const submitSelector = '.prg-goToList:not(:disabled)';
 
 export const changePublishedRange = async (page: Page) => {
   const getTotalNum = async () => await page
-    .$eval('.totalNum', (el) => $(el).eq(0).text());
+    .$eval('.totalNum', (el) => $(el).eq(0).text())
+    .catch(()=> {
+      logger.error(`Failed to find .totalnum at ${page.url()}`);
+      return 'error';
+    });
 
   logger.info(`Waiting for loading icon to appear. ${await getTotalNum()}件`);
   await Promise.all([
 
     page.waitForSelector(
       '#prg-loadingIcon', {visible: true, timeout: 2000})
-      .catch(()=>logger.error('Loading icon did not appear')),
+      .catch(()=>logger.error('Loading icon did not appear.')),
     page.select('#cond_newdate', '3'),
     page.waitForResponse((r) => r.url() === 'https://t.karte.io/track' && r.status() === 200),
   ]);

@@ -5,6 +5,8 @@ import {dumpPath} from './paths';
 import iconv from 'iconv-lite';
 import rmfr from 'rmfr';
 import {json2csvAsync} from 'json-2-csv';
+import {nanoid} from 'nanoid';
+import format from 'date-fns/format';
 
 export const getCSVFiles = (dir: string, appId: string) => {
   const result = fs.readdirSync(dir)
@@ -51,3 +53,17 @@ export const deleteFile = (file: string) => {
     throw new Error('Failed to delete file ' + err.message);
   }
 };
+
+export const getFileName = (
+  {
+    dir = './',
+    appId,
+    suffix = format(new Date(), `yyyyMMdd-HHmmss`) + `-${nanoid(5)}.csv`,
+    ext = 'csv',
+  }:
+  {
+    dir: string,
+    appId: string | number,
+    suffix?: string,
+    ext?: string
+  }) => path.join(dir, `${appId}-${suffix}.${ext}`);
