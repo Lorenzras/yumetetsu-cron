@@ -1,4 +1,3 @@
-import {Cluster} from 'puppeteer-cluster';
 export type TPropTypes =
 | 'tochi'
 | 'new_kodate'
@@ -17,10 +16,21 @@ export type TPropStatusText =
 | '保留'
 | '査定中'
 
+export type TPropStatus =
+| '01'
+| '06'
+| '03'
+| '05'
+| '02'
+| '07'
+| '04'
+| '08'
+
+
 export interface IConcurrentData {
-  store: string,
+  store?: string,
   agent?: string,
   propType?: TPropTypes[]
-  status?: TPropStatusText[]
-
+  status?: TPropStatus[]
+  fromDate?: string,
 }

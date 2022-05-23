@@ -11,9 +11,7 @@ import {scrapeDtMansion} from './scrapeDtMansion';
 import {scrapeDtLot} from './scrapeDtLot';
 import {scrapeDtHouse} from './scrapeDtHouse';
 
-import {scrapeContacts} from './scrapeContact/scrapeContacts';
-
-import {scrapeContacts} from './scrapeContact/scrapeContacts';
+import {scrapeContacts} from './getContact';
 
 
 const propertyActions: PropertyActions = [

@@ -20,9 +20,22 @@ export async function clear(page: Page, selector: string): Promise<any> {
  * @param page
  * @param selector
  */
-export async function clearField(page: Page, selector: string) {
+export const clearField = async (page: Page, selector: string) => {
   return await page.evaluate((selector) => {
     document.querySelector(selector).value = '';
   }, selector);
-}
+};
+
+export const setFieldValue = async (
+  {page, selector, newValue}:
+  {page: Page, selector: string, newValue: string}) => {
+  await page.waitForSelector(selector);
+  await page.evaluate((selector, value)=>{
+    const field = document
+      .querySelector(selector) as HTMLInputElement;
+    if (field) {
+      field.value = value;
+    }
+  }, selector, newValue);
+};
 

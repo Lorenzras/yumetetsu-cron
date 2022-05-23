@@ -1,10 +1,8 @@
-import {dirPortalCheck} from './../../config';
-import path from 'path';
 import {Page} from 'puppeteer';
 import {extractNumber, extractPrice, logger} from '../../../../../utils';
 import {ILot} from '../../types';
 
-export const scrapePage = async (page: Page) => {
+export const scrapeDtLotPage = async (page: Page) => {
   const data = await page.$$eval('.mod-mergeBuilding--sale', (els) => {
     return els.map<ILot>((el) => {
       const rawPrice = $(el)
@@ -63,7 +61,7 @@ export const scrapeDtLot = async (
   page: Page,
   result?: ILot[],
 ) : Promise<ILot[]> => {
-  const data = await scrapePage(page);
+  const data = await scrapeDtLotPage(page);
 
   const cummulativeResult = [...(result ?? []), ...data];
 
