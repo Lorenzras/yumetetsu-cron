@@ -1,6 +1,6 @@
 import {IMansion} from '../../types';
 import {Page} from 'puppeteer';
-import {extractNumber, extractPrice} from '../../../../../utils';
+import {extractNumber, extractPrice, logger} from '../../../../../utils';
 
 export const scrapeDtMansion = async (
   page: Page,
@@ -23,15 +23,15 @@ export const scrapeDtMansion = async (
         const propUrl = $(unit).find('.detail a').attr('href') || '';
 
         return {
-          id: 'homes-' + propUrl.split('/')
+          物件番号: 'homes-' + propUrl.split('/')
             .reduce((accu, curr) => curr ? curr : accu),
-          address: address,
-          rawFloorArea: rawFloorArea,
-          floorArea: 0,
-          price: 0,
-          propertyName: propertyName,
-          propertyUrl: propUrl,
-          rawPrice: $(unit).find('.priceLabel').text(),
+          所在地: address,
+          専有面積: rawFloorArea,
+          比較用専有面積: 0,
+          比較用価格: 0,
+          物件名: propertyName,
+          リンク: propUrl,
+          販売価格: $(unit).find('.priceLabel').text(),
         };
       });
 
@@ -43,8 +43,8 @@ export const scrapeDtMansion = async (
   const populateNumbers = data
     .map(((item)=>({
       ...item,
-      price: extractPrice(item.rawPrice),
-      floorArea: extractNumber(item.rawFloorArea),
+      比較用価格: extractPrice(item.販売価格),
+      比較用専有面積: extractNumber(item.専有面積),
     })));
 
   const cummulativeResult = [...(result ?? []), ...populateNumbers];
@@ -57,5 +57,6 @@ export const scrapeDtMansion = async (
     return await scrapeDtMansion(page, cummulativeResult);
   }
 
+  logger.info('Done scraping mansion');
   return cummulativeResult;
 };
