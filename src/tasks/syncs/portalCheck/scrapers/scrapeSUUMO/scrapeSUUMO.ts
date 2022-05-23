@@ -35,9 +35,10 @@ const propertyActions: PropertyActions = [
 export const scrapeSUUMO = async (page: Page) => {
   // 物件種別ごとに処理を繰り返す
   for (const actions of propertyActions) {
-  // citylistのkey(県)毎に処理を繰り返す
-    for (const [pref, cities] of Object.entries(location)) {
-      console.log(pref, cities);
+    // citylistのkey(県)毎に処理を繰り返す
+    for (const [pref, cityInfo] of Object.entries(location)) {
+      const cities = Object.keys(cityInfo); // 県ごとに市の配列を作成する
+
       const targetPref = pref === '愛知' ?
         actions.url + 'aichi/city/' : actions.url + 'gifu/city/';
 
