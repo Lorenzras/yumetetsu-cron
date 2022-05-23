@@ -3,7 +3,7 @@ import {ILocations} from './types';
 
 export const dirPortalCheck = __dirname;
 export const dlPortalCheck = path.join(dirPortalCheck, 'data');
-export const dlImg = path.join(dirPortalCheck, 'img');
+export const dlImg = path.join(dirPortalCheck, 'errImg');
 
 export const kintoneAppId = 199;
 
