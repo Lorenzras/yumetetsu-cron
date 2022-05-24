@@ -11,6 +11,7 @@ import {
 import {cityLists, dlImg, kintoneAppId} from '../config';
 import {PropertyType} from '../types';
 import {compareData} from './compareData';
+import {setLocation} from './setLocation';
 
 export interface IPropSearchData {
   propertyType: PropertyType,
@@ -31,69 +32,15 @@ export const selectByText = async (
   text: string,
 ) => {
   await page.waitForSelector(`${selector} option`);
-  await page.$eval(selector, (el, text) => {
+  const prefId = await page.$eval(selector, (el, text) => {
     const prefId = $(el)
       .children(`option:contains(${text})`).val() as string;
-    $(el).val(prefId);
-    $(el).trigger('change');
+    // $(el).val(prefId);
+    // $(el).trigger('change');
     return prefId;
   }, text);
 
-  // await page.select(selector, shopStoreId);
-};
-
-export const setLocation = async (
-  {page, data}:
-  {
-    page: Page,
-    data: {
-      pref: string,
-      city: string,
-      town: string,
-    }
-  }) => {
-  const {pref, city, town} = data;
-  await retry(async ()=>{
-    logger.info(`Setting location. ${pref} ${city} ${town}`);
-    /* Open modal */
-    await page.waitForSelector('#select_button_city1');
-    await page.click('#select_button_city1');
-
-
-    await selectByText(page, '#select_pref_id', pref );
-
-    await page.type('#modal_city_name_autocomplete', city);
-
-    /* Town field is disabled until triggering blur event on city field */
-    await page.$eval(
-      '#modal_city_name_autocomplete', (e) => {
-        $(e).trigger('blur');
-        $('#modal_town_name_autocomplete').trigger('focus');
-      });
-
-    if (town) {
-      return page.waitForSelector(
-        '#modal_town_name_autocomplete:not(:disabled)',
-        {timeout: 5000},
-      )
-        .then(()=>{
-          return page.type('#modal_town_name_autocomplete', town);
-        })
-        .catch(()=>{
-          logger.error('Failed to type town');
-          throw new Error('Failed to type town');
-        });
-    }
-
-    await page.click('#modal_ok_button');
-    await page.waitForSelector('#select_pref_id', {hidden: true});
-  }, {
-    retries: 3,
-    onRetry: async (e, tries) => {
-      logger.error(`Failed. Retrying to populate location form. ${e.message} Attempt: ${tries}`);
-      await page.click('#modal_clear_button');
-    },
-  });
+  await page.select(selector, prefId);
 };
 
 const setLotArea = async (page: Page, area: string) => {
