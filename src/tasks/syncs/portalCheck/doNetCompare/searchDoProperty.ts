@@ -139,6 +139,7 @@ export const searchDoProperty = async ({
       await page.screenshot({path: getFileName({
         dir: dlImg,
         appId: kintoneAppId,
+        suffix: `attempts(${attempt})`,
         ext: 'png',
       })});
     },
