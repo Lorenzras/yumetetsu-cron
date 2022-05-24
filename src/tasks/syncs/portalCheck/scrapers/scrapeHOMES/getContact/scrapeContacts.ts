@@ -6,7 +6,13 @@ import {IProperty} from '../../../types';
 import {produce} from 'immer';
 import {getContactByLink} from './getContactByLink';
 
-
+/**
+ * Retrieves HOMES contacts synchronously.
+ *
+ * @param page
+ * @param data Array of data with リンク
+ * @returns {IProperty} IProperty with contacts
+ */
 export const scrapeContacts = async (page: Page, data: IProperty[]) => {
   // const newPage = await page.browserContext().newPage();
   let nextState: IProperty[] = [...data];

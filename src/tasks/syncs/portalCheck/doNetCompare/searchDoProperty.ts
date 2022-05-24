@@ -2,6 +2,7 @@
 import retry from 'async-retry';
 import {Page} from 'puppeteer';
 import {getFileName, logger, spreadAddress} from '../../../../utils';
+import {blockImages} from '../../../common/browser';
 import {login} from '../../../common/doNet';
 import {navigateToPropertyPage} from '../../../common/doNet/pages/navigate';
 import {
@@ -61,6 +62,8 @@ export const searchDoProperty = async ({
   const {都道府県: pref, 市区: city, 町域: town} = spreadAddress(address);
   const shopName = cityLists[pref][city];
   const propType : TPropTypes = propTypeVals[propertyType];
+  page.removeAllListeners();
+  await blockImages(page);
 
   const result = await retry(async () => {
     logger.info('Starting search ' + JSON.stringify(data));

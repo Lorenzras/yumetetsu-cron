@@ -62,4 +62,5 @@ export const clusterScraper = async () => {
 
   await cluster.idle();
   await cluster.close();
+  await watcher.close();
 };

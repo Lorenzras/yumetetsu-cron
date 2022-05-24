@@ -7,6 +7,7 @@ import {Page} from 'puppeteer';
 import retry from 'async-retry';
 import {scrapeContactNew} from './scrapeContactNew';
 import path from 'path';
+import {blockImages} from '../../../../../common/browser';
 
 export const getContactByLink = async (page: Page, url: string) => {
   const initialVal = {
@@ -14,8 +15,8 @@ export const getContactByLink = async (page: Page, url: string) => {
     掲載企業TEL: '---',
   };
   return retry(async (bail, attempt)=>{
-    // page.removeAllListeners();
-    // await blockImages(page);
+    page.removeAllListeners();
+    await blockImages(page);
     await page.goto(url, {waitUntil: 'domcontentloaded'});
     logger.info('link : ' + url);
 
