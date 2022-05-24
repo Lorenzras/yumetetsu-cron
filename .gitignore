@@ -132,3 +132,4 @@ build
 cli-kintone*
 **.snap
 **.csv
+**/errImg/**.png

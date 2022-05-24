@@ -4,13 +4,8 @@ import {extractTel} from '../../../../../../utils';
 import {TCompanyContact} from '../../../types';
 
 export const scrapeSingleContactLot = async (page: Page) => {
-  const result : TCompanyContact = {
-    掲載企業: '',
-    掲載企業TEL: '',
-  };
-
   const mainSelector = '.realestate .inquire';
-
+  page.waitForSelector(mainSelector, {timeout: 60000});
 
   const dirtyResult = await page.$eval(
     mainSelector,
@@ -19,7 +14,7 @@ export const scrapeSingleContactLot = async (page: Page) => {
       const alternateTel = $(el).find('ul.annotation li').eq(1).text();
 
       return {
-        掲載企業: $(el).find('th:contains(会社名) ~ td').text(),
+        掲載企業: $(el).find('th:contains(会社名) ~ td').text() || '',
         掲載企業TEL: alternateTel ? alternateTel : companyTel,
       };
     },
@@ -30,5 +25,5 @@ export const scrapeSingleContactLot = async (page: Page) => {
     掲載企業TEL: extractTel(dirtyResult.掲載企業TEL || ''),
   };
 
-  return {...result, ...cleanResult};
+  return cleanResult;
 };

@@ -1,6 +1,6 @@
 import {getAgents} from './getAgents';
 
-import {IConcurrentData} from '../types';
+import {IConcurrentData, TPropStatusText} from '../types';
 import {Page} from 'puppeteer';
 
 import {selectors} from '../selectors';
@@ -22,7 +22,9 @@ const setAgent = async (page: Page, agent = '') => {
  * @param page Page
  * @param propTypes property type array
  */
-const setPropertyTypes = async (page: Page, propTypes : string[] = [] ) =>{
+export const setPropertyTypes = async (
+  page: Page, propTypes : string[] = [],
+) =>{
   await page.evaluate((propTypes: string[])=>{
     const inputs = $('th:contains(物件種別) ~ td input');
     inputs.each((_, el) => {
@@ -38,19 +40,18 @@ const setPropertyTypes = async (page: Page, propTypes : string[] = [] ) =>{
  * @param page Page
  * @param propStatuses property type array
  */
-const setPropertyStatus = async (page: Page, propStatuses : string[] = [] ) =>{
-  await page.evaluate((propStatuses: string[])=>{
-    const inputs = $('th:contains(ステータス) ~ td input');
-    const cleanStatused = propStatuses.filter(Boolean);
-    if (cleanStatused.length === 0) {
-      inputs.prop('checked', true );
-    } else {
-      inputs.each((_, el) => {
-        $(el).prop(
-          'checked',
-          cleanStatused.includes($(el).val()?.toString() || ''));
+export const setPropertyStatus = async (
+  page: Page, propStatuses : TPropStatusText[] = [],
+) =>{
+  await page.evaluate((propStatuses: TPropStatusText[])=>{
+    new Promise((resolve) => {
+      return resolve($('th:contains(ステータス) ~ td input').prop('checked', false));
+    }).then(()=>{
+      propStatuses.forEach((status)=> {
+        $(`th:contains(ステータス) ~ td div div:contains(${status}) input`)
+          .prop('checked', true);
       });
-    }
+    });
   }, propStatuses);
 };
 
