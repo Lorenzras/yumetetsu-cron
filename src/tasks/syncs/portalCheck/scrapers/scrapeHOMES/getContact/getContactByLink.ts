@@ -23,22 +23,22 @@ export const getContactByLink = async (page: Page, url: string) => {
     const task = await Promise.race([
       page
         .waitForSelector('p.attention a',
-          {visible: true, timeout: 600000})
+          {visible: true, timeout: 30000})
         .then(()=> 0),
       page
         .waitForSelector(
           '.realestate .inquire',
-          {visible: true, timeout: 600000},
+          {visible: true, timeout: 30000},
         )
         .then(()=> 1),
       page
         .waitForXPath(
           '//a//span[contains(text(), "詳細を見る")]/parent::a',
-          {visible: true, timeout: 600000})
+          {visible: true, timeout: 30000})
         .then(()=>2),
       page
         .waitForSelector('.mod-notFoundMsg',
-          {visible: true, timeout: 200000})
+          {visible: true, timeout: 20000})
         .then(()=> new Error('HOMES server error.')),
     ]).catch((err)=>{
       if (attempt >= 3) {
@@ -47,7 +47,7 @@ export const getContactByLink = async (page: Page, url: string) => {
         return initialVal;
       }
       throw new Error('Failed to find selector to get contact. ' + err.message);
-    });
+    }); 3;
 
     switch (task) {
       case 0: return scrapeSingleContact(page);
