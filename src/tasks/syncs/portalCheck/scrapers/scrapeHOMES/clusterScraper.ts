@@ -1,42 +1,40 @@
-import {getContactByLink} from './getContact';
-import {IProperty, IPropertyAction, PropertyActions} from '../../types';
+
+import {IPropertyAction} from '../../types';
 import {getExtraPuppeteer} from '../../../../common/browser/openBrowser';
 import {browserTimeOut} from '../../../../common/browser/config';
 import {logger} from '../../../../../utils/logger';
 import {Cluster} from 'puppeteer-cluster';
-import {scrapeDtMansion} from './scrapeDtMansion';
-import {scrapeDtLot} from './scrapeDtLot';
-import {scrapeDtHouse} from './scrapeDtHouse';
-
-// import puppeteer from 'puppeteer-extra';
-// import stealthPlugin from 'puppeteer-extra-plugin-stealth';
 import {clusterTask} from './clusterTask';
 import {byAction} from './clusterQueues/byAction';
+import chokidar from 'chokidar';
+import {dlPortalCheck} from '../../config';
+import {uploadTask} from '../../clusterTasks/uploadTask';
 
-// puppeteer.use(stealthPlugin());
-
-/* const propertyActions: PropertyActions = [
-  {
-    type: '中古戸建',
-    url: 'https://www.homes.co.jp/kodate/chuko/tokai/',
-    handleScraper: scrapeDtHouse,
-  },
-  {
-    type: '中古マンション',
-    url: 'https://www.homes.co.jp/mansion/chuko/tokai/',
-    handleScraper: scrapeDtMansion,
-  },
-  {
-    type: '土地',
-    url: 'https://www.homes.co.jp/tochi/tokai/',
-    handleScraper: scrapeDtLot,
-  },
-]; */
 
 export interface IClusterTaskData extends IPropertyAction {
   pref: string,
   cities: string[]
 }
+
+const initCluster = () => Cluster.launch({
+  puppeteer: getExtraPuppeteer(),
+  concurrency: Cluster.CONCURRENCY_CONTEXT,
+  maxConcurrency: 5,
+  retryLimit: 2,
+  retryDelay: 2000,
+  puppeteerOptions: {
+    headless: false,
+  },
+  timeout: browserTimeOut,
+});
+
+const initFileWatcher = () => {
+  return chokidar.watch(dlPortalCheck, {
+    ignored: /(^|[/\\])\../, // ignore dotfiles
+    ignoreInitial: true,
+    depth: 0,
+  });
+};
 
 
 /**
@@ -44,56 +42,25 @@ export interface IClusterTaskData extends IPropertyAction {
  * Refer to scrapeHOMES for synchronous processing.
  */
 export const clusterScraper = async () => {
-  const cluster: Cluster<IClusterTaskData> = await Cluster.launch({
-    puppeteer: getExtraPuppeteer(),
-    concurrency: Cluster.CONCURRENCY_CONTEXT,
-    maxConcurrency: 5,
-    puppeteerOptions: {
-      headless: false,
+  const cluster : Cluster<IClusterTaskData> = await initCluster();
+  const watcher = initFileWatcher();
 
-    },
-    timeout: browserTimeOut,
+  watcher.on('add', async (path)=>{
+    return await cluster.execute(({page})=> uploadTask(page, path));
   });
 
   logger.info(`Starting cluster.`);
 
   cluster.on('taskerror', (err, data) => {
-    console.log(`Error crawling : ${err.message}`, data);
+    logger.error(`Error crawling : ${err.message} ${data}`);
   });
 
   await cluster.task(clusterTask);
 
-  await byAction(cluster);
-
-  /*  const propertyProcessor = async (row: IProperty) =>{
-    const newRow = await cluster.execute(async ({page})=>{
-      const contact = await getContactByLink(page, row.リンク);
-
-      return {...row, ...contact};
-    });
-    return newRow;
-  };
-
-  const propertyTypesProcessor = async (
-    action : IPropertyAction, idx: number,
-  ) => {
-    logger.info(`Retrieving contacts for ${propertyActions[idx].type}`);
-    const propDt = await cluster.execute(action) as IProperty[];
-    const newPropDt = await Promise.all(propDt.map(propertyProcessor));
-    return newPropDt;
-  };
+  byAction(cluster);
 
 
-  const results = await Promise.all(
-    propertyActions.map(propertyTypesProcessor),
-  );
-
-  results.forEach((res)=>{
-    if ('length' in res) {
-      console.log('row ', res?.length);
-    }
-  });
- */
   await cluster.idle();
   await cluster.close();
+  await watcher.close();
 };
