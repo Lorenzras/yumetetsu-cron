@@ -101,7 +101,8 @@ export const byAction = async (
   /*
   Scrape by prefecture,
   get contacts for each link,
-  then compare to Donet
+  compare to Donet,
+  then save csv
    */
   const byPrefecture = async (action: IPropertyAction) => {
     return await Promise.all(Object.entries(cityLists).map(
