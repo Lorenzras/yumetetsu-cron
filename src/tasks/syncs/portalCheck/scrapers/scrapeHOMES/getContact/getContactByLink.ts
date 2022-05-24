@@ -8,6 +8,10 @@ import {Page} from 'puppeteer';
 import retry from 'async-retry';
 
 export const getContactByLink = async (page: Page, url: string) => {
+  const initialVal = {
+    掲載企業: '---',
+    掲載企業TEL: '---',
+  };
   return retry(async (bail, attempt)=>{
     // page.removeAllListeners();
     // await blockImages(page);
@@ -15,27 +19,30 @@ export const getContactByLink = async (page: Page, url: string) => {
     logger.info('link : ' + url);
 
     const task = await Promise.race([
-      page.waitForSelector('p.attention a', {visible: true, timeout: 20000})
+      page.waitForSelector('p.attention a', {visible: true, timeout: 600000})
         .then(()=> 0),
       page
         .waitForSelector(
           '.realestate .inquire',
-          {visible: true, timeout: 20000},
+          {visible: true, timeout: 600000},
         )
         .then(()=> 1),
-    ]);
+    ]).catch((err)=>{
+      if (attempt >= 3) {
+        bail(new Error('Failed'));
+        return initialVal;
+      }
+      throw new Error('Failed to find selector to get contact. ' + err.message);
+    });
 
     switch (task) {
       case 0: return scrapeSingleContact(page);
       case 1: return scrapeSingleContactLot(page);
-      default: return {
-        掲載企業: '---',
-        掲載企業TEL: '---',
-      };
+      default: return initialVal;
     }
   },
   {
-    retries: 5,
+    retries: 3,
     onRetry: async (e, attempt)=>{
       const errImgName = getFileName({
         dir: dlImg, appId: kintoneAppId, ext: 'png',
@@ -47,29 +54,4 @@ export const getContactByLink = async (page: Page, url: string) => {
       });
     },
   });
-  /* try {
-    await blockImages(page);
-    await page.goto(url, {waitUntil: 'domcontentloaded'});
-    logger.info('link : ' + url);
-
-    const isLotPage = await Promise.race([
-      page.waitForSelector('p.attention a')
-        .then(()=> false).catch(),
-      page.waitForSelector('.realestate .inquire')
-        .then(()=> true).catch(),
-    ]);
-
-
-    return isLotPage ?
-      await scrapeSingleContactLot(page) :
-      await scrapeSingleContact(page);
-  } catch (err: any) {
-    logger.error(`getContactByLink Failed ${page.url()} ${err.message}` );
-    return {
-      掲載企業: '取得失敗',
-      掲載企業TEL: '取得失',
-    };
-  } finally {
-    page.removeAllListeners();
-  } */
 };
