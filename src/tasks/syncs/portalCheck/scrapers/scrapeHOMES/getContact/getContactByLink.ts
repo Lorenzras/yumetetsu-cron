@@ -1,12 +1,12 @@
 import {getFileName} from './../../../../../../utils/file';
 import {dlImg, kintoneAppId} from './../../../config';
 import {logger} from './../../../../../../utils/logger';
-import {blockImages} from '../../../../../common/browser';
 import {scrapeSingleContact} from './scrapeSingleContact';
 import {scrapeSingleContactLot} from './scrapeSingleContactLot';
 import {Page} from 'puppeteer';
 import retry from 'async-retry';
-import {scrapeRealtorPage} from './scrapeRealtorPage';
+import {scrapeContactNew} from './scrapeContactNew';
+import path from 'path';
 
 export const getContactByLink = async (page: Page, url: string) => {
   const initialVal = {
@@ -47,7 +47,7 @@ export const getContactByLink = async (page: Page, url: string) => {
     switch (task) {
       case 0: return scrapeSingleContact(page);
       case 1: return scrapeSingleContactLot(page);
-      case 2: return scrapeRealtorPage(page);
+      case 2: return scrapeContactNew(page);
       default: return initialVal;
     }
   },
@@ -58,7 +58,7 @@ export const getContactByLink = async (page: Page, url: string) => {
         dir: dlImg, appId: kintoneAppId, ext: 'png',
       });
       // eslint-disable-next-line max-len
-      logger.error(`getContactByLink failed to find contact. ${page.url} ${errImgName} Attempt: ${attempt}`);
+      logger.error(`getContactByLink failed to find contact. ${page.url()} ${path.basename(errImgName)} Attempt: ${attempt}`);
       await page.screenshot({
         path: errImgName,
       });

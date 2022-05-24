@@ -2,7 +2,10 @@ import {logger} from '../../../../../../utils/logger';
 import {Page} from 'puppeteer';
 import {TCompanyContact} from '../../../types';
 
-export const scrapeRealtorPage = async (page: Page ) => {
+/* A new property page that doesn't use JQuery,
+  but the contact link still leads to legacy page.
+*/
+export const scrapeContactNew = async (page: Page ) => {
   let result : TCompanyContact = {
     掲載企業: '---',
     掲載企業TEL: '---',
@@ -16,12 +19,13 @@ export const scrapeRealtorPage = async (page: Page ) => {
       .then((el) => page.evaluate((el: HTMLAnchorElement) => {
         return el.getAttribute('href') || '';
       }, el))
-      .catch(()=>{
-        logger.error(`getKochiralink failed at ${page.url}`);
+      .catch((err: any)=>{
+        logger.error(
+          `get詳細を見る failed at ${page.url()} ${err.message}`);
         return '';
       });
 
-    logger.info('Kochiralink ' + realtorPage);
+    logger.info(`scrapeContactNew  ${realtorPage} --- ${page.url()}`);
 
     if (realtorPage) {
       await page.goto(realtorPage);

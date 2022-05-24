@@ -4,8 +4,8 @@ import {TCompanyContact} from '../../../types';
 
 export const scrapeSingleContact = async (page: Page ) => {
   let result : TCompanyContact = {
-    掲載企業: '',
-    掲載企業TEL: '',
+    掲載企業: '---',
+    掲載企業TEL: '---',
   };
   let getKochiraLink: string;
 
