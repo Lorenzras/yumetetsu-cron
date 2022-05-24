@@ -30,6 +30,7 @@ export const getContactByLink = async (page: Page, url: string) => {
     ]).catch((err)=>{
       if (attempt >= 3) {
         bail(new Error('Failed'));
+        logger.error('Get contact by link exceeded 3 tries');
         return initialVal;
       }
       throw new Error('Failed to find selector to get contact. ' + err.message);

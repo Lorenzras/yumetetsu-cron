@@ -69,17 +69,17 @@ export const setLocation = async (
 
   if (town) {
     await page.waitForSelector(
-      '#modal_town_name_autocomplete ~ ul',
-      {timeout: 5000});
-
-    await page.waitForSelector(
       '#modal_town_name_autocomplete:not(:disabled)',
       {timeout: 5000},
-    );
-
-    await page.type('#modal_town_name_autocomplete', town);
+    )
+      .then(()=>{
+        return page.type('#modal_town_name_autocomplete', town);
+      })
+      .catch(()=>{
+        logger.error('Failed to type town');
+        throw new Error('Failed to type town');
+      });
   }
-
 
   await page.click('#modal_ok_button');
   await page.waitForSelector('#select_pref_id', {hidden: true});
