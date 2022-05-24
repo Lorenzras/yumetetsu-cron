@@ -12,6 +12,7 @@ export interface IPropertyAction {
 }
 export type PropertyActions = Array<IPropertyAction>
 
+
 export interface IProperty {
   物件番号?: string,
   物件種別?: PropertyType,

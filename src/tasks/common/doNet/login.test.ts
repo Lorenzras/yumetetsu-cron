@@ -7,7 +7,8 @@ describe('DoNet', ()=>{
     const page = await openBrowserPage();
     await login(page);
 
-    page.browser().close();
+
     expect(page).toBeDefined();
+    page.browser().close();
   }, 30000);
 });
