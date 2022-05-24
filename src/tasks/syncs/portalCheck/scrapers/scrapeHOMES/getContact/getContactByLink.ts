@@ -6,6 +6,7 @@ import {scrapeSingleContact} from './scrapeSingleContact';
 import {scrapeSingleContactLot} from './scrapeSingleContactLot';
 import {Page} from 'puppeteer';
 import retry from 'async-retry';
+import {scrapeRealtorPage} from './scrapeRealtorPage';
 
 export const getContactByLink = async (page: Page, url: string) => {
   const initialVal = {
@@ -19,7 +20,9 @@ export const getContactByLink = async (page: Page, url: string) => {
     logger.info('link : ' + url);
 
     const task = await Promise.race([
-      page.waitForSelector('p.attention a', {visible: true, timeout: 600000})
+      page
+        .waitForSelector('p.attention a',
+          {visible: true, timeout: 600000})
         .then(()=> 0),
       page
         .waitForSelector(
@@ -27,6 +30,11 @@ export const getContactByLink = async (page: Page, url: string) => {
           {visible: true, timeout: 600000},
         )
         .then(()=> 1),
+      page
+        .waitForXPath(
+          '//a//span[contains(text(), "詳細を見る")]/parent::a',
+          {visible: true, timeout: 600000})
+        .then(()=>2),
     ]).catch((err)=>{
       if (attempt >= 3) {
         bail(new Error('Failed'));
@@ -39,6 +47,7 @@ export const getContactByLink = async (page: Page, url: string) => {
     switch (task) {
       case 0: return scrapeSingleContact(page);
       case 1: return scrapeSingleContactLot(page);
+      case 2: return scrapeRealtorPage(page);
       default: return initialVal;
     }
   },
