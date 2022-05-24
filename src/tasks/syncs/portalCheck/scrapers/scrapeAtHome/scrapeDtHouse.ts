@@ -24,7 +24,8 @@ export const scrapeDtHousePage = async (page: Page) => {
 
 export const scrapeDtHouse = async (
   page: Page,
-  result?: IHouse[] | []) => {
+  result?: IHouse[] | [],
+): Promise<IHouse[]> => {
   logger.info(`Scraping kodate. `);
 
   const data = await scrapeDtHousePage(page);
@@ -36,5 +37,18 @@ export const scrapeDtHouse = async (
     比較用土地面積: extractNumber(item.土地面積),
   })));
 
-  return populateNumbers;
+  const cummulativeResult = [...(result ?? []), ...populateNumbers];
+
+  if (await page.$('.nextPage')) {
+    logger.info('Clicking next page.');
+    await Promise.all([
+      page.waitForNavigation(),
+      page.click('.nextPage'),
+    ]);
+
+
+    return await scrapeDtHouse(page, cummulativeResult);
+  }
+
+  return cummulativeResult;
 };
