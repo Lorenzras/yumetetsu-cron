@@ -21,11 +21,12 @@ export const setLocation = async (
     await page.waitForSelector('#select_button_city1');
     await page.click('#select_button_city1');
 
-
+    // await selectByText(page, '#select_pref_id', '愛媛県' );
     await selectByText(page, '#select_pref_id', pref );
 
+    await page.click('#modal_city_name_autocomplete_list_button');
     await page.type('#modal_city_name_autocomplete', city);
-    await page.keyboard.press('Enter');
+
 
     /* Town field is disabled until triggering blur event on city field */
     await page.$eval(
@@ -34,11 +35,12 @@ export const setLocation = async (
       });
 
     if (town) {
-      return page.waitForSelector(
+      await page.waitForSelector(
         '#modal_town_name_autocomplete:not(:disabled)',
         {timeout: 5000},
       )
-        .then(()=>{
+        .then(async ()=>{
+          await page.click('#modal_town_name_autocomplete_list_button');
           return page.type('#modal_town_name_autocomplete', town);
         })
         .catch((err: any)=>{
