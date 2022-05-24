@@ -30,8 +30,6 @@ export const clusterScraper = async () => {
     retryDelay: 2000,
     puppeteerOptions: {
       headless: false,
-      defaultViewport: null,
-      args: ['--start-maximized'],
     },
     timeout: browserTimeOut,
   });
