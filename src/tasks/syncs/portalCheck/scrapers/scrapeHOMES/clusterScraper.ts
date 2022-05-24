@@ -45,8 +45,8 @@ export const clusterScraper = async () => {
   const cluster : Cluster<IClusterTaskData> = await initCluster();
   const watcher = initFileWatcher();
 
-  watcher.on('add', (path)=>{
-    cluster.execute(({page})=> uploadTask(page, path));
+  watcher.on('add', async (path)=>{
+    return await cluster.execute(({page})=> uploadTask(page, path));
   });
 
   logger.info(`Starting cluster.`);
@@ -57,7 +57,7 @@ export const clusterScraper = async () => {
 
   await cluster.task(clusterTask);
 
-  await byAction(cluster);
+  byAction(cluster);
 
 
   await cluster.idle();
