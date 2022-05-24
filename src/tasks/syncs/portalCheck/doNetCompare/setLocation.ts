@@ -40,6 +40,8 @@ export const setLocation = async (
         {timeout: 5000},
       )
         .then(async ()=>{
+          // There are times when blur doesn't fire to populate autocomplete.
+          // So click the button.
           await page.click('#modal_town_name_autocomplete_list_button');
           return page.type('#modal_town_name_autocomplete', town);
         })
