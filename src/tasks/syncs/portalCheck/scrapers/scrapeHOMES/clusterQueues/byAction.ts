@@ -9,8 +9,7 @@ import {cityLists, dlPortalCheck, kintoneAppId} from '../../../config';
 import {IClusterTaskData} from '../clusterScraper';
 import {getContactByLink} from '../getContact/';
 import {getFileName, logger, saveJSONToCSV} from '../../../../../../utils';
-import {
-  IPropSearchData,
+import {IPropSearchData,
   searchDoProperty} from '../../../doNetCompare/searchDoProperty';
 import {TSearchResult} from '../../../doNetCompare/compareData';
 
@@ -93,10 +92,11 @@ export const byAction = async (
     return await Promise.all(properties.map(async (prop) => {
       const propWithContact = await handleGetContact(prop);
       const propDoCompared = await handleDoNetCompare(prop);
-      const completeData = {...propWithContact, ...propDoCompared};
+      const completeData: IProperty = {...propWithContact, ...propDoCompared};
       return completeData;
     }));
   };
+
 
   /*
   Scrape by prefecture,
@@ -117,6 +117,15 @@ export const byAction = async (
 
         const resultCompleteData = await handleGetCompleteData(addedPropType);
 
+        if (resultCompleteData.length) {
+          // eslint-disable-next-line max-len
+          logger.info(`Saving file with ${resultCompleteData.length} lines. ${action.type}`);
+          await saveJSONToCSV(getFileName({
+            appId: kintoneAppId,
+            dir: dlPortalCheck,
+            suffix: action.type,
+          }), resultCompleteData);
+        }
         return resultCompleteData;
       }));
   };
@@ -129,12 +138,14 @@ export const byAction = async (
     finalResults
       .filter((d)=>d.length)
       .forEach((result) => {
-        logger.info(`Saving file with ${result.length} lines. ${action.type}`);
-        saveJSONToCSV(getFileName({
+        // eslint-disable-next-line max-len
+        /* logger.info(`Saving file with ${result.length} lines. ${action.type}`);
+        return saveJSONToCSV(getFileName({
           appId: kintoneAppId,
           dir: dlPortalCheck,
           suffix: action.type,
-        }), result);
+        }), result); */
+        console.log(result.length);
       });
   });
 };
