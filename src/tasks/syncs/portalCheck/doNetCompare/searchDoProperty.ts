@@ -1,13 +1,14 @@
+/* eslint-disable max-len */
 import retry from 'async-retry';
 import {Page} from 'puppeteer';
-import {logger, spreadAddress} from '../../../../utils';
+import {getFileName, logger, spreadAddress} from '../../../../utils';
 import {login} from '../../../common/doNet';
 import {navigateToPropertyPage} from '../../../common/doNet/pages/navigate';
 import {
   setPropertyStatus,
   setPropertyTypes,
   TPropTypes} from '../../../common/doNet/pages/properties';
-import {cityLists} from '../config';
+import {cityLists, dlImg, kintoneAppId} from '../config';
 import {PropertyType} from '../types';
 import {compareData} from './compareData';
 
@@ -133,6 +134,14 @@ export const searchDoProperty = async ({
     return await compareData(page, data);
   }, {
     retries: 3,
+    onRetry: async (e, attempt) => {
+      logger.error(`Retrying doNetCompare with ${attempt} attempts.`);
+      await page.screenshot({path: getFileName({
+        dir: dlImg,
+        appId: kintoneAppId,
+        ext: 'png',
+      })});
+    },
   });
 
   return result;
