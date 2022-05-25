@@ -1,7 +1,7 @@
 import {openMockBrowserPage} from '../../../../common/browser';
 import {browserTimeOut} from '../../../../common/browser/config';
 import {IProperty} from '../../types';
-import {getCompanyInfo} from './getCompanyInfo';
+import {scrapeContact} from './scrapeContact';
 
 /* https://suumo.jp/jj/bukken/ichiran/JJ012FC002/?ar=050&bs=030&ekTjCd=&ekTjNm=&kb=1&kj=9&km=1&kt=9999999&sc=21202&ta=21&tb=0&tj=0&tt=9999999&bknlistmodeflg=2&pc=30 */
 // こちらなし /* https://suumo.jp/chukomansion/__JJ_JJ010FJ100_arz1050z2bsz1011z2ncz198324093.html */
@@ -41,7 +41,7 @@ const data: IProperty = {
 
 test(('getCompanyInfo'), async () => {
   const page = await openMockBrowserPage();
-  const result = await getCompanyInfo(page, data);
+  const result = await scrapeContact(page, data);
 
   expect(result).toMatchSnapshot();
   page.browser().disconnect();

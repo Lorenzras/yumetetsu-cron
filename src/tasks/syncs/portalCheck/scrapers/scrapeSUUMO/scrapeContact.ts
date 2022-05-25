@@ -2,7 +2,7 @@ import {Page} from 'puppeteer';
 import {extractTel} from '../../../../../utils';
 import {IProperty} from '../../types';
 
-export const getCompanyInfo = async (
+export const scrapeContact = async (
   page: Page,
   data: IProperty,
 ) => {
