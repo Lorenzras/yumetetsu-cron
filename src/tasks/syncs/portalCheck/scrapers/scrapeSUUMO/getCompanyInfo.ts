@@ -13,26 +13,25 @@ export const getCompanyInfo = async (
   ]);
 
   console.log('処理確認::1', data.物件種別);
-  const datas = await page.evaluate((el) => {
+  let datas = await page.evaluate(() => {
     // マンションのみ、「所在階」を取得し、物件名に追加する
-    const floors = $(el).find('th:contains(所在階) ~ td')
+    const floors = $('th:contains(所在階) ~ td')
       .eq(0).text().trim().split('/', 1)[0];
 
     // 「こちら」のリンクの有無を確認する
-    const link = $(el).find('.heikiToiawaseWindow ~ input').eq(0).val();
+    const link = $('.heikiToiawaseWindow ~ input')
+      .eq(0).val() as string?? 'なし';
 
     // 「こちら」のリンクがない場合
     let kigyoumei = '';
     let tel = '';
-    if (!link) {
+    if (link === 'なし') {
       // 掲載企業名を取得する
-      kigyoumei = '';
+      kigyoumei = $('th:contains(お問い合せ先) ~ td')
+        .eq(0).children('p').eq(0).text();
       // 掲載企業の連絡先を取得する
-      tel = '';
-      /* const companyDates = {};
-
-        return companyDates;
-      }; */
+      tel = $('th:contains(お問い合せ先) ~ td')
+        .eq(0).children('p').eq(1).text().trim();
     }
 
     return {
@@ -46,26 +45,32 @@ export const getCompanyInfo = async (
   console.log('return check 1::', datas);
 
   // 「こちら」のリンクがある場合
-  if (datas.link) {
+  if (datas.link !== 'なし' && datas.link) {
     // リンク先にジャンプする
     await Promise.all([
       page.goto(datas.link, {waitUntil: 'networkidle2'}),
       page.waitForNavigation(),
     ]);
 
-    await page.evaluate((el) => {
-      const kigyoumei = $(el).find('.bkdt-shop-name').children('em').text();
-      const tel = $(el).find('.bkdt-shop-name ~ ul')
+    console.log('datas', datas);
+    datas = await page.evaluate((datas) => {
+      console.log('datas::', datas);
+      const kigyoumei = $('.bkdt-shop-name').children('em').text();
+      const tel = $('.bkdt-shop-name ~ ul')
         .children('li').children('em').text();
 
-      return {...datas,
-        kigyoumei: kigyoumei,
-        tel: extractTel(tel),
+      return {
+        ...datas,
+        掲載企業: kigyoumei,
+        掲載企業TEL: tel,
       };
-    });
+    }, datas);
 
     console.log('datas::', datas);
   }
 
-  return datas;
+  return {
+    ...datas,
+    掲載企業TEL: extractTel(datas.掲載企業TEL),
+  };
 };
