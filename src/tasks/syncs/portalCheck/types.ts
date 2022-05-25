@@ -1,16 +1,35 @@
 /* eslint-disable max-len */
 import {Page} from 'puppeteer';
-import {propertyTypes} from './config';
+import {cityLists, propertyTypes} from './config';
 
 export type PropertyType = typeof propertyTypes[number]
 
+/**
+ * @deprecated
+ */
 export interface IPropertyAction {
   url: string,
   type: PropertyType,
   handleScraper: (page: Page) => Promise<IProperty[]>,
   submitSelector?: string
 }
+
+/**
+ * @deprecated
+ */
 export type PropertyActions = Array<IPropertyAction>
+
+export type TMainScraper = (page: Page) => Promise<IProperty[]>
+export type THandlePrepareForm = (page: Page, pref: string) => Promise<boolean>
+export type TContactScraper = (page: Page, data: IProperty) => Promise<IProperty>
+
+export interface IAction {
+  pref: string,
+  type: PropertyType,
+  handleScraper: TMainScraper,
+  handlePrepareform: THandlePrepareForm
+  handleContactScraper: TContactScraper
+}
 
 
 export interface IProperty {
