@@ -1,6 +1,5 @@
 import {IProperty} from '../types';
 import {Page} from 'puppeteer';
-import {IPropSearchData} from './searchDoProperty';
 
 export type TSearchResult = Required<Pick<
 IProperty,
@@ -13,16 +12,16 @@ IProperty,
 
 export const compareData = async (
   page: Page,
-  data: IPropSearchData,
+  data: IProperty,
 ) : Promise<Array<TSearchResult>> => {
   const result = await page.evaluate(
-    (data: IPropSearchData) : TSearchResult[]=>{
+    (data: IProperty) : TSearchResult[]=>{
       const rows = Array.from(document.querySelectorAll('.ui-sortable tr'));
       const rowCount = rows.length.toString();
       const evalResult = rows.map<TSearchResult>((r) => {
         const col = $(r).children('td');
         const doPriceText = col.eq(8).find('span').text();
-        const priceDiff = +data.price - +doPriceText;
+        const priceDiff = +data.比較用価格 - +doPriceText;
         return {
           DOステータス: col.eq(7).text(),
           DO価格差: priceDiff.toString(),
@@ -34,7 +33,7 @@ export const compareData = async (
       });
       console.log(evalResult);
       return evalResult;
-    }, data as unknown as {[k: string] : string});
+    }, data as unknown as Record<string, string>);
 
   return result.length? result : [{
     DOステータス: '',

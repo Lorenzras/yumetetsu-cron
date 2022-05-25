@@ -1,29 +1,28 @@
 import {logger} from '../../../../../utils';
 import {cityLists} from '../../config';
-import {THandlePrepareForm, TProperty} from '../../types';
+import {THandlePrepareForm, TProperty, TPropertyConvert} from '../../types';
 import {changePublishedRange} from './citiesForm/prepareForm';
 import {selectTargetCities} from './citiesForm/selectTargetCities';
 
-
-type TPropertyConvert = Record<TProperty, string>
 
 const prefStr = {
   '愛知県': 'aichi',
   '岐阜県': 'gifu',
 };
 
-const propTypeStr: TPropertyConvert = {
+const propTypeStr: TPropertyConvert<string> = {
   土地: 'tochi',
-  中古マンション: 'kodate/chuko',
-  中古戸建: 'mansion/chuko',
+  中古マンション: 'mansion/chuko',
+  中古戸建: 'kodate/chuko',
 
 };
 
 const resolveUrl = (pref: keyof typeof prefStr, propType: TProperty) => {
+  console.log(propTypeStr[propType]);
   return `https://www.homes.co.jp/${propTypeStr[propType]}/${prefStr[pref]}/city`;
 };
 
-export const handlePrepareform:
+export const handlePrepareForm:
 THandlePrepareForm = async (page, pref, propType) => {
   const url = resolveUrl(pref as keyof typeof prefStr, propType);
   const cities = Object.keys(cityLists[pref]);

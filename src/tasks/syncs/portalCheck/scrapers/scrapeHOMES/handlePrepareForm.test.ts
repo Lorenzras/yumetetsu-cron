@@ -1,7 +1,7 @@
 import {openMockBrowserPage} from '../../../../common/browser';
 import {browserTimeOut} from '../../../../common/browser/config';
 import {TProperty} from '../../types';
-import {handlePrepareform} from './handlePrepareform';
+import {handlePrepareForm} from './handlePrepareForm';
 
 test('prepareForm', async () => {
   const page = await openMockBrowserPage();
@@ -10,7 +10,7 @@ test('prepareForm', async () => {
     ['愛知県', '土地'],
     ['愛知県', '中古マンション'],
   ] as [string, TProperty ][])) {
-    await handlePrepareform(page, pref, propType);
+    await handlePrepareForm(page, pref, propType);
   }
 
   page.browser().disconnect();
