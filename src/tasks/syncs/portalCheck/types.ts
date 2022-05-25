@@ -1,15 +1,15 @@
 /* eslint-disable max-len */
 import {Page} from 'puppeteer';
-import {cityLists, propertyTypes} from './config';
+import {propertyTypes} from './config';
 
-export type PropertyType = typeof propertyTypes[number]
+export type TProperty = typeof propertyTypes[number]
 
 /**
  * @deprecated
  */
 export interface IPropertyAction {
   url: string,
-  type: PropertyType,
+  type: TProperty,
   handleScraper: (page: Page) => Promise<IProperty[]>,
   submitSelector?: string
 }
@@ -19,22 +19,22 @@ export interface IPropertyAction {
  */
 export type PropertyActions = Array<IPropertyAction>
 
-export type TMainScraper = (page: Page) => Promise<IProperty[]>
-export type THandlePrepareForm = (page: Page, pref: string) => Promise<boolean>
-export type TContactScraper = (page: Page, data: IProperty) => Promise<IProperty>
+export type THandleScraper = (page: Page) => Promise<IProperty[]>
+export type THandlePrepareForm = (page: Page, pref: string, propType: TProperty) => Promise<boolean>
+export type THandleContactScraper = (page: Page, data: IProperty) => Promise<IProperty>
 
 export interface IAction {
   pref: string,
-  type: PropertyType,
-  handleScraper: TMainScraper,
+  type: TProperty,
+  handleScraper: THandleScraper,
   handlePrepareform: THandlePrepareForm
-  handleContactScraper: TContactScraper
+  handleContactScraper: THandleContactScraper
 }
 
 
 export interface IProperty {
   物件番号?: string,
-  物件種別?: PropertyType,
+  物件種別?: TProperty,
   物件名: string,
   販売価格: string,
   比較用価格: number,
