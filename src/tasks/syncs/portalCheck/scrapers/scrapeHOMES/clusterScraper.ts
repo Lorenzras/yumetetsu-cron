@@ -22,6 +22,7 @@ const initCluster = () => Cluster.launch({
   maxConcurrency: 5,
   retryLimit: 2,
   retryDelay: 2000,
+  monitor: true,
   puppeteerOptions: {
     headless: false,
   },
