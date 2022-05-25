@@ -1,9 +1,12 @@
 import {Page} from 'puppeteer';
-import {extractNumber, extractPrice, logger} from '../../../../../utils';
+import {logger} from '../../../../../utils';
 import {IHouse} from '../../types';
+import {webScraper} from '../helpers/webScraper';
 
 export const scrapeDtHousePage = async (page: Page) => {
-  return await page.$$eval('div[data-category="物件"', (els) => {
+  logger.info('Scraping HOMES dtHouse page.');
+  return await page.$$eval('div[data-category="物件"]', (els) => {
+    console.log(`Found ${els.length} in this page.`);
     return els.map<IHouse>((el)=>{
       const titleEl = $(el).find('.object-title_name a');
       const propName = titleEl
@@ -22,33 +25,29 @@ export const scrapeDtHousePage = async (page: Page) => {
   });
 };
 
-export const scrapeDtHouse = async (
-  page: Page,
-  result?: IHouse[] | [],
-): Promise<IHouse[]> => {
-  logger.info(`Scraping kodate. `);
-
-  const data = await scrapeDtHousePage(page);
-
-  const populateNumbers = data
-    .map<IHouse>(((item)=>({
-    ...item,
-    比較用価格: extractPrice(item.販売価格),
-    比較用土地面積: extractNumber(item.土地面積),
-  })));
-
-  const cummulativeResult = [...(result ?? []), ...populateNumbers];
-
-  if (await page.$('.nextPage')) {
+export const handleNextPage = async (page: Page) => {
+  const nextPageBtn = (await page.$x('//a[contains(text(), "次へ")]'))?.[0];
+  if (nextPageBtn) {
     logger.info('Clicking next page.');
     await Promise.all([
       page.waitForNavigation(),
-      page.click('.nextPage'),
+      nextPageBtn.click(),
     ]);
-
-
-    return await scrapeDtHouse(page, cummulativeResult);
+    return true;
   }
+  return false;
+};
 
-  return cummulativeResult;
+export const scrapeDtHouse = async (
+  page: Page,
+
+): Promise<IHouse[]> => {
+  logger.info(`Scraping kodate. `);
+
+
+  return await webScraper<IHouse>({
+    page,
+    handleScraper: scrapeDtHousePage,
+    handleNextPage: handleNextPage,
+  });
 };
