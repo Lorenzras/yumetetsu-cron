@@ -1,11 +1,12 @@
 import {Page} from 'puppeteer';
 import {extractPrice} from '../../../../../utils';
 import {ILot} from '../../types';
-import {getCompanyInfo} from './getCompanyInfo';
+import {scrapeContact} from './scrapeContact';
 
 export const scrapeDtLot = async (
   page: Page,
 ): Promise<ILot[] | []> => {
+  console.log('page::', page);
   let datas: ILot[] = await page.$$eval('.property_unit--osusume2',
     (list) => {
       return list.map<ILot>((el) => {
@@ -31,7 +32,7 @@ export const scrapeDtLot = async (
   datas = datas.map<ILot>((val) => {
     const price = extractPrice(val.販売価格.split('円')[0]);
     const area = val.土地面積.split('m')[0];
-    getCompanyInfo(page, val.リンク);
+    // scrapeContact(page, val);
     return {
       ...val,
       比較用価格: price,
