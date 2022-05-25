@@ -26,7 +26,6 @@ export const decodeToSJIS = (buffer: Buffer) => {
 export const extractNumber = (str: string): number => {
   const matchResult = str.match(/(\d+)(?:\.(\d+))?/g);
   const result = matchResult?.[0] || 0;
-  console.log(matchResult);
   return isNaN(+result) ? 0 : +result;
 };
 
