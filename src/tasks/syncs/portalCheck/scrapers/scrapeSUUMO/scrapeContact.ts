@@ -1,8 +1,8 @@
 import {Page} from 'puppeteer';
 import {extractTel} from '../../../../../utils';
-import {IProperty} from '../../types';
+import {IProperty, THandleContactScraper} from '../../types';
 
-export const scrapeContact = async (
+export const scrapeContact: THandleContactScraper = async (
   page: Page,
   data: IProperty,
 ) => {
@@ -12,15 +12,14 @@ export const scrapeContact = async (
     page.waitForNavigation(),
   ]);
 
-  console.log('処理確認::1', data.物件種別);
-  let datas = await page.evaluate(() => {
+  let info = await page.evaluate(() => {
     // マンションのみ、「所在階」を取得し、物件名に追加する
     const floors = $('th:contains(所在階) ~ td')
       .eq(0).text().trim().split('/', 1)[0];
 
     // 「こちら」のリンクの有無を確認する
     const link = $('.heikiToiawaseWindow ~ input')
-      .eq(0).val() as string?? 'なし';
+      .eq(0).val() as string ?? 'なし';
 
     // 「こちら」のリンクがない場合
     let kigyoumei = '';
@@ -42,35 +41,32 @@ export const scrapeContact = async (
     };
   });
 
-  console.log('return check 1::', datas);
-
   // 「こちら」のリンクがある場合
-  if (datas.link !== 'なし' && datas.link) {
+  if (info.link !== 'なし' && info.link) {
     // リンク先にジャンプする
     await Promise.all([
-      page.goto(datas.link, {waitUntil: 'networkidle2'}),
+      page.goto(info.link, {waitUntil: 'networkidle2'}),
       page.waitForNavigation(),
     ]);
 
-    console.log('datas', datas);
-    datas = await page.evaluate((datas) => {
-      console.log('datas::', datas);
+    // 企業情報を取得する
+    info = await page.evaluate((info) => {
       const kigyoumei = $('.bkdt-shop-name').children('em').text();
       const tel = $('.bkdt-shop-name ~ ul')
         .children('li').children('em').text();
 
       return {
-        ...datas,
+        ...info,
         掲載企業: kigyoumei,
         掲載企業TEL: tel,
       };
-    }, datas);
-
-    console.log('datas::', datas);
+    }, info);
   }
 
   return {
-    ...datas,
-    掲載企業TEL: extractTel(datas.掲載企業TEL),
+    ...data,
+    物件名: data.物件名 + info.階数,
+    掲載企業: info.掲載企業,
+    掲載企業TEL: extractTel(info.掲載企業TEL),
   };
 };

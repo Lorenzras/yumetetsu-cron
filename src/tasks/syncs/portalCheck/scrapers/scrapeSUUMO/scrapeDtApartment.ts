@@ -1,10 +1,10 @@
 import {Page} from 'puppeteer';
 import {extractPrice} from '../../../../../utils';
-import {IMansion} from '../../types';
+import {IMansion, THandleScraper} from '../../types';
 
-export const scrapeDtApartment = async (
+export const scrapeDtApartment: THandleScraper = async (
   page: Page,
-) : Promise<IMansion[]> => {
+): Promise<IMansion[]> => {
   let datas: IMansion[] = await page.$$eval('.property_unit--osusume2',
     (list) => {
       return list.map<IMansion>((el) => {
@@ -13,9 +13,11 @@ export const scrapeDtApartment = async (
         const rawPrice = $(el).find('.dottable-value--2').text().trim();
         const address = $(el).find('dt:contains("所在地") ~ dd').text();
         const rawArea = $(el).find('dt:contains("専有面積") ~ dd').text();
+        const id = 'suumo.Mansion-' + url.split('ncz')[1].split('.')[0];
 
         return {
           物件種別: '中古マンション',
+          物件番号: id,
           物件名: title,
           リンク: url,
           所在地: address,
