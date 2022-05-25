@@ -48,7 +48,8 @@ export const handlePrepareForm : THandlePrepareForm = async (
       page.click('.viewResult a'),
     ]);
 
-    await page.waitForSelector('#item-list');
+    await page.waitForSelector('#item-list', {timeout: 300000})
+      .catch(()=> page.reload());
     logger.info(`Succesfully navigated to ${url}`);
     return true;
   } catch (err: any) {

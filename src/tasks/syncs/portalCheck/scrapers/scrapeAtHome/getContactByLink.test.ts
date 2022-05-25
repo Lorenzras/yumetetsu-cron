@@ -21,3 +21,7 @@ test('getContact', async ()=>{
 
   page.browser().disconnect();
 }, browserTimeOut);
+
+// https://www.athome.co.jp/kodate/3915789702/
+// https://www.athome.co.jp/kodate/3915824302/
+// https://www.athome.co.jp/kodate/1031689167/
