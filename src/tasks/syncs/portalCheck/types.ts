@@ -12,6 +12,7 @@ export interface IPropertyAction {
 }
 export type PropertyActions = Array<IPropertyAction>
 
+
 export interface IProperty {
   物件番号?: string,
   物件種別?: PropertyType,
@@ -47,4 +48,9 @@ export interface IMansion extends IProperty {
   比較用専有面積: number,
 }
 
+export interface ILocations {
+  [p: string] : {
+    [c: string]: string
+  }
+}
 

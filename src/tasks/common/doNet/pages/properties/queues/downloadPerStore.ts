@@ -3,9 +3,8 @@ import {getDateYesterday} from './../../../../../../utils/dates';
 import {downloadLimit} from './../../../config';
 import {logger} from './../../../../../../utils/logger';
 import {IPropForm} from './../downloadTask';
-import {IConcurrentData, TPropTypes, TPropStatus} from './../types';
+import {IConcurrentData, TPropTypes, TPropStatusText} from './../types';
 import {Cluster} from 'puppeteer-cluster';
-import {getStores} from '../form';
 
 /**
  * DoNet has 4000 limit so we need to limit the filter should this exeed.
@@ -39,9 +38,10 @@ export const downloadPerStore = async (
 
   const handleDlByStatus = async (formSetting: IConcurrentData) => {
     ([
-      '01', '02', '03',
-      '04', '05', '07', '08',
-    ] as TPropStatus[])
+      '公開', '自社済み', '自社商談',
+      '他社商談', '他社済み', '中止', '保留',
+      '査定中',
+    ] as TPropStatusText[])
       .forEach(async (statusText) => {
         const newFormSetting: IConcurrentData = {...formSetting, status: [statusText]};
         const {count = 0, agents} = await cluster
