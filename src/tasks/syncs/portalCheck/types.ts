@@ -28,7 +28,7 @@ export interface IAction {
   pref: string,
   type: TProperty,
   handleScraper: THandleScraper,
-  handlePrepareform: THandlePrepareForm
+  handlePrepareForm: THandlePrepareForm
   handleContactScraper: THandleContactScraper
 }
 

@@ -90,6 +90,7 @@ export const spreadAddress = (
   町域: string
 } => {
   let newAddress = address;
+  console.log(newAddress);
   const pref = Object.keys(cityLists).find((i) => address.includes(i)) || '';
   const cities = Object.keys(cityLists[pref as keyof typeof cityLists]);
   const city = cities

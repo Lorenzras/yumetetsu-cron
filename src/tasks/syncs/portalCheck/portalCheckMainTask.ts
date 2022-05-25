@@ -8,6 +8,7 @@ import {logger} from '../../../utils';
 import {uploadTask} from './clusterTasks/uploadTask';
 import {actionsHOMES} from './scrapers/scrapeHOMES';
 import {Page} from 'puppeteer';
+import {actionsAtHome} from './scrapers/scrapeAtHome/actionsAtHome';
 
 export const initCluster = () => Cluster.launch({
   puppeteer: getExtraPuppeteer(),
@@ -49,8 +50,8 @@ export const portalCheckMainTask = async () => {
   });
 
   const actions = [
-    ...actionsHOMES(),
-
+    // ...actionsHOMES(),
+    ...actionsAtHome(),
   ];
 
   scraperTask(actions, cluster);

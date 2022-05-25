@@ -10,8 +10,6 @@ export const prepareForm = async (page: Page, cities: string[]) =>{
     });
 
     $('label:contains(3日以内に公開) input').trigger('click');
-
-    // $('.viewResult a').eq(0).trigger('click');
   }, cities);
 
   await page.click('.viewResult a');
