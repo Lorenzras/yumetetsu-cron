@@ -25,6 +25,7 @@ export type TContactScraper = (page: Page, data: IProperty) => Promise<IProperty
 
 export interface IAction {
   pref: string,
+  type: PropertyType,
   mainScraper: TMainScraper,
   handlePrepareform: THandlePrepareForm
   contactScraper: TContactScraper
