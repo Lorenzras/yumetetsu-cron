@@ -1,29 +1,34 @@
+import {saveJSONToCSV, getFileName} from './../../../../utils/file';
 import {Page} from 'puppeteer';
 import {Cluster} from 'puppeteer-cluster';
+import {TSearchResult} from '../doNetCompare/compareData';
 import {searchDoProperty} from '../doNetCompare/searchDoProperty';
 import {IAction, IProperty} from '../types';
+import {dlPortalCheck, kintoneAppId} from '../config';
 
 type TScraperTask = (
   actions: IAction[], cluster: Cluster<{page: Page}>
 ) => Promise<void>
 
 export const scraperTask: TScraperTask = async (actions, cluster) => {
-  const handleGetContacts = async (action: IAction, result: IProperty[]) => {
-    const resultWithContact = await Promise.all(result.map(async (r) => {
-      return await cluster.execute(({page}) => {
-        return action.handleContactScraper(page, r);
+  const handlePerProperty = async (action: IAction, dtArr: IProperty[]) => {
+    return await Promise.all(dtArr.map(async (dt) => {
+      const resultWithContact = await cluster.execute(async ({page}) => {
+        return await action.handleContactScraper(page, dt);
       }) as IProperty;
 
-      // Put donetcompare here
-    }));
-  };
+      const doNetComparedResults = await cluster.execute(async ({page}) => {
+        return await searchDoProperty(
+          {page, inputData: dt},
+        );
+      }) as TSearchResult[];
 
-  const handleDoNetCompare = async (result: IProperty[]) => {
-    return await Promise.all(result.map(async (r) => {
-      return await cluster.execute(async ({page}) => {
-        const result = await searchDoProperty({page, inputData: r});
-        return {...r, ...result[0]};
-      }) as IProperty;
+
+      return {
+        ...resultWithContact,
+        ...doNetComparedResults[0],
+        物件種別: action.type,
+      };
     }));
   };
 
@@ -33,20 +38,29 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
       pref, type, handleScraper, handlePrepareform,
     } = action;
 
-    const result : IProperty[] = await cluster.execute(async ({page}) => {
-      if (await handlePrepareform(page, pref, type)) {
-        const initialResult = await handleScraper(page, type);
-        const resultWithContact = await handleGetContacts(
-          action, initialResult,
-        );
-        const completeData = await handleDoNetCompare(resultWithContact);
+    const initialResult : IProperty[] = await cluster
+      .execute(async ({page}) => {
+        if (await handlePrepareform(page, pref, type)) {
+          const res = await handleScraper(page);
+          return res;
+        }
+        return [];
+      });
 
-        return completeData;
-      }
-      return [];
-    });
+    const completeData = await handlePerProperty(
+      action, initialResult,
+    );
 
-    return result;
+    if (completeData.length) {
+      // eslint-disable-next-line max-len
+      await saveJSONToCSV(getFileName({
+        appId: kintoneAppId,
+        dir: dlPortalCheck,
+        suffix: action.type,
+      }), completeData);
+    }
+
+    return completeData;
   };
 
   actions.forEach(async (action) => {

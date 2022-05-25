@@ -4,6 +4,7 @@ import {propertyTypes} from './config';
 
 export type TProperty = typeof propertyTypes[number]
 export type TPropertyConvert<T> = Record<TProperty, T>
+
 /**
  * @deprecated
  */
@@ -19,7 +20,7 @@ export interface IPropertyAction {
  */
 export type PropertyActions = Array<IPropertyAction>
 
-export type THandleScraper = (page: Page, propType?: TProperty) => Promise<IProperty[]>
+export type THandleScraper = (page: Page) => Promise<IProperty[]>
 export type THandlePrepareForm = (page: Page, pref: string, propType: TProperty) => Promise<boolean>
 export type THandleContactScraper = (page: Page, data: IProperty) => Promise<IProperty>
 

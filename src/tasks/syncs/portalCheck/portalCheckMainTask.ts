@@ -1,23 +1,13 @@
+import {scraperTask} from './clusterTasks/scraperTask';
 import {getExtraPuppeteer} from '../../common/browser';
 import {Cluster} from 'puppeteer-cluster';
 import {browserTimeOut} from '../../common/browser/config';
 import chokidar from 'chokidar';
 import {dlPortalCheck} from './config';
-import {IAction} from './types';
 import {logger} from '../../../utils';
 import {uploadTask} from './clusterTasks/uploadTask';
-
-/* import {IPropertyAction} from '../../types';
-import {getExtraPuppeteer} from '../../../../common/browser/openBrowser';
-import {browserTimeOut} from '../../../../common/browser/config';
-import {logger} from '../../../../../utils/logger';
-import {Cluster} from 'puppeteer-cluster';
-import {clusterTask} from './clusterTask';
-import {byAction} from './clusterQueues/byAction';
-import chokidar from 'chokidar';
-import {dlPortalCheck} from '../../config';
-import {uploadTask} from '../../clusterTasks/uploadTask';
- */
+import {actionsHOMES} from './scrapers/scrapeHOMES';
+import {Page} from 'puppeteer';
 
 export const initCluster = () => Cluster.launch({
   puppeteer: getExtraPuppeteer(),
@@ -44,8 +34,8 @@ const initFileWatcher = () => {
  * Concurrent processing of actions defined above.
  * Refer to scrapeHOMES for synchronous processing.
  */
-export const clusterScraper = async () => {
-  const cluster : Cluster<IAction> = await initCluster();
+export const portalCheckMainTask = async () => {
+  const cluster : Cluster<{page: Page}> = await initCluster();
   const watcher = initFileWatcher();
 
   watcher.on('add', async (path)=>{
@@ -57,6 +47,13 @@ export const clusterScraper = async () => {
   cluster.on('taskerror', (err, data) => {
     logger.error(`Error crawling : ${err.message} ${data}`);
   });
+
+  const actions = [
+    ...actionsHOMES(),
+
+  ];
+
+  scraperTask(actions, cluster);
 
 
   await cluster.idle();
