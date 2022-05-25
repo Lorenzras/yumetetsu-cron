@@ -19,16 +19,16 @@ export interface IPropertyAction {
  */
 export type PropertyActions = Array<IPropertyAction>
 
-export type TMainScraper = (page: Page) => Promise<IProperty[]>
+export type THandleScraper = (page: Page) => Promise<IProperty[]>
 export type THandlePrepareForm = (page: Page, pref: string) => Promise<boolean>
-export type TContactScraper = (page: Page, data: IProperty) => Promise<IProperty>
+export type THandleContactScraper = (page: Page, data: IProperty) => Promise<IProperty>
 
 export interface IAction {
   pref: string,
   type: PropertyType,
-  handleScraper: TMainScraper,
+  handleScraper: THandleScraper,
   handlePrepareform: THandlePrepareForm
-  handleContactScraper: TContactScraper
+  handleContactScraper: THandleContactScraper
 }
 
 
