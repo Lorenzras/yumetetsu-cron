@@ -24,8 +24,10 @@ export const decodeToSJIS = (buffer: Buffer) => {
 };
 
 export const extractNumber = (str: string): number => {
-  return +(str.match(/(\d+)(?:\.(\d+))?/g)
-    ?.join('') || 0);
+  const matchResult = str.match(/(\d+)(?:\.(\d+))?/g);
+  const result = matchResult?.[0] || 0;
+  console.log(matchResult);
+  return isNaN(+result) ? 0 : +result;
 };
 
 const getCleanJaPrice = (
