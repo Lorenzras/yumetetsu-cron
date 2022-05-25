@@ -20,7 +20,7 @@ export interface IPropertyAction {
 export type PropertyActions = Array<IPropertyAction>
 
 export type THandleScraper = (page: Page) => Promise<IProperty[]>
-export type THandlePrepareForm = (page: Page, pref: string) => Promise<boolean>
+export type THandlePrepareForm = (page: Page, pref: string, propType: PropertyType) => Promise<boolean>
 export type THandleContactScraper = (page: Page, data: IProperty) => Promise<IProperty>
 
 export interface IAction {
