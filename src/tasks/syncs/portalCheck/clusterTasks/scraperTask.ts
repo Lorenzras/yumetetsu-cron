@@ -9,10 +9,12 @@ type TScraperTask = (
 
 export const scraperTask: TScraperTask = async (actions, cluster) => {
   const handleGetContacts = async (action: IAction, result: IProperty[]) => {
-    return await Promise.all(result.map(async (r) => {
+    const resultWithContact = await Promise.all(result.map(async (r) => {
       return await cluster.execute(({page}) => {
         return action.handleContactScraper(page, r);
       }) as IProperty;
+
+      // Put donetcompare here
     }));
   };
 
