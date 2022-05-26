@@ -51,7 +51,13 @@ const contactFromModalLink = async (page: Page) => {
 };
 
 const pageResolver = async (page: Page) => {
-  await page.waitForNetworkIdle();
+  await Promise.race([
+    page.waitForSelector('#item-detail_company'),
+    page.waitForSelector('#modal-info_shop a'),
+    page.waitForSelector('#error-header'),
+  ]);
+
+
   if (await page.$('#item-detail_company')) {
     return contactFromSamePage(page);
   } else if (await page.$('#modal-info_shop a')) {

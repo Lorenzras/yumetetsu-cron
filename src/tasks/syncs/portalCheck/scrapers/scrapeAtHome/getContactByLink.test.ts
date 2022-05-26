@@ -1,11 +1,11 @@
-import {openMockBrowserPage} from '../../../../common/browser';
+import {openBrowserPage, openMockBrowserPage} from '../../../../common/browser';
 import {browserTimeOut} from '../../../../common/browser/config';
 import {getContactByLink} from './getContactByLink';
 
 // https://www.athome.co.jp/kodate/1022733165
 
 test('getContact', async ()=>{
-  const page = await openMockBrowserPage();
+  const page = await openBrowserPage();
   const urls = [
     'https://www.athome.co.jp/kodate/1022733165',
     'https://www.athome.co.jp/tochi/1040134670/',
@@ -25,7 +25,7 @@ test('getContact', async ()=>{
 
 
   expect(result).toMatchSnapshot();
-  page.browser().disconnect();
+  await page.close();
 }, browserTimeOut);
 
 // https://www.athome.co.jp/kodate/3915789702/
