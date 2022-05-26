@@ -14,7 +14,7 @@ export const initCluster = () => Cluster.launch({
   puppeteer: getExtraPuppeteer(),
   concurrency: Cluster.CONCURRENCY_CONTEXT,
   maxConcurrency: 5,
-  monitor: true,
+  // monitor: true,
   retryLimit: 2,
   retryDelay: 2000,
   puppeteerOptions: {
