@@ -2,6 +2,7 @@ import {Page} from 'puppeteer';
 import {logger} from '../../../../../utils';
 import {cityLists} from '../../config';
 import {THandlePrepareForm, TProperty} from '../../types';
+import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
 
 /**
  * 検索条件を設定する
@@ -74,7 +75,8 @@ export const prepareForm: THandlePrepareForm = async (
     ]);
     return true;
   } catch (error: any) {
-    logger.error(`検索ページの設定に失敗しました。${page.url()} ${error.message}`);
+    await logErrorScreenshot(page,
+      `検索ページの設定に失敗しました。${page.url()} ${error.message}`);
     return false;
   }
 };

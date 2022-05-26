@@ -1,6 +1,7 @@
 import {Page} from 'puppeteer';
 import {logger} from '../../../../../utils';
 import {IProperty} from '../../types';
+import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
 
 export const scrapeLoop =
   async (page: Page, func: (page: Page) => Promise<IProperty[]>) => {
@@ -29,7 +30,8 @@ export const scrapeLoop =
       console.log(result.length);
       return result;
     } catch (error: any) {
-      logger.error(`次のページへの遷移に失敗しました。${page.url()} ${error.message}`);
+      await logErrorScreenshot(page,
+        `次のページへの遷移に失敗しました。${page.url()} ${error.message}`);
       return result;
     }
   };

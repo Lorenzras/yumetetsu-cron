@@ -1,6 +1,7 @@
 import {Page} from 'puppeteer';
 import {extractTel, logger} from '../../../../../utils';
 import {IProperty, THandleContactScraper} from '../../types';
+import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
 
 export const scrapeContact: THandleContactScraper = async (
   page: Page,
@@ -80,7 +81,8 @@ export const getContactLink = async (
 
     return info;
   } catch (error: any) {
-    logger.error(`企業情報の取得に失敗しました。${page.url()} ${error.message}`);
+    await logErrorScreenshot(page,
+      `企業情報の取得に失敗しました。${page.url()} ${error.message}`);
     return {
       階数: '',
       link: 'なし',

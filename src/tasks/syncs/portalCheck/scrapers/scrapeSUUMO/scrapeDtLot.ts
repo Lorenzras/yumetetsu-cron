@@ -1,6 +1,7 @@
 import {Page} from 'puppeteer';
 import {extractPrice, logger} from '../../../../../utils';
 import {ILot, THandleScraper} from '../../types';
+import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
 
 export const scrapeDtLot: THandleScraper = async (
   page: Page,
@@ -42,7 +43,8 @@ export const scrapeDtLot: THandleScraper = async (
     });
     return datas;
   } catch (error: any) {
-    logger.error(`土地のスクレイピングに失敗しました。${page.url()} ${error.message}`);
+    await logErrorScreenshot(page,
+      `土地のスクレイピングに失敗しました。${page.url()} ${error.message}`);
     return ([{
       物件種別: '土地',
       物件番号: '取得失敗',

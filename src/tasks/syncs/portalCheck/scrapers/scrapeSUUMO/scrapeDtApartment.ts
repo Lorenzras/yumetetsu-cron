@@ -1,6 +1,7 @@
 import {Page} from 'puppeteer';
 import {extractPrice, logger} from '../../../../../utils';
 import {IMansion, THandleScraper} from '../../types';
+import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
 
 export const scrapeDtApartment: THandleScraper = async (
   page: Page,
@@ -42,7 +43,8 @@ export const scrapeDtApartment: THandleScraper = async (
 
     return datas;
   } catch (error: any) {
-    logger.error(`マンションのスクレイピングに失敗しました。${page.url()} ${error.message}`);
+    await logErrorScreenshot(page,
+      `マンションのスクレイピングに失敗しました。${page.url()} ${error.message}`);
     return ([{
       物件種別: '中古マンション',
       物件番号: '取得失敗',
