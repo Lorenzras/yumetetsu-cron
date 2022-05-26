@@ -48,6 +48,7 @@ describe('scrapecontact', () => {
     page.browser().disconnect();
   }, browserTimeOut);
 
+  /* test comand:: jest scrapeSUUMO/scrapeContact -t link -u */
   test(('link'), async () => {
     const page = await openMockBrowserPage();
     const testLinks = [
@@ -55,6 +56,7 @@ describe('scrapecontact', () => {
       'https://suumo.jp/chukomansion/__JJ_JJ010FJ100_arz1050z2bsz1011z2ncz198324093.html',
       'https://suumo.jp/chukoikkodate/__JJ_JJ010FJ100_arz1050z2bsz1021z2ncz198271927.html',
       'https://gggg',
+      'https://suumo.jp/tochi/__JJ_JJ010FJ100_arz1050z2bsz1030z2ncz197157686.html',
     ];
 
     const result = [];
