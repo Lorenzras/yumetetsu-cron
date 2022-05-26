@@ -5,7 +5,7 @@ import {logger} from '../../../utils/logger';
 import {URLs, selectors} from './config';
 
 export const login = async (page: Page ) => {
-  logger.info('Started login to doNetwork. ');
+  logger.info(`Started login to doNetwork. ${process.env.DO_NETWORK_USER}`);
 
   await page.goto(URLs['login'], {waitUntil: 'networkidle2'});
   await page.waitForNetworkIdle();

@@ -10,22 +10,22 @@ import {
   setPropertyTypes,
   TPropTypes} from '../../../common/doNet/pages/properties';
 import {cityLists, dlImg, kintoneAppId} from '../config';
-import {PropertyType} from '../types';
+import {IHouse, ILot, IMansion, IProperty, TProperty, TPropertyConvert} from '../types';
 import {compareData} from './compareData';
 import {setLocation} from './setLocation';
 
 export interface IPropSearchData {
-  propertyType: PropertyType,
+  propertyType: TProperty,
   address: string,
   price: string,
   area: string,
 }
 
-enum propTypeVals {
-  '中古戸建' = 'used_kodate',
-  '土地' = 'tochi',
-  '中古マンション' = 'used_mansion'
-}
+const doPropTypes: TPropertyConvert<TPropTypes> = {
+  中古戸建: 'used_kodate',
+  土地: 'tochi',
+  中古マンション: 'used_mansion',
+};
 
 export const selectByText = async (
   page: Page,
@@ -53,20 +53,32 @@ const setLotArea = async (page: Page, area: string) => {
 
 
 export const searchDoProperty = async ({
-  page, data,
+  page, inputData,
 }:{
   page: Page,
-  data: IPropSearchData
+  inputData: IProperty | IHouse | IMansion | ILot,
 }) => {
-  const {address, area, propertyType} = data;
+  const {
+    所在地: address,
+    物件種別: propertyType = '中古戸建',
+  } = inputData;
+  let area = '';
+
+
+  if ('比較用土地面積' in inputData) {
+    area = inputData.比較用土地面積.toString();
+  } else if ('比較用専有面積' in inputData) {
+    area = inputData.比較用専有面積.toString();
+  }
+
   const {都道府県: pref, 市区: city, 町域: town} = spreadAddress(address);
   const shopName = cityLists[pref][city];
-  const propType : TPropTypes = propTypeVals[propertyType];
+  const propType : TPropTypes = doPropTypes[propertyType];
   page.removeAllListeners();
   await blockImages(page);
 
   const result = await retry(async () => {
-    logger.info('Starting search ' + JSON.stringify(data));
+    logger.info('Starting search ' + JSON.stringify(inputData));
     await login(page);
     await navigateToPropertyPage(page);
     await page.waitForSelector('#m_estate_filters_fc_shop_id option');
@@ -91,7 +103,7 @@ export const searchDoProperty = async ({
       page.click('#btn_search'),
     ]);
 
-    return await compareData(page, data);
+    return await compareData(page, inputData);
   }, {
     retries: 3,
     onRetry: async (e, attempt) => {

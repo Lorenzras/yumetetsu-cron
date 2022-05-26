@@ -22,7 +22,7 @@ export const scrapeDtLotPage = async (page: Page) => {
         const unitSummary = $(el).find('.unitSummary');
 
         if (unitSummary.length) {
-          areas[0] = unitSummary.find('tbody td.space:first')
+          areas[0] = unitSummary.find('tbody tr:first td.space:first')
             .text().replaceAll('m²', '');
         } else {
           areas = $(el)

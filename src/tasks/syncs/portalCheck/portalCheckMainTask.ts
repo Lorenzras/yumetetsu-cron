@@ -1,28 +1,21 @@
-
-import {IPropertyAction} from '../../types';
-import {getExtraPuppeteer} from '../../../../common/browser/openBrowser';
-import {browserTimeOut} from '../../../../common/browser/config';
-import {logger} from '../../../../../utils/logger';
+import {scraperTask} from './clusterTasks/scraperTask';
+import {getExtraPuppeteer} from '../../common/browser';
 import {Cluster} from 'puppeteer-cluster';
-import {clusterTask} from './clusterTask';
-import {byAction} from './clusterQueues/byAction';
+import {browserTimeOut} from '../../common/browser/config';
 import chokidar from 'chokidar';
-import {dlPortalCheck} from '../../config';
-import {uploadTask} from '../../clusterTasks/uploadTask';
+import {dlPortalCheck} from './config';
+import {logger} from '../../../utils';
+import {uploadTask} from './clusterTasks/uploadTask';
+import {actionsHOMES} from './scrapers/scrapeHOMES';
+import {Page} from 'puppeteer';
+import {actionsAtHome} from './scrapers/scrapeAtHome/actionsAtHome';
 
-
-export interface IClusterTaskData extends IPropertyAction {
-  pref: string,
-  cities: string[]
-}
-
-const initCluster = () => Cluster.launch({
+export const initCluster = () => Cluster.launch({
   puppeteer: getExtraPuppeteer(),
   concurrency: Cluster.CONCURRENCY_CONTEXT,
   maxConcurrency: 5,
   retryLimit: 2,
   retryDelay: 2000,
-  monitor: true,
   puppeteerOptions: {
     headless: false,
   },
@@ -42,8 +35,8 @@ const initFileWatcher = () => {
  * Concurrent processing of actions defined above.
  * Refer to scrapeHOMES for synchronous processing.
  */
-export const clusterScraper = async () => {
-  const cluster : Cluster<IClusterTaskData> = await initCluster();
+export const portalCheckMainTask = async () => {
+  const cluster : Cluster<{page: Page}> = await initCluster();
   const watcher = initFileWatcher();
 
   watcher.on('add', async (path)=>{
@@ -56,9 +49,12 @@ export const clusterScraper = async () => {
     logger.error(`Error crawling : ${err.message} ${data}`);
   });
 
-  await cluster.task(clusterTask);
+  const actions = [
+    // ...actionsHOMES(),
+    ...actionsAtHome(),
+  ];
 
-  byAction(cluster);
+  scraperTask(actions, cluster);
 
 
   await cluster.idle();

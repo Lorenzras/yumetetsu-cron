@@ -1,8 +1,8 @@
 import {Page} from 'puppeteer';
 import {extractPrice} from '../../../../../utils';
-import {ILot} from '../../types';
+import {ILot, THandleScraper} from '../../types';
 
-export const scrapeDtLot = async (
+export const scrapeDtLot: THandleScraper = async (
   page: Page,
 ): Promise<ILot[] | []> => {
   let datas: ILot[] = await page.$$eval('.property_unit--osusume2',
@@ -13,9 +13,11 @@ export const scrapeDtLot = async (
         const rawPrice = $(el).find('.dottable-value--2').text().trim();
         const address = $(el).find('dt:contains("所在地") ~ dd').text();
         const rawArea = $(el).find('dt:contains("土地面積") ~ dd').text();
+        const id = 'suumo.Lot-' + url.split('ncz')[1].split('.')[0];
 
         return {
           物件種別: '土地',
+          物件番号: id,
           物件名: title,
           リンク: url,
           所在地: address,
@@ -30,6 +32,7 @@ export const scrapeDtLot = async (
   datas = datas.map<ILot>((val) => {
     const price = extractPrice(val.販売価格.split('円')[0]);
     const area = val.土地面積.split('m')[0];
+    // scrapeContact(page, val);
     return {
       ...val,
       比較用価格: price,

@@ -4,8 +4,13 @@ import {browserURL} from './config';
 import UserAgent from 'user-agents';
 import puppeteer from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
+import adblockerPlugin from 'puppeteer-extra-plugin-adblocker';
 
 puppeteer.use(stealthPlugin());
+puppeteer.use(adblockerPlugin({
+  blockTrackers: true,
+  useCache: true,
+}));
 
 interface OpenBrowserParam {
   loadImages?: boolean,

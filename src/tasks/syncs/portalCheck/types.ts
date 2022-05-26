@@ -2,20 +2,40 @@
 import {Page} from 'puppeteer';
 import {propertyTypes} from './config';
 
-export type PropertyType = typeof propertyTypes[number]
+export type TProperty = typeof propertyTypes[number]
+export type TPropertyConvert<T> = Record<TProperty, T>
 
+/**
+ * @deprecated
+ */
 export interface IPropertyAction {
   url: string,
-  type: PropertyType,
+  type: TProperty,
   handleScraper: (page: Page) => Promise<IProperty[]>,
   submitSelector?: string
 }
+
+/**
+ * @deprecated
+ */
 export type PropertyActions = Array<IPropertyAction>
+
+export type THandleScraper = (page: Page) => Promise<IProperty[]>
+export type THandlePrepareForm = (page: Page, pref: string, propType: TProperty) => Promise<boolean>
+export type THandleContactScraper = (page: Page, data: IProperty) => Promise<IProperty>
+
+export interface IAction {
+  pref: string,
+  type: TProperty,
+  handleScraper: THandleScraper,
+  handlePrepareForm: THandlePrepareForm
+  handleContactScraper: THandleContactScraper
+}
 
 
 export interface IProperty {
   物件番号?: string,
-  物件種別?: PropertyType,
+  物件種別?: TProperty,
   物件名: string,
   販売価格: string,
   比較用価格: number,
