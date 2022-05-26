@@ -5,6 +5,7 @@ import {TSearchResult} from '../doNetCompare/compareData';
 import {searchDoProperty} from '../doNetCompare/searchDoProperty';
 import {IAction, IProperty} from '../types';
 import {dlPortalCheck, kintoneAppId} from '../config';
+import {logger} from '../../../../utils';
 
 type TScraperTask = (
   actions: IAction[], cluster: Cluster<{page: Page}>
@@ -12,7 +13,8 @@ type TScraperTask = (
 
 export const scraperTask: TScraperTask = async (actions, cluster) => {
   const handlePerProperty = async (action: IAction, dtArr: IProperty[]) => {
-    return await Promise.all(dtArr.map(async (dt) => {
+    const dtLength = dtArr.length;
+    return await Promise.all(dtArr.map(async (dt, idx) => {
       const resultWithContact = await cluster.execute(async ({page}) => {
         return await action.handleContactScraper(page, dt);
       }) as IProperty;

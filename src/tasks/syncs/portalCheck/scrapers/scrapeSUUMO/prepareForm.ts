@@ -2,6 +2,7 @@ import {Page} from 'puppeteer';
 import {logger} from '../../../../../utils';
 import {cityLists} from '../../config';
 import {THandlePrepareForm, TProperty} from '../../types';
+import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
 
 /**
  * 検索条件を設定する
@@ -32,38 +33,50 @@ export const prepareForm: THandlePrepareForm = async (
   }
   url = pref === '愛知県' ? url + 'aichi/city/' : url + 'gifu/city/';
 
-  await page.goto(url, {waitUntil: 'networkidle2'}); // 検索サイトへ移動する
+  try {
+    await page.goto(url, {waitUntil: 'networkidle2'}); // 検索サイトへ移動する
 
-  await page.evaluate(
-    (cities: string[]) => { // 渡された変数を関数の引数にすれば、使用出来ます。
-      cities
-        .forEach((city) => { // 各都市
-          // サイトはJQueryがあるので、それを利用します
-          $(`input[name="sc"] ~ label:contains("${city}")`) // ラベルのセレクター
-            .prev().attr('checked', 'checked'); // clickをラベルに発火させます。
-        });
-    },
-    cities, // evaluate内のコードにcitiesにアクセスを与える
-  );
+    await page.evaluate(
+      (cities: string[]) => { // 渡された変数を関数の引数にすれば、使用出来ます。
+        cities
+          .forEach((city) => { // 各都市
+            // サイトはJQueryがあるので、それを利用します
+            $(`input[name="sc"] ~ label:contains("${city}")`) // ラベルのセレクター
+              .prev().attr('checked', 'checked'); // clickをラベルに発火させます。
+          });
+      },
+      cities, // evaluate内のコードにcitiesにアクセスを与える
+    );
 
-  // 3日以内に更新されたものに絞り込み
-  await page.click('#kki102');
+    // 3日以内に更新されたものに絞り込み
+    await page.click('#kki102');
 
-  // 検索をクリックする
-  logger.info('検索をクリックする');
-  await Promise.all([
-    page.click('.js-searchBtn'),
-    page.waitForNavigation(),
-  ]);
+    // 検索をクリックする
+    logger.info('検索をクリックする');
+    await Promise.all([
+      page.click('.js-searchBtn'),
+      page.waitForNavigation(),
+    ]);
 
-  // シンプル一覧表示をクリックする
-  logger.info('シンプル一覧表示をクリックする');
-  await Promise.all([
-    page.click('.ui-icon--tabview'),
-    page.waitForNavigation(),
-  ]);
+    // シンプル一覧表示をクリックする
+    logger.info('シンプル一覧表示をクリックする');
+    await Promise.all([
+      page.click('.ui-icon--tabview'),
+      page.waitForNavigation(),
+    ]);
 
-  // 100健吾と
-
-  return true;
+    // 100件ごとに表示する
+    await Promise.all([
+      page.evaluate(() => {
+        $('#js-tabmenu1-pcChange').val('100');
+        $('#js-tabmenu1-pcChange').trigger('change');
+      }),
+      page.waitForNavigation(),
+    ]);
+    return true;
+  } catch (error: any) {
+    await logErrorScreenshot(page,
+      `検索ページの設定に失敗しました。${page.url()} ${error.message}`);
+    return false;
+  }
 };
