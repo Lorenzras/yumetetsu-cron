@@ -1,39 +1,46 @@
 import {Page} from 'puppeteer';
-import {setTimeout} from 'timers';
-import {scrapeDtApartment} from './scrapeDtApartment';
-
-const sleep = async (delay: number) => {
-  return new Promise((resolve) => setTimeout(resolve, delay));
-};
+import {logger} from '../../../../../utils';
+import {cityLists} from '../../config';
+import {THandlePrepareForm, TProperty} from '../../types';
 
 /**
  * 検索条件を設定する
  * @param page 対象の県の初期ページ
- * @param cities 対象の県に含まれる検索対象の市の配列
+ * @param pref 対象の県
+ * @param type 物件種別
  */
-export const prepareForm = async (
+export const prepareForm: THandlePrepareForm = async (
   page: Page,
-  cities: string[],
+  pref: string,
+  type: TProperty,
 ) => {
-  // 対象の市にすべてチェックを入れる
-/*   for (const city of cities) {
-    console.log('City', city);
-    await page.$x(`//label[contains(text(),"${city}")]`)
-      .then(([cityLink]) => cityLink.click());
-    await sleep(800);
-  } */
+  // 対象の市のリストを準備する
+  const cities = Object.keys(cityLists[pref]);
 
-  // page.evaluate(pageFunction[, ...args])という関数で、ブラウザ内にコードを実行出来ます。
-  // pageFunction内のコードは隔離しているので、その外の変数などにアクセスはありません。
-  // [,...args]に渡せば、アクセスが与えられます。
+  // 物件種別によって、開くサイトアドレスを設定する
+  let url = '';
+  switch (type) {
+    case '中古戸建':
+      url = 'https://suumo.jp/chukoikkodate/';
+      break;
+    case '中古マンション':
+      url = 'https://suumo.jp/ms/chuko/';
+      break;
+    case '土地':
+      url = 'https://suumo.jp/tochi/';
+      break;
+  }
+  url = pref === '愛知県' ? url + 'aichi/city/' : url + 'gifu/city/';
+
+  await page.goto(url, {waitUntil: 'networkidle2'}); // 検索サイトへ移動する
 
   await page.evaluate(
-    (cities: string[])=>{ // 渡された変数を関数の引きすにすれば、使用出来ます。
+    (cities: string[]) => { // 渡された変数を関数の引数にすれば、使用出来ます。
       cities
         .forEach((city) => { // 各都市
           // サイトはJQueryがあるので、それを利用します
           $(`input[name="sc"] ~ label:contains("${city}")`) // ラベルのセレクター
-            .trigger('click'); // clickをラベルに発火させます。
+            .prev().attr('checked', 'checked'); // clickをラベルに発火させます。
         });
     },
     cities, // evaluate内のコードにcitiesにアクセスを与える
@@ -42,5 +49,21 @@ export const prepareForm = async (
   // 3日以内に更新されたものに絞り込み
   await page.click('#kki102');
 
-  // await sleep(3000);
+  // 検索をクリックする
+  logger.info('検索をクリックする');
+  await Promise.all([
+    page.click('.js-searchBtn'),
+    page.waitForNavigation(),
+  ]);
+
+  // シンプル一覧表示をクリックする
+  logger.info('シンプル一覧表示をクリックする');
+  await Promise.all([
+    page.click('.ui-icon--tabview'),
+    page.waitForNavigation(),
+  ]);
+
+  // 100健吾と
+
+  return true;
 };

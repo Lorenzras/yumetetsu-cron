@@ -1,8 +1,8 @@
 import {Page} from 'puppeteer';
 import {extractPrice} from '../../../../../utils';
-import {IHouse} from '../../types';
+import {IHouse, THandleScraper} from '../../types';
 
-export const scrapeDtHouse = async (
+export const scrapeDtHouse: THandleScraper = async (
   page: Page,
 ): Promise<IHouse[] | []> => {
   let datas: IHouse[] = await page.$$eval('.property_unit--osusume2',
@@ -13,9 +13,11 @@ export const scrapeDtHouse = async (
         const rawPrice = $(el).find('.dottable-value--2').text().trim();
         const address = $(el).find('dt:contains("所在地") ~ dd').text();
         const rawArea = $(el).find('dt:contains("土地面積") ~ dd').text();
+        const id = 'suumo.House-' + url.split('ncz')[1].split('.')[0];
 
         return {
           物件種別: '中古戸建',
+          物件番号: id,
           物件名: title,
           リンク: url,
           所在地: address,
