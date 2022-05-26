@@ -9,7 +9,11 @@ export const logErrorScreenshot = async (page: Page, message: string) => {
     dir: dlImg,
     ext: 'png',
   });
-  logger.error(`${message} ${path.basename(fileName)}` );
+  logger.error(`${message} ${path.basename(fileName).replace('.png', '')}` );
+
+  const html = await page.content();
+
+
   await page.screenshot({
     path: fileName,
   });

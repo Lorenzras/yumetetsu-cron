@@ -13,7 +13,6 @@ type TScraperTask = (
 
 export const scraperTask: TScraperTask = async (actions, cluster) => {
   const handlePerProperty = async (action: IAction, dtArr: IProperty[]) => {
-    const dtLength = dtArr.length;
     return await Promise.all(dtArr.map(async (dt, idx) => {
       const resultWithContact = await cluster.execute(async ({page}) => {
         return await action.handleContactScraper(page, dt);
@@ -22,7 +21,9 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
       const doNetComparedResults = await cluster.execute(async ({page}) => {
         return await searchDoProperty(
           {page, inputData: dt},
-        );
+        ) ?? {
+          DO管理有無: '処理エラー',
+        } as IProperty;
       }) as TSearchResult[];
 
 
@@ -66,7 +67,6 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   };
 
   actions.forEach(async (action) => {
-    const completeData = await handleAction(action);
-    console.log(completeData);
+    await handleAction(action);
   });
 };

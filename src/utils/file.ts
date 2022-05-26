@@ -69,5 +69,10 @@ export const getFileName = (
   }) => {
   const randomize = format(new Date(), `yyyyMMdd-HHmmss`) + `-${nanoid(5)}`;
 
-  return path.join(dir, `${[appId, randomize, suffix].join('-')}.${ext}`);
+  return path.join(
+    dir,
+    `${[appId, randomize, suffix]
+      .filter(Boolean)
+      .join('-')}.${ext}`,
+  );
 };

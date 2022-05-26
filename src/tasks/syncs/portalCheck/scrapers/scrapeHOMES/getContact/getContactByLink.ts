@@ -15,8 +15,8 @@ export const getContactByLink = async (page: Page, url: string) => {
     掲載企業TEL: '---',
   };
   try {
-    page.removeAllListeners();
-    await blockImages(page);
+    // page.removeAllListeners();
+    // await blockImages(page);
     await page.goto(url, {waitUntil: 'domcontentloaded'});
     logger.info('link : ' + url);
 
