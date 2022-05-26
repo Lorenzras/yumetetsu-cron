@@ -1,12 +1,11 @@
-import {getFileName} from './../../../../../../utils/file';
-import {dlImg, kintoneAppId} from './../../../config';
+
 import {logger} from './../../../../../../utils/logger';
 import {scrapeSingleContact} from './scrapeSingleContact';
 import {scrapeSingleContactLot} from './scrapeSingleContactLot';
 import {Page} from 'puppeteer';
-import retry from 'async-retry';
+
 import {scrapeContactNew} from './scrapeContactNew';
-import path from 'path';
+
 import {blockImages} from '../../../../../common/browser';
 
 export const getContactByLink = async (page: Page, url: string) => {
@@ -14,7 +13,7 @@ export const getContactByLink = async (page: Page, url: string) => {
     掲載企業: '---',
     掲載企業TEL: '---',
   };
-  return retry(async (bail, attempt)=>{
+  try {
     page.removeAllListeners();
     await blockImages(page);
     await page.goto(url, {waitUntil: 'domcontentloaded'});
@@ -39,34 +38,23 @@ export const getContactByLink = async (page: Page, url: string) => {
       page
         .waitForSelector('.mod-notFoundMsg',
           {visible: true, timeout: 20000})
-        .then(()=> new Error('HOMES server error.')),
-    ]).catch((err)=>{
-      if (attempt >= 3) {
-        bail(new Error('Failed'));
-        logger.error('Get contact by link exceeded 3 tries');
-        return initialVal;
-      }
-      throw new Error('Failed to find selector to get contact. ' + err.message);
-    }); 3;
-
+        .then(()=> 3),
+    ]);
     switch (task) {
       case 0: return scrapeSingleContact(page);
       case 1: return scrapeSingleContactLot(page);
       case 2: return scrapeContactNew(page);
+      case 3: return {
+        掲載企業: '取得失敗 3',
+        掲載企業TEL: '取得失敗 3',
+      };
       default: return initialVal;
     }
-  },
-  {
-    retries: 3,
-    onRetry: async (e, attempt)=>{
-      const errImgName = getFileName({
-        dir: dlImg, appId: kintoneAppId, ext: 'png',
-      });
-      // eslint-disable-next-line max-len
-      logger.error(`getContactByLink failed to find contact. ${page.url()} ${path.basename(errImgName)} Attempt: ${attempt}`);
-      await page.screenshot({
-        path: errImgName,
-      });
-    },
-  });
+  } catch (err :any) {
+    logger.error(`Failed to get contact ${page.url()} ${err.message}`);
+    return {
+      掲載企業: '取得失敗',
+      掲載企業TEL: '取得失敗',
+    };
+  }
 };
