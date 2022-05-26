@@ -1,4 +1,3 @@
-import {logger} from '../../../../../../utils/logger';
 import {Page} from 'puppeteer';
 import {extractTel} from '../../../../../../utils';
 import {TCompanyContact} from '../../../types';
