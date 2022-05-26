@@ -13,7 +13,7 @@ export const scrapeDtLot: THandleScraper = async (
         const rawPrice = $(el).find('.dottable-value--2').text().trim();
         const address = $(el).find('dt:contains("所在地") ~ dd').text();
         const rawArea = $(el).find('dt:contains("土地面積") ~ dd').text();
-        const id = 'suumo.Lot-' + url.split('ncz')[1].split('.')[0];
+        const id = 'suumo-' + url.split('ncz')[1].split('.')[0];
 
         return {
           物件種別: '土地',

@@ -63,7 +63,13 @@ export const prepareForm: THandlePrepareForm = async (
     page.waitForNavigation(),
   ]);
 
-  // 100健吾と
-
+  // 100件ごとに表示する
+  await Promise.all([
+    page.evaluate(() => {
+      $('#js-tabmenu1-pcChange').val('100');
+      $('#js-tabmenu1-pcChange').trigger('change');
+    }),
+    page.waitForNavigation(),
+  ]);
   return true;
 };
