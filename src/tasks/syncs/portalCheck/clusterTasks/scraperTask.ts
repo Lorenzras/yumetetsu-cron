@@ -53,7 +53,7 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
 
     const filteredData = completeData.filter((dt)=>{
       if (dt.DO管理有無 === '無' ||
-      (dt.DO管理有無 === '有' && +dt.DO価格差 > 0)) {
+      (dt.DO管理有無 === '有' && +dt.DO価格差 !== 0)) {
         return true;
       }
     });
