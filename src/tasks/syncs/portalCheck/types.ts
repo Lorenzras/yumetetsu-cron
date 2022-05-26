@@ -3,6 +3,7 @@ import {Page} from 'puppeteer';
 import {propertyTypes} from './config';
 
 export type TProperty = typeof propertyTypes[number]
+export type TPropertyConvert<T> = Record<TProperty, T>
 
 /**
  * @deprecated
@@ -27,7 +28,7 @@ export interface IAction {
   pref: string,
   type: TProperty,
   handleScraper: THandleScraper,
-  handlePrepareform: THandlePrepareForm
+  handlePrepareForm: THandlePrepareForm
   handleContactScraper: THandleContactScraper
 }
 

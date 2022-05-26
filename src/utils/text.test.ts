@@ -2,11 +2,19 @@ import {extractNumber, extractPrice, extractTel, spreadAddress} from './text';
 
 describe(('stringManipulation'), ()=>{
   test('extractNumber', ()=>{
-    const testVals = ['222.22m2'];
-    testVals.forEach((i)=>{
+    const testVals = [
+      '222.22m2',
+      '600.00m² (181.49坪)',
+      '284.00m² (85.90坪)',
+      '1,035.00m² (313.08坪)',
+      '2、335.00m²',
+    ];
+    const result =testVals.map((i)=>{
       const res = extractNumber(i);
-      console.log('extractNumber', i, res);
+      return [i, res];
     });
+
+    expect(result).toMatchSnapshot();
   });
 
 

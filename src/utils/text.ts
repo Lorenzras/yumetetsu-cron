@@ -24,8 +24,11 @@ export const decodeToSJIS = (buffer: Buffer) => {
 };
 
 export const extractNumber = (str: string): number => {
-  return +(str.match(/(\d+)(?:\.(\d+))?/g)
-    ?.join('') || 0);
+  const matchResult = str
+    .replace(/[,、]/, '')
+    .match(/(\d+)(?:\.(\d+))?/g);
+  const result = matchResult?.[0] || 0;
+  return isNaN(+result) ? 0 : +result;
 };
 
 const getCleanJaPrice = (
@@ -87,6 +90,7 @@ export const spreadAddress = (
   町域: string
 } => {
   let newAddress = address;
+  console.log(newAddress);
   const pref = Object.keys(cityLists).find((i) => address.includes(i)) || '';
   const cities = Object.keys(cityLists[pref as keyof typeof cityLists]);
   const city = cities
