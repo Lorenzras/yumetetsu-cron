@@ -51,6 +51,7 @@ const contactFromModalLink = async (page: Page) => {
 };
 
 const pageResolver = async (page: Page) => {
+  await page.waitForNetworkIdle();
   if (await page.$('#item-detail_company')) {
     return contactFromSamePage(page);
   } else if (await page.$('#modal-info_shop a')) {
@@ -61,7 +62,7 @@ const pageResolver = async (page: Page) => {
       掲載企業TEL: `ページ無くなった`,
     };
   } else {
-    throw new Error(`Failed to identify property page ${page.url()}`);
+    throw new Error(`Failed to identify property page`);
   }
 };
 
