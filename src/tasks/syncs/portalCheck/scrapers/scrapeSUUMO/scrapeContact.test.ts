@@ -1,7 +1,7 @@
 import {openMockBrowserPage} from '../../../../common/browser';
 import {browserTimeOut} from '../../../../common/browser/config';
 import {IProperty} from '../../types';
-import {scrapeContact} from './scrapeContact';
+import {getContactLink, scrapeContact} from './scrapeContact';
 
 /* https://suumo.jp/jj/bukken/ichiran/JJ012FC002/?ar=050&bs=030&ekTjCd=&ekTjNm=&kb=1&kj=9&km=1&kt=9999999&sc=21202&ta=21&tb=0&tj=0&tt=9999999&bknlistmodeflg=2&pc=30 */
 // こちらなし /* https://suumo.jp/chukomansion/__JJ_JJ010FJ100_arz1050z2bsz1011z2ncz198324093.html */
@@ -39,10 +39,30 @@ const data: IProperty = {
   比較用価格: 2980,
 }; */
 
-test(('getCompanyInfo'), async () => {
-  const page = await openMockBrowserPage();
-  const result = await scrapeContact(page, data);
+describe('scrapecontact', () => {
+  test(('scrapeContact'), async () => {
+    const page = await openMockBrowserPage();
+    const result = await scrapeContact(page, data);
 
-  expect(result).toMatchSnapshot();
-  page.browser().disconnect();
-}, browserTimeOut);
+    expect(result).toMatchSnapshot();
+    page.browser().disconnect();
+  }, browserTimeOut);
+
+  test(('link'), async () => {
+    const page = await openMockBrowserPage();
+    const testLinks = [
+      'https://suumo.jp/ms/chuko/aichi/sc_nagoyashichikusa/nc_97454649/',
+      'https://suumo.jp/chukomansion/__JJ_JJ010FJ100_arz1050z2bsz1011z2ncz198324093.html',
+      'https://suumo.jp/chukoikkodate/__JJ_JJ010FJ100_arz1050z2bsz1021z2ncz198271927.html',
+      'https://gggg',
+    ];
+
+    const result = [];
+    for (const link of testLinks) {
+      result.push(await getContactLink(page, link));
+    }
+
+    expect(result).toMatchSnapshot();
+    page.browser().disconnect();
+  }, browserTimeOut);
+});

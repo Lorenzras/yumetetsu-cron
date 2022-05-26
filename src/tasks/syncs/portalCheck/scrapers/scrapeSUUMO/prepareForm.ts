@@ -40,7 +40,7 @@ export const prepareForm: THandlePrepareForm = async (
         .forEach((city) => { // 各都市
           // サイトはJQueryがあるので、それを利用します
           $(`input[name="sc"] ~ label:contains("${city}")`) // ラベルのセレクター
-            .trigger('click'); // clickをラベルに発火させます。
+            .prev().attr('checked', 'checked'); // clickをラベルに発火させます。
         });
     },
     cities, // evaluate内のコードにcitiesにアクセスを与える
@@ -62,6 +62,8 @@ export const prepareForm: THandlePrepareForm = async (
     page.click('.ui-icon--tabview'),
     page.waitForNavigation(),
   ]);
+
+  // 100健吾と
 
   return true;
 };

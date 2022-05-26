@@ -5,7 +5,6 @@ import {ILot, THandleScraper} from '../../types';
 export const scrapeDtLot: THandleScraper = async (
   page: Page,
 ): Promise<ILot[] | []> => {
-  console.log('page::', page);
   let datas: ILot[] = await page.$$eval('.property_unit--osusume2',
     (list) => {
       return list.map<ILot>((el) => {
