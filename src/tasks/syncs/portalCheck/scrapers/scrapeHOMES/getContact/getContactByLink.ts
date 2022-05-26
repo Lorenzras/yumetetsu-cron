@@ -7,6 +7,7 @@ import {Page} from 'puppeteer';
 import {scrapeContactNew} from './scrapeContactNew';
 
 import {blockImages} from '../../../../../common/browser';
+import {logErrorScreenshot} from '../../helpers/logErrorScreenshot';
 
 export const getContactByLink = async (page: Page, url: string) => {
   const initialVal = {
@@ -51,7 +52,8 @@ export const getContactByLink = async (page: Page, url: string) => {
       default: return initialVal;
     }
   } catch (err :any) {
-    logger.error(`Failed to get contact ${page.url()} ${err.message}`);
+    await logErrorScreenshot(
+      page, `Failed to get contact ${page.url()} ${err.message}`);
     return {
       掲載企業: '取得失敗',
       掲載企業TEL: '取得失敗',

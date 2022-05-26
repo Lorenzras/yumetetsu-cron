@@ -1,6 +1,7 @@
 import {TCompanyContact} from '../../types';
 import {Page} from 'puppeteer';
 import {extractTel, logger} from '../../../../../utils';
+import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
 
 const contactFromSamePage = async (page: Page) => {
   logger.info(`Retrieving contact at same page. ${page.url()}`);
@@ -57,6 +58,10 @@ const pageResolver = async (page: Page) => {
     page.waitForSelector('#error-header'),
   ]);
 
+  await page.waitForResponse((resp) => {
+    return resp.url().includes('jquery.min.js') && resp.status() === 200;
+  });
+
 
   if (await page.$('#item-detail_company')) {
     return contactFromSamePage(page);
@@ -84,7 +89,8 @@ export const getContactByLink = async (
 
     return result;
   } catch (err: any) {
-    logger.error(`Failed to retrieve contact ${url} ${err.message}`);
+    await logErrorScreenshot(
+      page, `Failed to retrieve contact ${url} ${err.message}`);
     return {
       掲載企業: `取得失敗`,
       掲載企業TEL: `取得失敗`,
