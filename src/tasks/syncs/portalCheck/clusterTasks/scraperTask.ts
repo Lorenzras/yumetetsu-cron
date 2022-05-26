@@ -51,13 +51,20 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
       action, initialResult,
     );
 
+    const filteredData = completeData.filter((dt)=>{
+      if (dt.DO管理有無 === '無' ||
+      (dt.DO管理有無 === '有' && +dt.DO価格差 > 0)) {
+        return true;
+      }
+    });
+
     if (completeData.length) {
       // eslint-disable-next-line max-len
       await saveJSONToCSV(getFileName({
         appId: kintoneAppId,
         dir: dlPortalCheck,
         suffix: action.type,
-      }), completeData);
+      }), filteredData);
     }
 
     return completeData;
