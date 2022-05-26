@@ -19,8 +19,18 @@ test('getContact', async ()=>{
     'https://www.athome.co.jp/kodate/3915824302/',
   ];
 
-  const result = [];
-  for (const url of urls) {
+  const result: any[] = await Promise.all(
+    urls.map(async (url)=>{
+      const pageRes = await cluster.execute(({page})=>{
+        return getContactByLink(page, url);
+      });
+
+      return {...pageRes, url};
+    }),
+  );
+
+
+  /*   for (const url of urls) {
     console.log('Processing url ', url);
 
     const pageRes = await cluster.execute(({page})=>{
@@ -28,7 +38,7 @@ test('getContact', async ()=>{
     });
     console.log(pageRes);
     result.push( {...pageRes, url});
-  }
+  } */
 
 
   expect(result).toMatchSnapshot();

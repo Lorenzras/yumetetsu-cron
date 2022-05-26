@@ -1,15 +1,16 @@
 
+import path from 'path';
 import {Page} from 'puppeteer';
 import {getFileName, logger} from '../../../../../utils';
-import {dlImg, kintoneAppId} from '../../config';
+import {dlImg} from '../../config';
 
 export const logErrorScreenshot = async (page: Page, message: string) => {
-  logger.error(message);
+  const fileName = getFileName({
+    dir: dlImg,
+    ext: 'png',
+  });
+  logger.error(`${message} ${path.basename(fileName)}` );
   await page.screenshot({
-    path: getFileName({
-      appId: kintoneAppId,
-      dir: dlImg,
-      ext: 'png',
-    }),
+    path: fileName,
   });
 };

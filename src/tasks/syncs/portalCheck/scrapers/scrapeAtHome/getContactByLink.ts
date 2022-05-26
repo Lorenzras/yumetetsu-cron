@@ -58,9 +58,7 @@ const pageResolver = async (page: Page) => {
     page.waitForSelector('#error-header'),
   ]);
 
-  await page.waitForResponse((resp) => {
-    return resp.url().includes('jquery.min.js') && resp.status() === 200;
-  });
+  await page.waitForFunction(() => $);
 
 
   if (await page.$('#item-detail_company')) {

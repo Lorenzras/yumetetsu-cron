@@ -63,7 +63,7 @@ export const getFileName = (
   }:
   {
     dir: string,
-    appId: string | number,
+    appId?: string | number,
     suffix?: string,
     ext?: string
   }) => {
