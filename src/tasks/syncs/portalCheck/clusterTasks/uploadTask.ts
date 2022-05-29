@@ -14,5 +14,6 @@ export const uploadTask = async (page: Page, file: string) => {
   // Clean up
   // page.removeAllListeners();
   await deleteFile(file);
+  await page.close();
   logger.info('Finished upload task for ' + path.basename(file));
 };

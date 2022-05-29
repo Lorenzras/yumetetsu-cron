@@ -1,3 +1,4 @@
+import {openBrowserPage} from './../../common/browser/openBrowser';
 import {scraperTask} from './clusterTasks/scraperTask';
 import {getExtraPuppeteer} from '../../common/browser';
 import {Cluster} from 'puppeteer-cluster';
@@ -41,7 +42,10 @@ export const portalCheckMainTask = async () => {
   const watcher = initFileWatcher();
 
   watcher.on('add', async (path)=>{
-    await cluster.execute(({page})=> uploadTask(page, path));
+    logger.info(`Detected file ${path}`);
+    const page = await openBrowserPage();
+    await uploadTask(page, path);
+    logger.info(`Uploaded detected file ${path}`);
   });
 
   logger.info(`Starting cluster.`);
@@ -55,10 +59,13 @@ export const portalCheckMainTask = async () => {
     // actionsAtHome()[0],
   ];
 
-  scraperTask(actions, cluster);
+  await scraperTask(actions, cluster);
 
 
   await cluster.idle();
   await cluster.close();
+
+  logger.info('Closing watcher');
+  watcher.removeAllListeners();
   await watcher.close();
 };
