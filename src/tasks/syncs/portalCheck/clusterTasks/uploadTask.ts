@@ -1,11 +1,10 @@
-import {blockImages} from '../../../common/browser';
 import {uploadSingleCSVSmart} from '../../../common/kintone/uploadCSV';
 import {Page} from 'puppeteer';
 import {deleteFile, logger} from '../../../../utils';
 import path from 'path';
 
 export const uploadTask = async (page: Page, file: string) => {
-  await blockImages(page);
+  // await blockImages(page);
   await uploadSingleCSVSmart({
     page,
     fileWithAppId: file,
@@ -13,7 +12,8 @@ export const uploadTask = async (page: Page, file: string) => {
   });
 
   // Clean up
-  page.removeAllListeners();
+  // page.removeAllListeners();
   await deleteFile(file);
+  await page.close();
   logger.info('Finished upload task for ' + path.basename(file));
 };
