@@ -9,7 +9,7 @@ import {logger} from '../../../../utils';
 
 type TScraperTask = (
   actions: IAction[], cluster: Cluster<{page: Page}>
-) => Promise<void>
+) => Promise<IProperty[]>
 
 export const scraperTask: TScraperTask = async (actions, cluster) => {
   const handlePerProperty = async (action: IAction, dtArr: IProperty[]) => {
@@ -65,7 +65,7 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
       }
     });
 
-    if (completeData.length) {
+    if (filteredData.length) {
       // eslint-disable-next-line max-len
       await saveJSONToCSV(getFileName({
         appId: kintoneAppId,
@@ -74,12 +74,19 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
       }), filteredData);
     }
 
-    return completeData;
+    return filteredData;
   };
 
-  await Promise.all(
+  const finalResults = (await Promise.all(
     actions.map(async (action) => {
-      await handleAction(action);
+      return await handleAction(action);
     }),
-  );
+  )).flatMap((res) => {
+    logger.info(`Flattening ${res.length} rows.`);
+    return res;
+  });
+
+  logger.info(`Final result has ${finalResults.length} rows.`);
+
+  return finalResults;
 };
