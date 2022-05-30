@@ -1,6 +1,6 @@
 import {browserTimeOut} from '../../../common/browser/config';
 import {getGroupByCity, saveToExcel} from './saveToExcel';
-import jsonData from './test/test.json';
+import jsonData from './test/199-20220531-063130-XVAu1.json';
 import {IProperty} from './../types';
 
 describe('SaveToExcel', ()=>{

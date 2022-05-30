@@ -134,4 +134,4 @@ cli-kintone*
 **.csv
 **/errImg/**.png
 **/data/json/**.json
-**/data/excel/**.xlsx
+**/data/excel/**/**.xlsx

@@ -57,7 +57,7 @@ export const portalCheckMainTask = async () => {
 
   const actions = [
     ...actionsHOMES(),
-    // actionsAtHome()[0],
+    ...actionsAtHome(),
   ];
 
   await scraperTask(actions, cluster);

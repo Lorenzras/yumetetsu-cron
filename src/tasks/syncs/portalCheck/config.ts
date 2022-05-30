@@ -4,11 +4,15 @@ import {ILocations} from './types';
 export const dirPortalCheck = __dirname;
 export const dlPortalCheck = path.join(dirPortalCheck, 'data');
 export const dlJSON = path.join(dlPortalCheck, 'json');
-export const dlExcelResult = path
-  .join('\\\\192.168.11.150', 'Data01', '★サポート共有', '【ポータル新着物件】');
+
+export const dlExcelResult = process.env.ENVIRONMENT === 'prod' ?
+  path.join('\\\\192.168.11.150', 'Data01', '★サポート共有', '【ポータル新着物件】') :
+  path.join(dlPortalCheck, 'excel');
+
 export const resultFileTemplate = path.join(
   dirPortalCheck, 'excelTask', 'template.xlsx',
 );
+
 export const dlImg = path.join(dirPortalCheck, 'errImg');
 
 export const kintoneAppId = 199;

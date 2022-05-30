@@ -110,7 +110,7 @@ export const searchDoProperty = async ({
     }, {
       retries: 3,
       onRetry: async (e, attempt) => {
-        logger.warning(`Failed to compare data with ${attempt} attempt/s.  ${e.message} Retrying...`);
+        logger.warn(`Failed to compare data with ${attempt} attempt/s.  ${e.message} Retrying...`);
       },
     });
   } catch (err: any) {

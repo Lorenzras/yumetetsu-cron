@@ -18,13 +18,11 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   // Shuffle actions to spread network traffic between sites.
   const shuffledActions = _.shuffle(actions);
 
-  console.log(actions.map((a) => a.type), shuffledActions.map((a) => a.type));
+
   const handlePerProperty = async (action: IAction, dtArr: IProperty[]) => {
     const dtArrLength = dtArr.length;
     return await Promise.all(dtArr.map(async (dt, idx) => {
-      const resultWithContact = await cluster.execute(async ({page}) => {
-        return await action.handleContactScraper(page, dt);
-      }) as IProperty;
+      let resultWithContact = dt;
 
       const doNetComparedResults = await cluster.execute(async ({page}) => {
         return await searchDoProperty(
@@ -34,14 +32,25 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
         } as IProperty;
       }) as TSearchResult[];
 
+      const firstComparedResult = doNetComparedResults[0];
+
+      if (firstComparedResult.DO管理有無 === '無' ||
+      (firstComparedResult.DO管理有無 === '有' && +firstComparedResult.DO価格差 !== 0)) {
+        resultWithContact = await cluster.execute(async ({page}) => {
+          return await action.handleContactScraper(page, dt);
+        }) as IProperty;
+      } else {
+        logger.warn(`It already exist in doNetwork, will not retrieve contact for ${dt.リンク}`);
+      }
+
+
       const completedData = {
         ...resultWithContact,
-        ...doNetComparedResults[0],
+        ...firstComparedResult,
         物件種別: action.type,
       };
 
-      // eslint-disable-next-line max-len
-      logger.info(`Processed ${idx + 1 } / ${dtArrLength} items. ${completedData.リンク} `);
+      logger.info(`Processed ${idx + 1 } / ${dtArrLength} items. ${dt.リンク} `);
       return completedData;
     }));
   };
@@ -62,20 +71,26 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
             res.push(...await handleScraper(page));
           }
         } else {
+          // This handles edge cases where the site limits the number of cities selected. e.g. Yahoo
           while (formState.chunkLength <= formState.nextIdx) {
-            await handlePrepareForm(page, pref, type, formState.nextIdx);
-            res.push(...await handleScraper(page));
+            if (formState.success) {
+              await handlePrepareForm(page, pref, type, formState.nextIdx);
+              res.push(...await handleScraper(page));
+            } else {
+              logger.error(`handlePrepareForm failed. ${JSON.stringify(formState)}`);
+            }
           }
         }
 
         return res;
       });
 
+
     const completeData = await handlePerProperty(
       action, initialResult,
     );
 
-
+    // Extract data that exist and with price difference with doNetwork.
     const filteredData = completeData.filter((dt)=>{
       if (dt.DO管理有無 === '無' ||
       (dt.DO管理有無 === '有' && +dt.DO価格差 !== 0)) {
@@ -85,13 +100,13 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
 
     logger.info(`Completed: ${completeData.length}, Filtered: ${filteredData.length}.`);
 
-    if (filteredData.length) {
-      await saveJSONToCSV(getFileName({
-        appId: kintoneAppId,
-        dir: dlPortalCheck,
-        suffix: action.type,
-      }), filteredData);
-    }
+
+    // Saving file to dlPortalCheck will also trigger file watcher on another process thread.
+    await saveJSONToCSV(getFileName({
+      appId: kintoneAppId,
+      dir: dlPortalCheck,
+      suffix: action.type,
+    }), filteredData);
 
     return filteredData;
   };
@@ -109,9 +124,11 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
 
   logger.info(`Final result has ${finalResults.length} rows.`);
 
+  // Saving file to dlJSON will also trigger file watcher on another process thread.
   await saveJSON(getFileName({
     appId: kintoneAppId,
     dir: dlJSON,
   }), finalResults);
+
   return finalResults;
 };

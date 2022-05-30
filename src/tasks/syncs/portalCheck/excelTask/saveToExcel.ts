@@ -43,9 +43,20 @@ export const saveFile = async (items: IProperty[], fileName: string) => {
     const rows = (props).map((
       item,
     ) => {
-      const {物件名, 販売価格, 所在地,
-        リンク, DO管理有無, DO物件番号, DOステータス,
-        DO登録価格, DO価格差, DO検索結果件数, 掲載企業TEL, 掲載企業} = item;
+      const {
+        物件名 = '',
+        販売価格 = '',
+        所在地 = '',
+        リンク = '',
+        DO管理有無 = '',
+        DO物件番号 = '',
+        DOステータス = '',
+        DO登録価格 = '',
+        DO価格差 = '',
+        DO検索結果件数 = '',
+        掲載企業TEL = '',
+        掲載企業 = '',
+      } = item;
 
       let area = '';
       if ('土地面積' in item) {
@@ -83,7 +94,7 @@ export const saveFile = async (items: IProperty[], fileName: string) => {
   await workbook.xlsx.writeFile(
     path.join(
       saveFolder,
-      `${fileName}.xlsx`,
+      `${fileName}-${format(new Date(), 'yyyy.MM.dd-HHmmss')}.xlsx`,
     ),
   );
 };
@@ -91,7 +102,7 @@ export const saveFile = async (items: IProperty[], fileName: string) => {
 
 export const saveToExcel = async (items: IProperty[]) => {
   if (!items.length) {
-    logger.warning('Result is empty. Stopping saveToExcel.');
+    logger.warn('Result is empty. Stopping saveToExcel.');
     return;
   }
 
