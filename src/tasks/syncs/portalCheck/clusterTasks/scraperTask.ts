@@ -1,17 +1,24 @@
-import {saveJSONToCSV, getFileName} from './../../../../utils/file';
+/* eslint-disable max-len */
+import {saveJSONToCSV, saveJSON, getFileName} from './../../../../utils/file';
 import {Page} from 'puppeteer';
 import {Cluster} from 'puppeteer-cluster';
 import {TSearchResult} from '../doNetCompare/compareData';
 import {searchDoProperty} from '../doNetCompare/searchDoProperty';
 import {IAction, IProperty} from '../types';
-import {dlPortalCheck, kintoneAppId} from '../config';
+import {dlJSON, dlPortalCheck, kintoneAppId} from '../config';
 import {logger} from '../../../../utils';
+import _ from 'lodash';
+
 
 type TScraperTask = (
   actions: IAction[], cluster: Cluster<{page: Page}>
 ) => Promise<IProperty[]>
 
 export const scraperTask: TScraperTask = async (actions, cluster) => {
+  // Shuffle actions to spread network traffic between sites.
+  const shuffledActions = _.shuffle(actions);
+
+  console.log(actions.map((a) => a.type), shuffledActions.map((a) => a.type));
   const handlePerProperty = async (action: IAction, dtArr: IProperty[]) => {
     const dtArrLength = dtArr.length;
     return await Promise.all(dtArr.map(async (dt, idx) => {
@@ -68,6 +75,7 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
       action, initialResult,
     );
 
+
     const filteredData = completeData.filter((dt)=>{
       if (dt.DO管理有無 === '無' ||
       (dt.DO管理有無 === '有' && +dt.DO価格差 !== 0)) {
@@ -75,8 +83,9 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
       }
     });
 
+    logger.info(`Completed: ${completeData.length}, Filtered: ${filteredData.length}.`);
+
     if (filteredData.length) {
-      // eslint-disable-next-line max-len
       await saveJSONToCSV(getFileName({
         appId: kintoneAppId,
         dir: dlPortalCheck,
@@ -87,8 +96,10 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     return filteredData;
   };
 
+
+  // Main thread emitter
   const finalResults = (await Promise.all(
-    actions.map(async (action) => {
+    shuffledActions.map(async (action) => {
       return await handleAction(action);
     }),
   )).flatMap((res) => {
@@ -98,5 +109,9 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
 
   logger.info(`Final result has ${finalResults.length} rows.`);
 
+  await saveJSON(getFileName({
+    appId: kintoneAppId,
+    dir: dlJSON,
+  }), finalResults);
   return finalResults;
 };

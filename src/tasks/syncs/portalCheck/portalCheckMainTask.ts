@@ -11,6 +11,7 @@ import {actionsHOMES} from './scrapers/scrapeHOMES';
 import {Page} from 'puppeteer';
 import {actionsAtHome} from './scrapers/scrapeAtHome/actionsAtHome';
 
+
 export const initCluster = () => Cluster.launch({
   puppeteer: getExtraPuppeteer(),
   concurrency: Cluster.CONCURRENCY_CONTEXT,
@@ -61,12 +62,6 @@ export const portalCheckMainTask = async () => {
 
   await scraperTask(actions, cluster);
 
-
-  // logger.info('Waiting for remaining tasks to be registered.');
-  // await sleep(2000);
-
-  // logger.info('Waiting for all upload tasks to finish.');
-  // await Promise.all(uploadTasks);
 
   logger.info('Closing watcher');
   await watcher.close();

@@ -133,3 +133,5 @@ cli-kintone*
 **.snap
 **.csv
 **/errImg/**.png
+**/data/json/**.json
+**/data/excel/**.xlsx

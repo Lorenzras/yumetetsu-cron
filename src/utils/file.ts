@@ -41,7 +41,14 @@ export const saveJSONToCSV = async (
   filePath: string,
   json: {[k: string]: any}[],
 ) =>{
-  saveCSV(filePath, await json2csvAsync(json));
+  saveCSV(filePath + '.csv', await json2csvAsync(json));
+};
+
+export const saveJSON = async (
+  filePath: string,
+  data: {[k: string]: any}[],
+) => {
+  fs.writeFileSync(filePath + '.json', JSON.stringify(data));
 };
 
 export const deleteFile = async (file: string) => {
@@ -59,7 +66,6 @@ export const getFileName = (
     dir = './',
     appId,
     suffix,
-    ext = 'csv',
   }:
   {
     dir: string,
@@ -73,6 +79,6 @@ export const getFileName = (
     dir,
     `${[appId, randomize, suffix]
       .filter(Boolean)
-      .join('-')}.${ext}`,
+      .join('-')}`,
   );
 };
