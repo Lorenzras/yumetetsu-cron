@@ -47,11 +47,21 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
 
     const initialResult : IProperty[] = await cluster
       .execute(async ({page}) => {
-        if (await handlePrepareForm(page, pref, type)) {
-          const res = await handleScraper(page);
-          return res;
+        const formState = await handlePrepareForm(page, pref, type);
+        const res: IProperty[] = [];
+
+        if (typeof formState === 'boolean' ) {
+          if (formState) {
+            res.push(...await handleScraper(page));
+          }
+        } else {
+          while (formState.chunkLength <= formState.nextIdx) {
+            await handlePrepareForm(page, pref, type, formState.nextIdx);
+            res.push(...await handleScraper(page));
+          }
         }
-        return [];
+
+        return res;
       });
 
     const completeData = await handlePerProperty(
