@@ -27,12 +27,15 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
         } as IProperty;
       }) as TSearchResult[];
 
-      logger.info(`Processed ${idx + 1 } / ${dtArrLength} items.`);
-      return {
+      const completedData = {
         ...resultWithContact,
         ...doNetComparedResults[0],
         物件種別: action.type,
       };
+
+      // eslint-disable-next-line max-len
+      logger.info(`Processed ${idx + 1 } / ${dtArrLength} items. ${completedData.リンク} `);
+      return completedData;
     }));
   };
 
