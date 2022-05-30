@@ -4,4 +4,5 @@ export * from './file';
 export * from './logger';
 export * from './paths';
 export * from './slack';
+export * from './sleep';
 export * from './text';

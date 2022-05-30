@@ -5,7 +5,7 @@ import {Cluster} from 'puppeteer-cluster';
 import {browserTimeOut} from '../../common/browser/config';
 import chokidar from 'chokidar';
 import {dlPortalCheck} from './config';
-import {logger} from '../../../utils';
+import {logger, sleep} from '../../../utils';
 import {uploadTask} from './clusterTasks/uploadTask';
 import {actionsHOMES} from './scrapers/scrapeHOMES';
 import {Page} from 'puppeteer';
@@ -28,6 +28,7 @@ const initFileWatcher = () => {
   return chokidar.watch(dlPortalCheck, {
     ignored: /(^|[/\\])\../, // ignore dotfiles
     ignoreInitial: true,
+    persistent: false,
     depth: 0,
   });
 };
@@ -41,11 +42,10 @@ export const portalCheckMainTask = async () => {
   const cluster : Cluster<{page: Page}> = await initCluster();
   const watcher = initFileWatcher();
 
-  watcher.on('add', async (path)=>{
-    logger.info(`Detected file ${path}`);
-    const page = await openBrowserPage();
-    await uploadTask(page, path);
-    logger.info(`Uploaded detected file ${path}`);
+
+  watcher.on('add', (path)=>{
+    cluster
+      .execute(({page}) => uploadTask(page, path));
   });
 
   logger.info(`Starting cluster.`);
@@ -62,10 +62,17 @@ export const portalCheckMainTask = async () => {
   await scraperTask(actions, cluster);
 
 
-  await cluster.idle();
-  await cluster.close();
+  // logger.info('Waiting for remaining tasks to be registered.');
+  // await sleep(2000);
+
+  // logger.info('Waiting for all upload tasks to finish.');
+  // await Promise.all(uploadTasks);
 
   logger.info('Closing watcher');
-  watcher.removeAllListeners();
   await watcher.close();
+
+  await cluster.idle();
+  logger.info('Cluster is now idle.');
+  await cluster.close();
+  logger.info('Cluster is closed.');
 };

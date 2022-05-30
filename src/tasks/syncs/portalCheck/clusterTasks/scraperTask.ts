@@ -13,6 +13,7 @@ type TScraperTask = (
 
 export const scraperTask: TScraperTask = async (actions, cluster) => {
   const handlePerProperty = async (action: IAction, dtArr: IProperty[]) => {
+    const dtArrLength = dtArr.length;
     return await Promise.all(dtArr.map(async (dt, idx) => {
       const resultWithContact = await cluster.execute(async ({page}) => {
         return await action.handleContactScraper(page, dt);
@@ -26,7 +27,7 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
         } as IProperty;
       }) as TSearchResult[];
 
-
+      logger.info(`Processed ${idx + 1 } / ${dtArrLength} items.`);
       return {
         ...resultWithContact,
         ...doNetComparedResults[0],
@@ -73,7 +74,9 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     return completeData;
   };
 
-  actions.forEach(async (action) => {
-    await handleAction(action);
-  });
+  await Promise.all(
+    actions.map(async (action) => {
+      await handleAction(action);
+    }),
+  );
 };
