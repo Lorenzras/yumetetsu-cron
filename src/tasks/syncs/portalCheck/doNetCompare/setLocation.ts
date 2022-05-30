@@ -37,7 +37,7 @@ export const setLocation = async (
     if (town) {
       await page.waitForSelector(
         '#modal_town_name_autocomplete:not(:disabled)',
-        {timeout: 5000},
+        {timeout: 10000},
       )
         .then(async ()=>{
           // There are times when blur doesn't fire to populate autocomplete.

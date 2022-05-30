@@ -21,7 +21,16 @@ export interface IPropertyAction {
 export type PropertyActions = Array<IPropertyAction>
 
 export type THandleScraper = (page: Page) => Promise<IProperty[]>
-export type THandlePrepareForm = (page: Page, pref: string, propType: TProperty) => Promise<boolean>
+export type THandlePrepareForm = (
+  page: Page,
+  pref: string,
+  propType: TProperty,
+  nextIdx?: number,
+) => Promise<{
+  success: boolean,
+  chunkLength?: number,
+  nextIdx?: number,
+} | boolean>
 export type THandleContactScraper = (page: Page, data: IProperty) => Promise<IProperty>
 
 export interface IAction {
@@ -73,4 +82,8 @@ export interface ILocations {
     [c: string]: string
   }
 }
+
+
+const cityArr = [['豊橋市', '何市'], ['テスト市']];
+
 

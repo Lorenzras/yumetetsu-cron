@@ -1,10 +1,11 @@
+import {openBrowserPage} from './../../common/browser/openBrowser';
 import {scraperTask} from './clusterTasks/scraperTask';
 import {getExtraPuppeteer} from '../../common/browser';
 import {Cluster} from 'puppeteer-cluster';
 import {browserTimeOut} from '../../common/browser/config';
 import chokidar from 'chokidar';
 import {dlPortalCheck} from './config';
-import {logger} from '../../../utils';
+import {logger, sleep} from '../../../utils';
 import {uploadTask} from './clusterTasks/uploadTask';
 import {actionsHOMES} from './scrapers/scrapeHOMES';
 import {Page} from 'puppeteer';
@@ -14,6 +15,7 @@ export const initCluster = () => Cluster.launch({
   puppeteer: getExtraPuppeteer(),
   concurrency: Cluster.CONCURRENCY_CONTEXT,
   maxConcurrency: 5,
+  // monitor: true,
   retryLimit: 2,
   retryDelay: 2000,
   puppeteerOptions: {
@@ -26,6 +28,7 @@ const initFileWatcher = () => {
   return chokidar.watch(dlPortalCheck, {
     ignored: /(^|[/\\])\../, // ignore dotfiles
     ignoreInitial: true,
+    persistent: false,
     depth: 0,
   });
 };
@@ -39,8 +42,10 @@ export const portalCheckMainTask = async () => {
   const cluster : Cluster<{page: Page}> = await initCluster();
   const watcher = initFileWatcher();
 
-  watcher.on('add', async (path)=>{
-    return await cluster.execute(({page})=> uploadTask(page, path));
+
+  watcher.on('add', (path)=>{
+    cluster
+      .execute(({page}) => uploadTask(page, path));
   });
 
   logger.info(`Starting cluster.`);
@@ -50,14 +55,24 @@ export const portalCheckMainTask = async () => {
   });
 
   const actions = [
-    // ...actionsHOMES(),
-    ...actionsAtHome(),
+    ...actionsHOMES(),
+    // actionsAtHome()[0],
   ];
 
-  scraperTask(actions, cluster);
+  await scraperTask(actions, cluster);
 
+
+  // logger.info('Waiting for remaining tasks to be registered.');
+  // await sleep(2000);
+
+  // logger.info('Waiting for all upload tasks to finish.');
+  // await Promise.all(uploadTasks);
+
+  logger.info('Closing watcher');
+  await watcher.close();
 
   await cluster.idle();
+  logger.info('Cluster is now idle.');
   await cluster.close();
-  await watcher.close();
+  logger.info('Cluster is closed.');
 };

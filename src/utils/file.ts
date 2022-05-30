@@ -44,10 +44,10 @@ export const saveJSONToCSV = async (
   saveCSV(filePath, await json2csvAsync(json));
 };
 
-export const deleteFile = (file: string) => {
+export const deleteFile = async (file: string) => {
   try {
     logger.info(`Deleting file ${path.basename(file)}`);
-    return rmfr(file);
+    await rmfr(file);
   } catch (err: any) {
     logger.error('Failed to delete file.');
     throw new Error('Failed to delete file ' + err.message);
@@ -63,11 +63,16 @@ export const getFileName = (
   }:
   {
     dir: string,
-    appId: string | number,
+    appId?: string | number,
     suffix?: string,
     ext?: string
   }) => {
   const randomize = format(new Date(), `yyyyMMdd-HHmmss`) + `-${nanoid(5)}`;
 
-  return path.join(dir, `${[appId, randomize, suffix].join('-')}.${ext}`);
+  return path.join(
+    dir,
+    `${[appId, randomize, suffix]
+      .filter(Boolean)
+      .join('-')}.${ext}`,
+  );
 };

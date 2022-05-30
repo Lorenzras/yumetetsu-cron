@@ -9,11 +9,11 @@ import {logger} from '../../../../utils';
 
 type TScraperTask = (
   actions: IAction[], cluster: Cluster<{page: Page}>
-) => Promise<void>
+) => Promise<IProperty[]>
 
 export const scraperTask: TScraperTask = async (actions, cluster) => {
   const handlePerProperty = async (action: IAction, dtArr: IProperty[]) => {
-    const dtLength = dtArr.length;
+    const dtArrLength = dtArr.length;
     return await Promise.all(dtArr.map(async (dt, idx) => {
       const resultWithContact = await cluster.execute(async ({page}) => {
         return await action.handleContactScraper(page, dt);
@@ -22,15 +22,20 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
       const doNetComparedResults = await cluster.execute(async ({page}) => {
         return await searchDoProperty(
           {page, inputData: dt},
-        );
+        ) ?? {
+          DO管理有無: '処理エラー',
+        } as IProperty;
       }) as TSearchResult[];
 
-
-      return {
+      const completedData = {
         ...resultWithContact,
         ...doNetComparedResults[0],
         物件種別: action.type,
       };
+
+      // eslint-disable-next-line max-len
+      logger.info(`Processed ${idx + 1 } / ${dtArrLength} items. ${completedData.リンク} `);
+      return completedData;
     }));
   };
 
@@ -60,7 +65,7 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
       }
     });
 
-    if (completeData.length) {
+    if (filteredData.length) {
       // eslint-disable-next-line max-len
       await saveJSONToCSV(getFileName({
         appId: kintoneAppId,
@@ -69,11 +74,19 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
       }), filteredData);
     }
 
-    return completeData;
+    return filteredData;
   };
 
-  actions.forEach(async (action) => {
-    const completeData = await handleAction(action);
-    console.log(completeData);
+  const finalResults = (await Promise.all(
+    actions.map(async (action) => {
+      return await handleAction(action);
+    }),
+  )).flatMap((res) => {
+    logger.info(`Flattening ${res.length} rows.`);
+    return res;
   });
+
+  logger.info(`Final result has ${finalResults.length} rows.`);
+
+  return finalResults;
 };

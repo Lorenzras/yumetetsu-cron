@@ -20,7 +20,7 @@ export const changePublishedRange = async (page: Page) => {
         '#prg-loadingIcon', {visible: true, timeout: 2000})
         .catch(()=>logger.error('Loading icon did not appear.')),
       page.select('#cond_newdate', '3'),
-      page.waitForResponse((r) => r.url() === 'https://t.karte.io/track' && r.status() === 200),
+      // page.waitForResponse((r) => r.url() === 'https://t.karte.io/track' && r.status() === 200),
     ]);
 
     await page.waitForSelector('#prg-loadingIcon', {hidden: true});
@@ -29,7 +29,7 @@ export const changePublishedRange = async (page: Page) => {
     logger.info(`Loading icon is gone.`);
     return await getTotalNum();
   } catch (err: any) {
-    logger.error(`changePublishedRange ${err.message}`);
+    logger.error(`changePublishedRange Failed ${err.message}`);
     throw new Error(err.message);
   }
 };
