@@ -2,6 +2,8 @@ import {TCompanyContact} from '../../types';
 import {Page} from 'puppeteer';
 import {extractTel, logger} from '../../../../../utils';
 import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
+import axios from 'axios';
+import {load} from 'cheerio';
 
 const contactFromSamePage = async (page: Page) => {
   logger.info(`Retrieving contact at same page. ${page.url()}`);
@@ -68,7 +70,9 @@ const contactFromModalLink = async (page: Page) => {
 
 type TPageType = 'samePage' | 'linkInModal' | 'notFound' | 'samePageNoLink'
 
-const pageResolver = async (page: Page) => {
+const pageResolver = async (page: Page, url: string) => {
+  logger.info(`Trying to identify property page ${page.url()}`);
+  await page.goto(url);
   const pageType: TPageType = await Promise.race([
     page.waitForSelector('#item-detail_company')
       .then(():TPageType => 'samePage'),
@@ -102,13 +106,25 @@ export const getContactByLink = async (
   page: Page, url: string,
 ) => {
   try {
-    await page.goto(url);
+    await page.goto('about:blank');
+    logger.info(`Trying to fetch html ${page.url()}`);
+    const html = await axios.post(url).then((resp)=> resp.data);
+    const $ = load(html);
 
-    logger.info(`Trying to identify property page ${page.url()}`);
+    const companyName =$('.company-data_name-flex').text() ||
+    $('.company-data_name-flex a').text().trim();
 
-    const result = await pageResolver(page);
+    const dirtyContact = $('th:contains(TEL/FAX) ~ td').text().trim();
 
-    return result;
+    if (companyName || dirtyContact) {
+      logger.info(`Succesfully fetched html ${page.url()}`);
+      return {
+        掲載企業: companyName,
+        掲載企業TEL: extractTel(dirtyContact),
+      };
+    } else {
+      return await pageResolver(page, url);
+    }
   } catch (err: any) {
     await logErrorScreenshot(
       page, `Failed to retrieve contact ${url} ${err.message}`);

@@ -1,7 +1,7 @@
 
 import path from 'path';
 import {Page} from 'puppeteer';
-import {getFileName, logger} from '../../../../../utils';
+import {getFileName, logger, saveFile} from '../../../../../utils';
 import {dlImg} from '../../config';
 
 export const logErrorScreenshot = async (page: Page, message: string) => {
@@ -9,7 +9,9 @@ export const logErrorScreenshot = async (page: Page, message: string) => {
     dir: dlImg,
   });
   logger.error(`${message} ${path.basename(fileName)}` );
+  const body = await page.content();
 
+  await saveFile(fileName + '.html', body);
 
   await page.screenshot({
     path: fileName + '.png',
