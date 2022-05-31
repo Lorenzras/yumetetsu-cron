@@ -8,6 +8,7 @@ import {IAction, IProperty} from '../types';
 import {dlJSON, dlPortalCheck, kintoneAppId} from '../config';
 import {logger} from '../../../../utils';
 import _ from 'lodash';
+import {saveToExcel} from '../excelTask/saveToExcel';
 
 
 type TScraperTask = (
@@ -129,6 +130,8 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     appId: kintoneAppId,
     dir: dlJSON,
   }), finalResults);
+
+  await saveToExcel(finalResults);
 
   return finalResults;
 };
