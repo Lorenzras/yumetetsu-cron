@@ -9,6 +9,7 @@ import {dlJSON, dlPortalCheck, kintoneAppId} from '../config';
 import {logger} from '../../../../utils';
 import _ from 'lodash';
 import {saveToExcel} from '../excelTask/saveToExcel';
+import {handleGetCompanyDetails} from './handleGetCompanyDetails';
 
 
 type TScraperTask = (
@@ -23,7 +24,7 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   const handlePerProperty = async (action: IAction, dtArr: IProperty[]) => {
     const dtArrLength = dtArr.length;
     return await Promise.all(dtArr.map(async (dt, idx) => {
-      let resultWithContact = dt;
+      // const resultWithContact = dt;
 
 
       const doNetComparedResults = await cluster.execute(async ({page}) => {
@@ -37,21 +38,22 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
 
       const firstComparedResult = doNetComparedResults[0];
 
-      if (firstComparedResult.DO管理有無 === '無' ||
+      /*      if (firstComparedResult.DO管理有無 === '無' ||
       (firstComparedResult.DO管理有無 === '有' && +firstComparedResult.DO価格差 !== 0)) {
         resultWithContact = await cluster.execute(async ({page}) => {
           return await action.handleContactScraper(page, dt);
         }) as IProperty;
       } else {
         logger.warn(`It already exist in doNetwork, will not retrieve contact for ${dt.リンク}`);
-      }
+      } */
 
 
       const completedData = {
-        ...resultWithContact,
+        // ...resultWithContact,
+        ...dt,
         ...firstComparedResult,
         物件種別: action.type,
-      };
+      } as IProperty;
 
       logger.info(`Processed ${idx + 1 } / ${dtArrLength} items. ${dt.リンク} `);
       return completedData;
@@ -97,27 +99,19 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     // Extract data that exist and with price difference with doNetwork.
     const filteredData = completeData.filter((dt)=>{
       if (dt.DO管理有無 === '無' ||
-      (dt.DO管理有無 === '有' && +dt.DO価格差 !== 0)) {
+      (dt.DO管理有無 === '有' && +(dt.DO価格差 ?? 0) !== 0)) {
         return true;
       }
     });
 
     logger.info(`Completed: ${completeData.length}, Filtered: ${filteredData.length}.`);
 
-
-    // Saving file to dlPortalCheck will also trigger file watcher on another process thread.
-    await saveJSONToCSV(getFileName({
-      appId: kintoneAppId,
-      dir: dlPortalCheck,
-      suffix: `${action.type}-${filteredData.length.toString()}`,
-    }), filteredData);
-
     return filteredData;
   };
 
 
   // Main thread emitter
-  const finalResults = (await Promise.all(
+  const intermediateResults = (await Promise.all(
     shuffledActions.map(async (action) => {
       return await handleAction(action);
     }),
@@ -126,9 +120,17 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     return res;
   });
 
+  const finalResults = await Promise.all(
+    _.shuffle(intermediateResults)
+      .map(async (data) => {
+        return cluster.execute(({page})=>{
+          return handleGetCompanyDetails(page, data);
+        }) as Promise<IProperty>;
+      }),
+  );
+
   logger.info(`Final result has ${finalResults.length} rows.`);
 
-  // Saving file to dlJSON will also trigger file watcher on another process thread.
   await saveJSON(getFileName({
     appId: kintoneAppId,
     dir: dlJSON,
@@ -136,6 +138,14 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   }), finalResults);
 
   await saveToExcel(finalResults);
+
+  // Saving file to dlPortalCheck will also trigger file watcher on another process thread.
+  await saveJSONToCSV(getFileName({
+    appId: kintoneAppId,
+    dir: dlPortalCheck,
+    suffix: `${finalResults.length.toString()}`,
+  }), finalResults);
+
 
   return finalResults;
 };

@@ -4,6 +4,7 @@ import {extractTel, logger} from '../../../../../utils';
 import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
 import axios from 'axios';
 import {load} from 'cheerio';
+import retry from 'async-retry';
 
 const contactFromSamePage = async (page: Page) => {
   logger.info(`Retrieving contact at same page. ${page.url()}`);
@@ -102,26 +103,63 @@ const pageResolver = async (page: Page, url: string) => {
   }
 };
 
+/**
+ * Fetch details in company page.
+ *
+ * @param urlPart
+ */
+const fetchCompanyPage = async (urlPart: string) =>{
+  const fullUrl = `https://www.athome.co.jp${urlPart}`;
+  logger.info(
+    `Trying to fetch contact from the actual company page. ${fullUrl}`,
+  );
+  const html = await axios.post(fullUrl).then((resp)=> resp.data);
+  const $ = load(html);
+  return $('#item-est_outline li div:contains(電話)').next().text().trim();
+};
+
+export const fetchCompanyDetails = async (url: string) =>{
+  logger.info(`Trying to fetch html ${url}`);
+  const html = await axios.post(url).then((resp)=> resp.data);
+  const $ = load(html);
+
+  const companyName =$('.company-data_name-flex a').text().trim() ||
+  $('.company-data_name-flex').text().trim();
+  let dirtyContact = $('th:contains(TEL/FAX) ~ td').text().trim();
+
+  const companyLink = $('.company-data_name-flex a').attr('href');
+
+  if (companyLink) {
+    dirtyContact = await fetchCompanyPage(companyLink);
+  }
+
+  if (companyName || dirtyContact) {
+    return {
+      掲載企業: companyName,
+      掲載企業TEL: extractTel(dirtyContact),
+    };
+  }
+
+  return null;
+};
+
 export const getContactByLink = async (
   page: Page, url: string,
 ) => {
   try {
-    await page.goto('about:blank');
-    logger.info(`Trying to fetch html ${page.url()}`);
-    const html = await axios.post(url).then((resp)=> resp.data);
-    const $ = load(html);
+    const companyDetails = await retry(
+      async ()=> fetchCompanyDetails(url),
+      {
+        retries: 2,
+        minTimeout: 2000,
+        onRetry: (e, tries) => logger
+          .error(`Retrying fetch ${url} with ${tries} tries.`),
+      },
+    );
 
-    const companyName =$('.company-data_name-flex').text() ||
-    $('.company-data_name-flex a').text().trim();
-
-    const dirtyContact = $('th:contains(TEL/FAX) ~ td').text().trim();
-
-    if (companyName || dirtyContact) {
-      logger.info(`Succesfully fetched html ${page.url()}`);
-      return {
-        掲載企業: companyName,
-        掲載企業TEL: extractTel(dirtyContact),
-      };
+    if (companyDetails) {
+      logger.info(`Succesfully fetched html ${url}`);
+      return companyDetails;
     } else {
       return await pageResolver(page, url);
     }
