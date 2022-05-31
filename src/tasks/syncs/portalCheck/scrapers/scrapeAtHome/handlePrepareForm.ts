@@ -44,17 +44,25 @@ export const handlePrepareForm : THandlePrepareForm = async (
     }, cities);
 
 
+    // Click search as it become visible
+    const searchBtn = await page
+      .waitForSelector(
+        '.viewResult.ir-bt_view_result a',
+        {visible: true},
+      );
     await Promise.all([
+      searchBtn?.click(),
       page.waitForNavigation(),
-      page.click('.viewResult a'),
     ]);
 
     await page.waitForSelector('#item-list', {timeout: 300000})
       .catch(()=> page.reload());
-    logger.info(`Succesfully navigated to ${url}`);
+    logger.info(`Succesfully navigated to ${page.url()}`);
     return true;
   } catch (err: any) {
-    await logErrorScreenshot(page, `Failed to navigate ${url} ${err.message}`);
+    await logErrorScreenshot(
+      page, `Failed to navigate ${page.url()} ${err.message}`,
+    );
     return false;
   }
 };
