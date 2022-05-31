@@ -38,7 +38,7 @@ export const saveFile = async (items: IProperty[], fileName: string) => {
   workbook.eachSheet((ws)=>{
     const wsName = ws.name as TProperty;
     const props = groupedByPropType[wsName];
-    if (!props) return; // Short circuit
+    if (!props) return; // Short circuit when it doesn't exist
 
     const rows = (props).map((
       item,
@@ -94,7 +94,12 @@ export const saveFile = async (items: IProperty[], fileName: string) => {
   await workbook.xlsx.writeFile(
     path.join(
       saveFolder,
-      `${fileName}-${format(new Date(), 'yyyy.MM.dd-HHmmss')}.xlsx`,
+      [
+        fileName,
+        format(new Date(), 'yyyy.MM.dd-HHmmss'),
+        items.length,
+      ]
+        .join('-') + '.xlsx',
     ),
   );
 };

@@ -25,7 +25,9 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     return await Promise.all(dtArr.map(async (dt, idx) => {
       let resultWithContact = dt;
 
+
       const doNetComparedResults = await cluster.execute(async ({page}) => {
+        logger.info(`Comparing to donet at ${idx + 1 } / ${dtArrLength} items. ${dt.リンク} `);
         return await searchDoProperty(
           {page, inputData: dt},
         ) ?? {
@@ -83,6 +85,7 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
           }
         }
 
+        logger.info(`Scraped total of ${res.length} from ${page.url()}`);
         return res;
       });
 
@@ -106,7 +109,7 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     await saveJSONToCSV(getFileName({
       appId: kintoneAppId,
       dir: dlPortalCheck,
-      suffix: action.type,
+      suffix: `${action.type}-${filteredData.length.toString()}`,
     }), filteredData);
 
     return filteredData;
@@ -129,6 +132,7 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   await saveJSON(getFileName({
     appId: kintoneAppId,
     dir: dlJSON,
+    suffix: finalResults.length.toString(),
   }), finalResults);
 
   await saveToExcel(finalResults);
