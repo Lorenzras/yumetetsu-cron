@@ -15,7 +15,7 @@ import {actionsAtHome} from './scrapers/scrapeAtHome/actionsAtHome';
 export const initCluster = () => Cluster.launch({
   puppeteer: getExtraPuppeteer(),
   concurrency: Cluster.CONCURRENCY_CONTEXT,
-  maxConcurrency: process.env.CLUSTER_MAXCONCURRENCY ?? 5,
+  maxConcurrency: +process.env.CLUSTER_MAXCONCURRENCY ?? 5,
   // monitor: true,
   retryLimit: 2,
   retryDelay: 2000,
