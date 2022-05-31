@@ -25,7 +25,9 @@ declare global {
       DO_NETWORK_PASSWORD: string,
 
       REINS_USER?: string,
-      REINS_PASS?: string
+      REINS_PASS?: string,
+
+      CLUSTER_MAXCONCURRENCY: number
 
       BROWSER_TYPE?: 'NORMAL' | 'HEADLESS',
       ENVIRONMENT?: 'dev' | 'prod',
