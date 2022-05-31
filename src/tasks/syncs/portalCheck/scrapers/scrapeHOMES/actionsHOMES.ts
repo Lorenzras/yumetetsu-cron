@@ -5,7 +5,7 @@ import {scrapeDtHouse} from './scrapeDtHouse';
 import {scrapeDtLot} from './scrapeDtLot';
 import {scrapeDtMansion} from './scrapeDtMansion';
 import {handleContactScraper} from './handleContactScraper';
-import {handlePrepareForm} from './handlePrepareform';
+import {handlePrepareForm} from './handlePrepareForm';
 
 export const getScraperByPropType = (propType: TProperty) => {
   switch (propType) {
