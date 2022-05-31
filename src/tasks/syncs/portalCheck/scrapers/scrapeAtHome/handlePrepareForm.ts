@@ -1,6 +1,7 @@
 import {logger} from '../../../../../utils';
 import {cityLists} from '../../config';
 import {THandlePrepareForm, TProperty} from '../../types';
+import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
 
 
 type TPropertyConvert = Record<TProperty, string>
@@ -43,17 +44,25 @@ export const handlePrepareForm : THandlePrepareForm = async (
     }, cities);
 
 
+    // Click search as it become visible
+    const searchBtn = await page
+      .waitForSelector(
+        '.viewResult.ir-bt_view_result a',
+        {visible: true},
+      );
     await Promise.all([
+      searchBtn?.click(),
       page.waitForNavigation(),
-      page.click('.viewResult a'),
     ]);
 
     await page.waitForSelector('#item-list', {timeout: 300000})
       .catch(()=> page.reload());
-    logger.info(`Succesfully navigated to ${url}`);
+    logger.info(`Succesfully navigated to ${page.url()}`);
     return true;
   } catch (err: any) {
-    logger.error(`Failed to navigate ${url} ${err.message}`);
+    await logErrorScreenshot(
+      page, `Failed to navigate ${page.url()} ${err.message}`,
+    );
     return false;
   }
 };

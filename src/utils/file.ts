@@ -41,7 +41,19 @@ export const saveJSONToCSV = async (
   filePath: string,
   json: {[k: string]: any}[],
 ) =>{
-  saveCSV(filePath, await json2csvAsync(json));
+  if (!json.length) return;
+  saveCSV(filePath + '.csv', await json2csvAsync(json));
+};
+
+export const saveJSON = async (
+  filePath: string,
+  data: {[k: string]: any}[],
+) => {
+  try {
+    fs.writeFileSync(filePath + '.json', JSON.stringify(data));
+  } catch (err) {
+    logger.error('Failed to save json file.');
+  }
 };
 
 export const deleteFile = async (file: string) => {
@@ -54,12 +66,29 @@ export const deleteFile = async (file: string) => {
   }
 };
 
+/**
+ * CAUTION
+ * This action is not recoverable.
+ * @param dir directory where files will be deleted
+ */
+export const deleteFilesInFolder = (dir: string) =>{
+// Still thinking if I will include this as it is damaging.
+};
+
+/**
+ * All files in the folder will be moved to archived folder
+ * at the same directory
+ * @param dir
+ */
+export const archiveFilesInFolder = (dir: string) =>{
+  // ToDo
+};
+
 export const getFileName = (
   {
     dir = './',
     appId,
     suffix,
-    ext = 'csv',
   }:
   {
     dir: string,
@@ -67,12 +96,14 @@ export const getFileName = (
     suffix?: string,
     ext?: string
   }) => {
+  fs.existsSync(dir) || fs.mkdirSync(dir);
+
   const randomize = format(new Date(), `yyyyMMdd-HHmmss`) + `-${nanoid(5)}`;
 
   return path.join(
     dir,
     `${[appId, randomize, suffix]
       .filter(Boolean)
-      .join('-')}.${ext}`,
+      .join('-')}`,
   );
 };

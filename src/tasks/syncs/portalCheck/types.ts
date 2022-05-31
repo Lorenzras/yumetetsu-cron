@@ -28,8 +28,8 @@ export type THandlePrepareForm = (
   nextIdx?: number,
 ) => Promise<{
   success: boolean,
-  chunkLength?: number,
-  nextIdx?: number,
+  chunkLength: number,
+  nextIdx: number,
 } | boolean>
 export type THandleContactScraper = (page: Page, data: IProperty) => Promise<IProperty>
 

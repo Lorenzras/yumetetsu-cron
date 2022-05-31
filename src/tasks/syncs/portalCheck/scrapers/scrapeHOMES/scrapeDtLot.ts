@@ -1,6 +1,8 @@
 import {Page} from 'puppeteer';
 import {extractNumber, extractPrice, logger} from '../../../../../utils';
 import {ILot} from '../../types';
+import {webScraper} from '../helpers/webScraper';
+import {handleNextPage} from './handleNextPage';
 
 export const scrapeDtLotPage = async (page: Page) => {
   try {
@@ -63,32 +65,17 @@ export const scrapeDtLotPage = async (page: Page) => {
   }
 };
 
+
 export const scrapeDtLot = async (
   page: Page,
-  result?: ILot[],
-) : Promise<ILot[]> => {
-  try {
-    const data = await scrapeDtLotPage(page);
 
-    const cummulativeResult = [...(result ?? []), ...data];
+): Promise<ILot[]> => {
+  logger.info(`Scraping ${page.url()}. `);
 
-    if (await page.$('.nextPage')) {
-      logger.info(`Scrape Lot => Clicking nextPage ${page.url()}`);
 
-      await Promise.all([
-        page.waitForNavigation(),
-        page.evaluate(()=>{
-          $('.nextPage a')[0].click(); // force click next
-        }),
-      ]);
-      logger.info(`Scrape Lot => Goto nextPage success. `);
-      return await scrapeDtLot(page, cummulativeResult);
-    }
-
-    logger.info(`Done scraping lot ${cummulativeResult.length}`);
-    return cummulativeResult;
-  } catch (err: any) {
-    logger.error(`HOMES scrapeDtLot ${err.message}`);
-    throw new Error(err);
-  }
+  return await webScraper<ILot>({
+    page,
+    handleScraper: scrapeDtLotPage,
+    handleNextPage: handleNextPage,
+  });
 };

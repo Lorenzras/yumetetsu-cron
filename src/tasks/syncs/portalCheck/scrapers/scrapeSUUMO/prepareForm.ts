@@ -53,8 +53,11 @@ export const prepareForm: THandlePrepareForm = async (
 
     // 検索をクリックする
     logger.info('検索をクリックする');
+    const searchBtn = await page.waitForSelector(
+      '#js-searchpanel a.js-searchBtn', {visible: true},
+    );
     await Promise.all([
-      page.click('.js-searchBtn'),
+      searchBtn?.click(),
       page.waitForNavigation(),
     ]);
 

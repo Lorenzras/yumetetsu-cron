@@ -7,7 +7,9 @@ export const testExcel = async () => {
   // workbook.getWorksheet('Sheet1');
 
   workbook.eachSheet((ws)=>{
-    console.log(ws.name);
+    const row = ws.addRow(['test', 'test3'], 'i');
   });
+
+  await workbook.xlsx.writeFile(path.join(__dirname, './result.xlsx'));
 };
 

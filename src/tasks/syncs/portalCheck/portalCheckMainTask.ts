@@ -11,10 +11,11 @@ import {actionsHOMES} from './scrapers/scrapeHOMES';
 import {Page} from 'puppeteer';
 import {actionsAtHome} from './scrapers/scrapeAtHome/actionsAtHome';
 
+
 export const initCluster = () => Cluster.launch({
   puppeteer: getExtraPuppeteer(),
   concurrency: Cluster.CONCURRENCY_CONTEXT,
-  maxConcurrency: 5,
+  maxConcurrency: +process.env.CLUSTER_MAXCONCURRENCY ?? 5,
   // monitor: true,
   retryLimit: 2,
   retryDelay: 2000,
@@ -56,17 +57,11 @@ export const portalCheckMainTask = async () => {
 
   const actions = [
     ...actionsHOMES(),
-    // actionsAtHome()[0],
+    ...actionsAtHome(),
   ];
 
   await scraperTask(actions, cluster);
 
-
-  // logger.info('Waiting for remaining tasks to be registered.');
-  // await sleep(2000);
-
-  // logger.info('Waiting for all upload tasks to finish.');
-  // await Promise.all(uploadTasks);
 
   logger.info('Closing watcher');
   await watcher.close();

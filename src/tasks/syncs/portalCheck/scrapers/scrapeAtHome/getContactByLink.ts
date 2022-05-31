@@ -14,15 +14,6 @@ const contactFromSamePage = async (page: Page) => {
     return page
       .evaluate((elem : HTMLElement) => elem.innerText, el);
   });
-  // await page.waitForSelector('[data-label="不動産会社"]', {timeout: 600000});
-
-  /*
-  const companyName = await page.$eval(
-    '[data-label="不動産会社"]',
-  (el) => {
-    return (el as HTMLAnchorElement)?.innerText;
-  })
-  || await page.$eval('.company-data_name', ()) */
 
   const telEl = await page.$x(
     '//th[contains(text(),\'TEL/FAX\')]/following-sibling::td',
@@ -31,17 +22,7 @@ const contactFromSamePage = async (page: Page) => {
   const tel = await page.evaluate((telEl)=>{
     return (telEl as HTMLTableCellElement).innerText;
   }, telEl);
-  /*   return await page.evaluate((): TCompanyContact => {
-    const companyName = (
-      document?.querySelector('[data-label="不動産会社"]') as HTMLAnchorElement
-    )?.innerText || '';
 
-
-    return {
-      掲載企業: companyName || $('.company-data_name span').text().trim(),
-      掲載企業TEL: $('th:contains(TEL/FAX) ~ td').text().split('／', 1)[0].trim(),
-    };
-  }); */
 
   return {
     掲載企業: companyName,
@@ -52,6 +33,7 @@ const contactFromSamePage = async (page: Page) => {
 export const scrapeCompanyPage = async (page: Page) => {
   logger.info(`Retrieving contact at company page. ${page.url()}`);
   await page.waitForSelector('#item-est_outline');
+  await page.waitForFunction(() => jQuery);
   const dirtyResult = await page
     .$eval('#item-est_outline', (el): TCompanyContact => {
       const companyName = $(el).find('li div:contains(商号)')
@@ -98,7 +80,6 @@ const pageResolver = async (page: Page) => {
       .then(():TPageType=>'samePageNoLink'),
   ]);
 
-  await page.waitForFunction(() => $);
 
   logger.info(`Identified page as ${pageType} ${page.url()}`);
   switch (pageType) {
