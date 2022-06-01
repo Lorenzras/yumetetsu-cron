@@ -1,21 +1,24 @@
-import {openBrowserPage} from './../../common/browser/openBrowser';
+
+import {Page} from 'puppeteer';
 import {scraperTask} from './clusterTasks/scraperTask';
 import {getExtraPuppeteer} from '../../common/browser';
 import {Cluster} from 'puppeteer-cluster';
 import {browserTimeOut} from '../../common/browser/config';
-import chokidar from 'chokidar';
-import {dlPortalCheck} from './config';
-import {logger, sleep} from '../../../utils';
+// import chokidar from 'chokidar';
+// import {dlPortalCheck} from './config';
+import {logger} from '../../../utils';
 import {uploadTask} from './clusterTasks/uploadTask';
 import {actionsHOMES} from './scrapers/scrapeHOMES';
-import {Page} from 'puppeteer';
 import {actionsAtHome} from './scrapers/scrapeAtHome/actionsAtHome';
+import {
+  suumoActions as actionsSUUMO,
+} from './scrapers/scrapeSUUMO/suumoActions';
 
 
 export const initCluster = () => Cluster.launch({
   puppeteer: getExtraPuppeteer(),
   concurrency: Cluster.CONCURRENCY_CONTEXT,
-  maxConcurrency: +process.env.CLUSTER_MAXCONCURRENCY ?? 5,
+  maxConcurrency: +process.env.CLUSTER_MAXCONCURRENCY || 5,
   // monitor: true,
   retryLimit: 2,
   retryDelay: 2000,
@@ -25,14 +28,14 @@ export const initCluster = () => Cluster.launch({
   timeout: browserTimeOut,
 });
 
-const initFileWatcher = () => {
+/* const initFileWatcher = () => {
   return chokidar.watch(dlPortalCheck, {
     ignored: /(^|[/\\])\../, // ignore dotfiles
     ignoreInitial: true,
     persistent: false,
     depth: 0,
   });
-};
+}; */
 
 
 /**
@@ -41,14 +44,14 @@ const initFileWatcher = () => {
  */
 export const portalCheckMainTask = async () => {
   const cluster : Cluster<{page: Page}> = await initCluster();
-  const watcher = initFileWatcher();
+  // const watcher = initFileWatcher();
 
 
-  watcher.on('add', (path)=>{
+  /*   watcher.on('add', (path)=>{
     cluster
       .execute(({page}) => uploadTask(page, path));
   });
-
+ */
   logger.info(`Starting cluster.`);
 
   cluster.on('taskerror', (err, data) => {
@@ -58,13 +61,15 @@ export const portalCheckMainTask = async () => {
   const actions = [
     ...actionsHOMES(),
     ...actionsAtHome(),
+    // ...actionsSUUMO(),
+    // actionsSUUMO()[2],
   ];
 
   await scraperTask(actions, cluster);
 
 
-  logger.info('Closing watcher');
-  await watcher.close();
+  // logger.info('Closing watcher');
+  // await watcher.close();
 
   await cluster.idle();
   logger.info('Cluster is now idle.');

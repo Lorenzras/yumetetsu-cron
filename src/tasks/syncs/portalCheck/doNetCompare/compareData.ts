@@ -14,6 +14,11 @@ export const compareData = async (
   page: Page,
   data: IProperty,
 ) : Promise<Array<TSearchResult>> => {
+  await Promise.race([
+    page.waitForSelector('.ui-sortable tr'), // 結果あり
+    page.waitForSelector('.sf_admin_list p.big'), // 検索結果が見つかりませんでした
+  ]);
+
   const result = await page.evaluate(
     (data: IProperty) : TSearchResult[]=>{
       const rows = Array.from(document.querySelectorAll('.ui-sortable tr'));
@@ -31,7 +36,7 @@ export const compareData = async (
           DO管理有無: '有',
         };
       });
-      console.log(evalResult);
+
       return evalResult;
     }, data as unknown as Record<string, string>);
 

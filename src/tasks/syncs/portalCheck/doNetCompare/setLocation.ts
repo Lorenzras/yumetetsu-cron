@@ -17,6 +17,8 @@ export const setLocation = async (
   const {pref, city, town} = data;
   await retry(async ()=>{
     logger.info(`Setting location. ${pref} ${city} ${town}`);
+    await page.click('#modal_clear_button').catch(()=>null);
+
     /* Open modal */
     await page.waitForSelector('#select_button_city1');
     await page.click('#select_button_city1');
@@ -56,7 +58,6 @@ export const setLocation = async (
     retries: 3,
     onRetry: async (e, tries) => {
       logger.error(`Failed. Retrying to populate location form. ${e.message} Attempt: ${tries}`);
-      await page.click('#modal_clear_button');
     },
   });
 };

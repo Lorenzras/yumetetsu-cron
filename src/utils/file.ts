@@ -23,6 +23,7 @@ export const getCSVFiles = (dir: string, appId: string) => {
  *
  * @param filePath
  * @param data comma delimited csv. See conventions.
+ * @returns {string} path of saved file.
  */
 export const saveCSV = (filePath: string, data: string) => {
   fs.writeFileSync(filePath, '');
@@ -35,14 +36,17 @@ export const saveCSV = (filePath: string, data: string) => {
 
   fs.writeSync( fd, buff);
   fs.close(fd);
+
+  return filePath;
 };
+
 
 export const saveJSONToCSV = async (
   filePath: string,
   json: {[k: string]: any}[],
 ) =>{
   if (!json.length) return;
-  saveCSV(filePath + '.csv', await json2csvAsync(json));
+  return saveCSV(filePath + '.csv', await json2csvAsync(json));
 };
 
 export const saveJSON = async (

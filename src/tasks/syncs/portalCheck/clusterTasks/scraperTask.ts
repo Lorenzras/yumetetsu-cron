@@ -10,6 +10,7 @@ import {logger} from '../../../../utils';
 import _ from 'lodash';
 import {saveToExcel} from '../excelTask/saveToExcel';
 import {handleGetCompanyDetails} from './handleGetCompanyDetails';
+import {uploadTask} from './uploadTask';
 
 
 type TScraperTask = (
@@ -120,16 +121,21 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     return res;
   });
 
+  const dataLength = intermediateResults.length;
+
   const finalResults = await Promise.all(
     _.shuffle(intermediateResults)
-      .map(async (data) => {
+      .map(async (data, idx) => {
         return cluster.execute(({page})=>{
+          logger.info(`Fetching contact: ${idx} of ${dataLength} rows.`);
           return handleGetCompanyDetails(page, data);
         }) as Promise<IProperty>;
       }),
   );
 
   logger.info(`Final result has ${finalResults.length} rows.`);
+
+  // Finishing task
 
   await saveJSON(getFileName({
     appId: kintoneAppId,
@@ -139,13 +145,16 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
 
   await saveToExcel(finalResults);
 
-  // Saving file to dlPortalCheck will also trigger file watcher on another process thread.
-  await saveJSONToCSV(getFileName({
+
+  const csvFile = await saveJSONToCSV(getFileName({
     appId: kintoneAppId,
     dir: dlPortalCheck,
     suffix: `${finalResults.length.toString()}`,
   }), finalResults);
 
+  if (csvFile) {
+    await cluster.queue(({page})=> uploadTask(page, csvFile));
+  }
 
   return finalResults;
 };

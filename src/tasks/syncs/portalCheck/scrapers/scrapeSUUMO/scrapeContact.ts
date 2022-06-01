@@ -24,7 +24,7 @@ export const getContactLink = async (
   try {
     // 物件詳細ページを表示する
     await Promise.all([
-      page.goto(url, {waitUntil: 'networkidle2'}),
+      page.goto(url, {waitUntil: 'domcontentloaded'}),
       page.waitForNavigation(),
     ]);
 
@@ -61,7 +61,7 @@ export const getContactLink = async (
     if (info.link !== 'なし' && info.link) {
       // リンク先にジャンプする
       await Promise.all([
-        page.goto(info.link, {waitUntil: 'networkidle2'}),
+        page.goto(info.link, {waitUntil: 'domcontentloaded'}),
         page.waitForNavigation(),
       ]);
 
