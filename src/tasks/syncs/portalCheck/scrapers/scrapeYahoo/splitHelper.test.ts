@@ -1,5 +1,5 @@
-import {openMockBrowserPage} from '../../../../common/browser';
-import {splitCities} from './splitCities';
+// import {openMockBrowserPage} from '../../../../common/browser';
+import {splitCities} from './splitHelper';
 
 test('splitCities', async () => {
   // const page = await openMockBrowserPage;

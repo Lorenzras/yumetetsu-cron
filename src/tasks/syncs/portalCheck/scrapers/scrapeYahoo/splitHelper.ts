@@ -13,7 +13,8 @@ export const numOfChoices = 10;
  */
 export const splitCities = (pref: string, idx: number) => {
   const cities = Object.keys(cityLists[pref]);
-  return cities.slice(idx * numOfChoices, idx * numOfChoices + numOfChoices);
+  const baseNum = idx * numOfChoices;
+  return cities.slice(baseNum, baseNum + numOfChoices);
   // console.log('対象の市', cities);
 };
 
