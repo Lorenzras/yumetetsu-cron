@@ -6,7 +6,6 @@ import {Page} from 'puppeteer';
 
 import {scrapeContactNew} from './scrapeContactNew';
 
-import {blockImages} from '../../../../../common/browser';
 import {logErrorScreenshot} from '../../helpers/logErrorScreenshot';
 
 export const getContactByLink = async (page: Page, url: string) => {

@@ -56,6 +56,18 @@ export const saveJSON = async (
   }
 };
 
+export const saveFile = async (
+  filePath: string,
+  data: string,
+) => {
+  try {
+    fs.writeFileSync(filePath, data);
+  } catch (err) {
+    logger.error('Failed to save file');
+  }
+};
+
+
 export const deleteFile = async (file: string) => {
   try {
     logger.info(`Deleting file ${path.basename(file)}`);
