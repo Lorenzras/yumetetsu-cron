@@ -40,14 +40,13 @@ export const saveFile = async (items: IProperty[], fileName: string) => {
     const props = groupedByPropType[wsName];
     if (!props) return; // Short circuit when it doesn't exist
 
-    const rows = (props).map((
+    const rows = props.map((
       item,
     ) => {
       const {
         物件名 = '',
         販売価格 = '',
         所在地 = '',
-        リンク = '',
         DO管理有無 = '',
         DO物件番号 = '',
         DOステータス = '',
@@ -67,20 +66,37 @@ export const saveFile = async (items: IProperty[], fileName: string) => {
 
       return [
         物件名, 販売価格, 所在地, area,
-        リンク,
         DO管理有無, DO物件番号, DOステータス,
         DO登録価格, DO価格差, DO検索結果件数, '', '',
         掲載企業, 掲載企業TEL,
       ];
     });
 
-    ws.addRows(rows, 'i');
+    ws.addRows(rows);
+
 
     rows.forEach((row, idx) => {
-      ws.getCell('E' + (idx + 2) ).value = {
-        formula: `=HYPERLINK("${row[4]}", "${row[4]}")`, date1904: false,
+      const excelIdx = idx + 2;
+      const propNameCell = ws.getCell('A' + excelIdx );
+      propNameCell.font = {
+        color: {argb: '004e47cc'},
+        bold: true,
+        underline: true,
+      };
+      propNameCell.value = {
+        formula: `=HYPERLINK("${props[idx].リンク}", "${row[0]}")`,
+        date1904: false,
       };
     });
+
+    // Styling
+
+    /*     ws.getRow(1).font = {
+      // color: {argb: '004e47cc'},
+      bold: true,
+    }; */
+
+    // setStyles
   });
 
   const saveFolder = path.join(
