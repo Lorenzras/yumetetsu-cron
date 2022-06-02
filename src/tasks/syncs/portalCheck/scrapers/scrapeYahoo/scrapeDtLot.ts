@@ -1,17 +1,15 @@
 /* eslint-disable max-len */
-import {ElementHandle, Page} from 'puppeteer';
-import {logger, getTextByXPath} from '../../../../../utils';
+import {Page} from 'puppeteer';
+import {logger} from '../../../../../utils';
 import {ILot} from '../../types';
 import {webScraper} from './../helpers/webScraper';
 import {getDataEndpoint} from './helpers/getDataEndpoint';
-import axios from 'axios';
+
 import {load} from 'cheerio';
 
 export const scrapeDtLotPage = async (page: Page) => {
   const htmlBody = await page.content();
 
-  /* const htmlBody = await axios.get('https://realestate.yahoo.co.jp/used/house/search/partials/?bk=5&min_st=99&group_with_cond=0&sort=-buy_default+p_from+-area&lc=05&pf=23&grp=231&page=1')
-    .then((res)=>res.data); */
 
   const $ = load(htmlBody);
   const els = $('.ListBukken__list__item:not(._devListBoxWrap)').toArray();
@@ -35,7 +33,7 @@ export const scrapeDtLotPage = async (page: Page) => {
   );
 };
 
-const handleNextPage = async (page: Page) => {
+export const handleNextPage = async (page: Page) => {
   const hasNextPage = await page.$eval('[data-has_next_page]', (el) => {
     return JSON.parse((el as HTMLElement).dataset.has_next_page ?? 'false');
   });
@@ -43,10 +41,8 @@ const handleNextPage = async (page: Page) => {
   if (hasNextPage) {
     const rawPage = page.url().split('&')?.at(-1) ?? '';
     const nextPageNum = +(rawPage?.split('=').at(-1) ?? 0) + 1;
-
     await page.goto(page.url().replace(rawPage, `page=${nextPageNum}`));
   }
-
   return hasNextPage;
 };
 
