@@ -11,10 +11,13 @@ import {Page, ElementHandle} from 'puppeteer';
  * @returns {string} the text inside the element
  */
 export const getTextByXPath = async (
-  page: Page, xPath: string, el?: ElementHandle) => {
-  return (el ?? page)
+  page: Page, xPath: string, el: ElementHandle) => {
+  // console.log((await el.$x(xPath)).length);
+
+  return (el)
     .$x(xPath)
     .then(([xEl]) => page.evaluate((ch)=>{
-      return (ch as HTMLElement).innerText ?? '';
+      // console.log(ch);
+      return (ch as HTMLElement)?.innerText ?? '';
     }, xEl));
 };
