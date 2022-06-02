@@ -1,58 +1,46 @@
+import {load} from 'cheerio';
 import {Page} from 'puppeteer';
-import {extractPrice, getTextByXPath, logger} from '../../../../../utils';
-import {IHouse, THandleScraper} from '../../types';
+import {getTextByXPath, logger} from '../../../../../utils';
+import {IHouse} from '../../types';
 import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
+import {webScraper} from '../helpers/webScraper';
+import {getDataEndpoint} from './helpers/getDataEndpoint';
 
-export const scrapeDtHouse: THandleScraper = async (
+export const scrapeDtHousePage = async (
   page: Page,
 ): Promise<IHouse[] | []> => {
   try {
     // PRは除く
-    const els = await page.$$('.ListBukken__list__item:not(._devListBoxWrap)');
-    const datas = Promise.all(
-      els.map<Promise<IHouse>>(async (el) => {
-        const title = await el.$eval('.ListCassette__title__text--single',
-          (ch) => (ch as HTMLHeadElement).innerText);
-        const url = await el.$eval('button',
-          (ch) => ch.getAttribute('data-dtlurl') ?? '');
+    const htmlBody = await page.content();
 
-        const getXPath = (dtName: string) => {
-          return `//dt[contains(text(), "${dtName}")]/following-sibling::dd`;
-        };
-        const rawPrice = await el.$x(getXPath('価格')) // ページ内の最初の価格を取得してしまう。
-          .then(([xEl]) => page.evaluate((ch)=>{
-            return (ch as HTMLElement).innerText ?? '';
-          }, xEl));
-        console.log('debag:: ', rawPrice);
-        const address = await getTextByXPath(page, getXPath('所在地'), el );
-        const rawArea = await getTextByXPath(page, getXPath('土地面積'), el );
+    const $ = load(htmlBody);
+    const els = $('.ListBukken__list__item:not(._devListBoxWrap)').toArray();
 
-        return {
-          物件種別: '中古戸建',
-          物件番号: '', // 'yahoo-' + url.split('/').at(-2),
-          物件名: title,
-          リンク: url,
-          所在地: address,
-          販売価格: rawPrice,
-          比較用価格: 0,
-          土地面積: rawArea,
-          比較用土地面積: 0,
-        };
-      }));
+    // const datas = Promise.all(
+    return els.map<IHouse>((el) => {
+      const title = $(el).find('.ListCassette__title__text--single')
+        .text().trim();
+      const url = $(el).find('button').attr('data-dtlurl') ?? '';
+      const rawPrice = $(el).find(':contains(価格)').next('dd').text().trim();
+      const address = $(el).find(':contains(所在地)').next('dd').text().trim();
+      const rawArea = $(el).find(':contains(土地面積)').next('dd').text().trim();
 
-    /* datas = datas.map<IHouse>((val) => {
-      const price = extractPrice(val.販売価格.split('円')[0]);
-      const area = val.土地面積.split('m')[0];
       return {
-        ...val,
-        比較用価格: price,
-        比較用土地面積: +area,
+        物件種別: '中古戸建',
+        物件番号: 'yahoo-' + url.split('/').at(-2),
+        物件名: title,
+        リンク: url,
+        所在地: address,
+        販売価格: rawPrice,
+        比較用価格: 0,
+        土地面積: rawArea,
+        比較用土地面積: 0,
       };
-    }); */
-    return datas;
+    },
+    );
   } catch (error: any) {
     await logErrorScreenshot(page,
-      `中古戸建のスクレイピングに失敗しました。${page.url()} ${error.message}`);
+      `Yahoo中古戸建のスクレイピングに失敗しました。${page.url()} ${error.message}`);
     return ([{
       物件種別: '中古戸建',
       物件番号: '取得失敗',
@@ -65,4 +53,36 @@ export const scrapeDtHouse: THandleScraper = async (
       比較用土地面積: 0,
     }]);
   }
+};
+
+const handleNextPage = async (page: Page) => {
+  const hasNextPage = await page.$eval('[data-has_next_page]', (el) => {
+    return JSON.parse((el as HTMLElement).dataset.has_next_page ?? 'false');
+  });
+
+  if (hasNextPage) {
+    const rawPage = page.url().split('&')?.at(-1) ?? '';
+    const nextPageNum = +(rawPage?.split('=').at(-1) ?? 0) + 1;
+
+    await page.goto(page.url().replace(rawPage, `page=${nextPageNum}`));
+  }
+
+  return hasNextPage;
+};
+
+export const scrapeDtHouse = async (
+  page: Page,
+
+): Promise<IHouse[]> => {
+  logger.info(`Scraping ${page.url()}. `);
+
+  const dataEndpoint = getDataEndpoint(page.url());
+
+  await page.goto(dataEndpoint);
+
+  return await webScraper<IHouse>({
+    page,
+    handleScraper: scrapeDtHousePage,
+    handleNextPage: handleNextPage,
+  });
 };
