@@ -14,7 +14,7 @@ export const getTextByXPath = async (
   page: Page, xPath: string, el: ElementHandle) => {
   // console.log((await el.$x(xPath)).length);
 
-  return (el)
+  return (el ?? page)
     .$x(xPath)
     .then(([xEl]) => page.evaluate((ch)=>{
       // console.log(ch);

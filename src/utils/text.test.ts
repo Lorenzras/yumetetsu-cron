@@ -8,6 +8,7 @@ describe(('stringManipulation'), ()=>{
       '284.00m² (85.90坪)',
       '1,035.00m² (313.08坪)',
       '2、335.00m²',
+      '3LDK/73.18m2',
     ];
     const result =testVals.map((i)=>{
       const res = extractNumber(i);
@@ -35,6 +36,7 @@ describe(('stringManipulation'), ()=>{
       '28,000万円',
       '未定',
       'なんとか',
+      '1,879万円、1,899万円',
     ];
 
     const testResult = testVals.map((i) => {

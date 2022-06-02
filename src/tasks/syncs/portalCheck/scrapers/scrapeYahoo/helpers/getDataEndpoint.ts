@@ -13,5 +13,5 @@ export const getDataEndpoint = (url: string) => {
 
   const baseUrl = url.split('search/')[0];
 
-  return `${baseUrl}search/partials/?bk=3&bk=6&${params}&page=0`;
+  return `${baseUrl}search/partials/?${params}&page=0`;
 };
