@@ -15,7 +15,6 @@ export const scrapeDtLotPage = async (page: Page) => {
 
   const $ = load(htmlBody);
   const els = $('.ListBukken__list__item:not(._devListBoxWrap)').toArray();
-
   return els.map<ILot>((el) => {
     const propName = $(el).find('.__title__ h2').text().trim();
     const link = $(el).find('button').attr('data-dtlurl') ?? '';
@@ -34,44 +33,6 @@ export const scrapeDtLotPage = async (page: Page) => {
     };
   },
   );
-
-
-  // PR 物件以外
-  /* const els = (await page.$$('.ListBukken__list__item:not(._devListBoxWrap)'));
-  console.log(els.length);
-  const data = Promise.all(
-    els.map<Promise<ILot>>(async (el)=>{
-
-      const getXPath = (dtName: string) => `//[contains(text(), "${dtName}")]/following-sibling::dd`;
-      const propName = await el.$eval('.__title__ h2',
-        (ch) => {
-          console.log('hello', (ch as HTMLHeadElement).innerText);
-          return (ch as HTMLHeadElement).innerText;
-        });
-
-      const link = await el.$eval('button',
-        (ch) => ch.getAttribute('data-dtlurl') ?? '');
-
-
-      const address = await getTextByXPath(page, getXPath('所在地'), el );
-      const lotArea = await getTextByXPath(page, getXPath('土地面積'), el );
-      const price = await getTextByXPath(page, getXPath('価格'), el );
-
-      return {
-        リンク: link,
-        土地面積: lotArea,
-        所在地: address,
-        比較用価格: 0,
-        比較用土地面積: 0,
-        物件名: propName,
-        販売価格: price,
-        物件番号: 'yahoo-' + link.split('/').at(-2),
-      };
-    }),
-  );
-
-
-  return data ?? [];*/
 };
 
 const handleNextPage = async (page: Page) => {
