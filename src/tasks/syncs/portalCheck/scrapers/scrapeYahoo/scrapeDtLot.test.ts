@@ -1,4 +1,6 @@
-import {openMockBrowserPage} from '../../../../common/browser';
+import {
+  openMockBrowserPage, openBrowserPage,
+} from '../../../../common/browser';
 import {browserTimeOut} from '../../../../common/browser/config';
 import {getDataEndpoint} from './helpers/getDataEndpoint';
 import {scrapeDtLot, scrapeDtLotPage} from './scrapeDtLot';
@@ -27,7 +29,7 @@ describe('scrapeDtLot', ()=>{
 
   it('all', async ()=>{
     // Mock start
-    const page = await openMockBrowserPage();
+    const page = await openBrowserPage();
     await page.goto(testURL);
     // Mock end
 
@@ -36,6 +38,7 @@ describe('scrapeDtLot', ()=>{
     console.log(`Fetched ${result.length} items`);
     expect(result).toMatchSnapshot();
 
-    page.browser().disconnect();
+    // page.browser().disconnect();
+    await page.browser().close();
   }, browserTimeOut);
 });
