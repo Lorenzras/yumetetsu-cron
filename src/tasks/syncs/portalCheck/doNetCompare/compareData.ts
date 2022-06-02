@@ -15,8 +15,10 @@ export const compareData = async (
   data: IProperty,
 ) : Promise<Array<TSearchResult>> => {
   await Promise.race([
-    page.waitForSelector('.ui-sortable tr'), // 結果あり
-    page.waitForSelector('.sf_admin_list p.big'), // 検索結果が見つかりませんでした
+    page.waitForSelector(
+      '.ui-sortable tr', {timeout: 60000}), // 結果あり
+    page.waitForSelector(
+      '.sf_admin_list p.big', {timeout: 60000}), // 検索結果が見つかりませんでした
   ]);
 
   const result = await page.evaluate(
