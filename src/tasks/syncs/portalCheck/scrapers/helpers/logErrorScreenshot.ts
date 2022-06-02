@@ -4,6 +4,13 @@ import {Page} from 'puppeteer';
 import {getFileName, logger, saveFile} from '../../../../../utils';
 import {dlImg} from '../../config';
 
+/**
+ * Saves the screenshot, message, and the page content.
+ * Directory may be set at portalCheck/config/dlImage
+ *
+ * @param page
+ * @param message
+ */
 export const logErrorScreenshot = async (page: Page, message: string) => {
   const fileName = getFileName({
     dir: dlImg,
