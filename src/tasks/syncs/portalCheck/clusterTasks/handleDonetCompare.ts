@@ -28,6 +28,20 @@ const setCookie = async (page: Page, workerId: number) => {
   }
 };
 
+/**
+ * Split properties into chunks then compare each item to donet.
+ * This was designed to reuse the browser for each chunk.
+ *
+ * However, Chrome's memory leak kicks in when the browser is open for
+ * a long time, so I reverted back to 1 task/thread and just
+ * have dedicated cookie file for each worker.
+ *
+ * I'll refactor this again.
+ *
+ * @param cluster Cluster object
+ * @param dtArr s
+ * @returns {IProperty[]} Processed properties.
+ */
 export const handleDonetCompare = async (
   cluster: Cluster<{page: Page}>,
   dtArr: IProperty[],
@@ -37,6 +51,8 @@ export const handleDonetCompare = async (
   const chunkSize = Math.ceil(dtArrLength / clusterSize);
   const chunks = _.chunk(dtArr, chunkSize);
   const chunkLength = chunks.length;
+
+
   const chunkedResult = await Promise.all(chunks.map( async (props, psIdx) => {
     const propsLength = props.length;
     return await Promise.all(props.map( async (prop, pIdx)=>{
