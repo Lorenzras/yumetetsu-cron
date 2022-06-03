@@ -39,7 +39,7 @@ const setCookie = async (page: Page, workerId: number) => {
  * I'll refactor this again.
  *
  * @param cluster Cluster object
- * @param dtArr s
+ * @param dtArr unprocessed IProperty[]
  * @returns {IProperty[]} Processed properties.
  */
 export const handleDonetCompare = async (
