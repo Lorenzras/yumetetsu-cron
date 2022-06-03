@@ -38,8 +38,10 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
 
     const initialResult : IProperty[] = await cluster
       .execute(async ({page}) => {
-        const formState = await handlePrepareForm(page, pref, type);
+        let formState = await handlePrepareForm(page, pref, type);
         const res: IProperty[] = [];
+
+        console.log(formState);
 
         if (typeof formState === 'boolean' ) {
           if (formState) {
@@ -47,13 +49,19 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
           }
         } else {
           // This handles edge cases where the site limits the number of cities selected. e.g. Yahoo
-          while (formState.chunkLength <= formState.nextIdx) {
+          // console.log('FORM', formState.chunkLength, formState.nextIdx);
+          while (
+            typeof formState !== 'boolean' &&
+            formState.nextIdx <= formState.chunkLength) {
+            console.log('FORM', formState.chunkLength, formState.nextIdx);
+            // if (formState.success) {
             if (formState.success) {
-              await handlePrepareForm(page, pref, type, formState.nextIdx);
               res.push(...await handleScraper(page));
-            } else {
-              logger.error(`handlePrepareForm failed. ${JSON.stringify(formState)}`);
             }
+            formState = await handlePrepareForm(page, pref, type, formState.nextIdx);
+            // } else {
+            //   logger.error(`handlePrepareForm failed. ${JSON.stringify(formState)}`);
+            // }
           }
         }
 

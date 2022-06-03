@@ -13,7 +13,9 @@ import {actionsAtHome} from './scrapers/scrapeAtHome/actionsAtHome';
 import {
   suumoActions as actionsSUUMO,
 } from './scrapers/scrapeSUUMO/suumoActions';
-
+import {
+  yahooActions as actionsYahoo,
+} from './scrapers/scrapeYahoo/yahooActions';
 
 export const initCluster = () => Cluster.launch({
   puppeteer: getExtraPuppeteer(),
@@ -59,9 +61,10 @@ export const portalCheckMainTask = async () => {
   });
 
   const actions = [
-    ...actionsHOMES(),
+    // ...actionsHOMES(),
     // ...actionsAtHome(),
     // ...actionsSUUMO(),
+    actionsYahoo()[0],
     // actionsSUUMO()[2],
   ];
 
