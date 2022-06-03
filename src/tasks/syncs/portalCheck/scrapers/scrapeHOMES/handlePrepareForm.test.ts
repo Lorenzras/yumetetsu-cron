@@ -1,7 +1,7 @@
 import {openMockBrowserPage} from '../../../../common/browser';
 import {browserTimeOut} from '../../../../common/browser/config';
 import {TProperty} from '../../types';
-import {handlePrepareForm} from './handlePrepareFoorm';
+import {handlePrepareForm} from './handlePrepareForm';
 
 test('prepareForm', async () => {
   const page = await openMockBrowserPage();
