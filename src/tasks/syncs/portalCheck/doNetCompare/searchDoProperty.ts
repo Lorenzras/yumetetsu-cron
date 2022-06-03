@@ -78,11 +78,19 @@ export const searchDoProperty = async ({
     const shopName = cityLists[pref][city];
     const propType : TPropTypes = doPropTypes[propertyType];
 
+    await Promise.race([
+      page.waitForSelector('.btn_login'),
+      page.waitForSelector('#m_estate_filters_fc_shop_id option'),
+      page.waitForSelector('body div', {hidden: true}),
+    ]);
 
     result = await retry(async () => {
       logger.info('Starting search ' + JSON.stringify(inputData));
-      await login(page);
-      await navigateToPropertyPage(page);
+      if (await page.$('.btn_login') || !await page.$('body div')) {
+        await login(page);
+        await navigateToPropertyPage(page);
+      }
+
       await page.waitForSelector('#m_estate_filters_fc_shop_id option');
 
       /* Select store */

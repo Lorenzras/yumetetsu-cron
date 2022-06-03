@@ -26,7 +26,8 @@ export const setLocation = async (
     // await selectByText(page, '#select_pref_id', '愛媛県' );
     await selectByText(page, '#select_pref_id', pref );
 
-    await page.click('#modal_city_name_autocomplete_list_button');
+    // await page.click('#modal_city_name_autocomplete_list_button');
+    await page.click('#modal_city_name_autocomplete', {clickCount: 3});
     await page.type('#modal_city_name_autocomplete', city);
 
 
@@ -43,8 +44,8 @@ export const setLocation = async (
       )
         .then(async ()=>{
           // There are times when blur doesn't fire to populate autocomplete.
-          // So click the button.
-          await page.click('#modal_town_name_autocomplete_list_button');
+          // So 3x click the field.
+          await page.click('#modal_town_name_autocomplete', {clickCount: 3});
           return page.type('#modal_town_name_autocomplete', town);
         })
         .catch((err: any)=>{
