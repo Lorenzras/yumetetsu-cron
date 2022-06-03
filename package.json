@@ -8,7 +8,7 @@
     "start:dev": "cross-env NODE_ENV=dev nodemon",
     "upstart": "cross-env NODE_ENV=prod git pull && npm run start",
     "build": "rimraf ./build && tsc",
-    "start": "npm run build && node build/index.js",
+    "start": "npm run build && node build/main.js",
     "generate-barrels": "barrelsby --delete",
     "start:forever": "npm run build && forever start -o yumetetsu-cron-o.log -a -w --uid 'yumetetsu-cron' --minUptime 1000 --spinSleepTime 1000  build/index.js",
     "dtsgen:ltcust": "kintone-dts-gen --base-url https://rdmuhwtt6gx7.cybozu.com/ --app-id 189 -u RPA03 --namespace Yume.longtermCust -o src/types/longtermCust.d.ts",
