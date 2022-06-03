@@ -125,11 +125,13 @@ export const fetchCompanyDetails = async (url: string) =>{
 
   const companyName =$('.company-data_name-flex a').text().trim() ||
   $('.company-data_name-flex').text().trim();
-  let dirtyContact = $('th:contains(TEL/FAX) ~ td').text().trim();
+  let dirtyContact = $('th:contains("TEL/FAX") ~ td').text().trim();
 
   const companyLink = $('.company-data_name-flex a').attr('href');
 
+  // If there is company link, crawl it.
   if (companyLink) {
+    logger.info(`Found company link. crawling ${companyLink}`);
     dirtyContact = await fetchCompanyPage(companyLink);
   }
 

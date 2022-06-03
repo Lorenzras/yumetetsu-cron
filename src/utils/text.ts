@@ -110,14 +110,21 @@ export const spreadAddress = (
 };
 
 export const extractTel = (dirtySource: string) => {
+  const cleanerSource = dirtySource
+    .replace(/[\s-]/g, '')
+    // fails to capture at " ／ " so replace it with any word
+    .replace('／', '電話');
+
   const result = findPhoneNumbersInText(
-    dirtySource,
+    cleanerSource,
     {
       defaultCountry: 'JP',
     },
   );
+
+
   return result
     .map((i) => parsePhoneNumber(i.number.number)
       .formatNational(),
-    ).join(' または ');
+    ).join(' / ');
 };
