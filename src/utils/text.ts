@@ -22,11 +22,11 @@ export const decodeToSJIS = (buffer: Buffer) => {
   const decoder = new TextDecoder('shift_jis');
   return decoder.decode(buffer);
 };
-
+// /^\d*\.?\d+/g
 export const extractNumber = (str: string): number => {
   const matchResult = str
     .replace(/[,、]/, '')
-    .match(/(\d+)(?:\.(\d+))(?![A-Z])?/g);
+    .match(/(\d*\.?\d+(?![A-Z]))/g);
   const result = matchResult?.[0] || 0;
   return isNaN(+result) ? 0 : +result;
 };

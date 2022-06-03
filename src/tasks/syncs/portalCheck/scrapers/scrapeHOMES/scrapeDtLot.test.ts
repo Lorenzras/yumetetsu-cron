@@ -5,7 +5,7 @@ import {scrapeDtLot, scrapeDtLotPage} from './scrapeDtLot';
 // sample link: https://www.homes.co.jp/tochi/aichi/toyokawa-city/list/
 
 describe('scrapeDtLot', ()=>{
-  test('allPages', async ()=>{
+  test('all', async ()=>{
     const page = await openMockBrowserPage();
     const result = await scrapeDtLot(page);
 
@@ -13,8 +13,9 @@ describe('scrapeDtLot', ()=>{
     expect(result).toMatchSnapshot();
   }, browserTimeOut);
 
-  test('single page', async ()=>{
+  test('single', async ()=>{
     const page = await openMockBrowserPage();
+    await page.goto('https://www.homes.co.jp/tochi/aichi/toyokawa-city/list/', {waitUntil: 'domcontentloaded'});
     const result = await scrapeDtLotPage(page);
 
     page.browser().disconnect();

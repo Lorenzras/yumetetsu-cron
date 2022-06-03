@@ -37,9 +37,9 @@ cron.schedule('*/10 8-19 * * 1-6', () => syncDoNetCust());
 /**
  * Portal Check.
  *
- * At 22:00 everyday.
+ * At 07:00.
  */
-cron.schedule('0 22 * * *', () => portalCheckMainTask());
+cron.schedule('0 7 * * *', () => portalCheckMainTask());
 
 /**
  * Still alive log.
