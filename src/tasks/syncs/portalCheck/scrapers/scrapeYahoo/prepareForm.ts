@@ -40,12 +40,7 @@ export const prepareForm: THandlePrepareForm = async (
     // 対象のサイトを開く
     let url = getUrl(type);
     url = pref === '愛知県' ? url + '05/23/city/' : url + '05/21/city/';
-    // console.log('urlの確認', url);
-    await Promise.all([
-      page.goto(url),
-      page.waitForNavigation(),
-    ]);
-    // await page.goto(url, {waitUntil: 'networkidle2'}); // 検索サイトへ移動する
+    await page.goto(url, {waitUntil: 'domcontentloaded'});
     logger.info(`urlの確認 ${url}`);
 
     // 対象の市を選択する(XPath)
@@ -66,6 +61,8 @@ export const prepareForm: THandlePrepareForm = async (
     await page.$eval('#_info_open3', (el) => {
       (el as HTMLInputElement).click();
     });
+    await page.waitForNetworkIdle();
+
     // 3日以内をクリックする(XPath)
     /*   const [spanBtn] = await page.$x('//input[@id="_info_open3"]');
     // サイトの構成上、puppeteerのクリックが使えないため、evaluateを使用する
@@ -76,7 +73,25 @@ export const prepareForm: THandlePrepareForm = async (
     /*     const radio = document.querySelector('#_info_open3');
         (radio as HTMLInputElement)?.click(); */
 
-    await page.waitForSelector('#_FixedSearchButton', {visible: true});
+    await page.waitForSelector('.FixedBtnBox__inner', {visible: true});
+
+    //
+    const isdisabled = await Promise.race([
+      page.waitForSelector('.FixedBtnBox__btnWrp__btnMove--disabled'
+        , {visible: true}).then(() => true),
+      page.waitForSelector('.FixedBtnBox__btnWrp__btnMove'
+        , {visible: true}).then(() => false),
+    ]);
+
+    console.log('isdisabled::', isdisabled);
+
+    if (isdisabled) {
+      return {
+        success: false,
+        chunkLength: chunkLengs(pref),
+        nextIdx: nextIdx + 1,
+      };
+    }
 
     // 検索をクリックする
     await page.$eval('#_FixedSearchButton', (el) => {
