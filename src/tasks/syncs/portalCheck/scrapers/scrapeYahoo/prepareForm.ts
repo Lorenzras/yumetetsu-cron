@@ -35,12 +35,12 @@ export const prepareForm: THandlePrepareForm = async (
   try {
     // 対象の市のリストを準備する
     const cities = splitCities(pref, nextIdx);
-    console.log('市リストの確認', cities);
+    // console.log('市リストの確認', cities);
 
     // 対象のサイトを開く
     let url = getUrl(type);
     url = pref === '愛知県' ? url + '05/23/city/' : url + '05/21/city/';
-    console.log('urlの確認', url);
+    // console.log('urlの確認', url);
     await Promise.all([
       page.goto(url),
       page.waitForNavigation(),
@@ -52,7 +52,7 @@ export const prepareForm: THandlePrepareForm = async (
     logger.info('対象の市を選択する');
     for (const city of cities) {
       const newCity = city.replace('名古屋市', '');
-      console.log('市の確認', newCity);
+      // console.log('市の確認', newCity);
       const [cityChkBox] = await page.$x(`//span[a
       [contains(text(), "${newCity}")]]/preceding-sibling::input`);
 
@@ -79,11 +79,16 @@ export const prepareForm: THandlePrepareForm = async (
     await page.waitForSelector('#_FixedSearchButton', {visible: true});
 
     // 検索をクリックする
-    logger.info('検索をクリックする');
+    await page.$eval('#_FixedSearchButton', (el) => {
+      (el as HTMLAnchorElement).click();
+    });
+
+    await page.waitForSelector('#_ResultCountDisplay');
+    /* logger.info('検索をクリックする');
     await Promise.all([
       page.click('#_FixedSearchButton'),
       page.waitForNavigation(),
-    ]);
+    ]); */
   } catch (error: any) {
     await logErrorScreenshot(page,
       `Yahoo検索ページの設定に失敗しました。${page.url()} ${error.message}`);
