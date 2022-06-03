@@ -82,11 +82,16 @@ export const searchDoProperty = async ({
       page.waitForSelector('.btn_login'),
       page.waitForSelector('#m_estate_filters_fc_shop_id option'),
       page.waitForSelector('body div', {hidden: true}),
+      page.waitForSelector('.error_navi td#error_area'),
     ]);
 
     result = await retry(async () => {
       logger.info('Starting search ' + JSON.stringify(inputData));
-      if (await page.$('.btn_login') || !await page.$('body div')) {
+      if (
+        await page.$('.btn_login') || // login page
+        await page.$('.error_navi td#error_area') || // error page
+        !await page.$('body div') // blank page
+      ) {
         await login(page);
         await navigateToPropertyPage(page);
       }

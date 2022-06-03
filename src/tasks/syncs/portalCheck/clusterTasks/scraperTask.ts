@@ -23,12 +23,10 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   const shuffledActions = _.shuffle(actions);
 
 
-  const handleAddPropertyType = async (action: IAction, dtArr: IProperty[]) => {
-    return await Promise.all(dtArr.map(async (dt) => {
-      return {
-        ...dt,
-        物件種別: action.type,
-      } as IProperty;
+  const handleAddPropertyType = (action: IAction, dtArr: IProperty[]) => {
+    return dtArr.map((dt) => ({
+      ...dt,
+      物件種別: action.type,
     }));
   };
 
@@ -63,19 +61,7 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
         return res;
       });
 
-    const dataWithType = await handleAddPropertyType(
-      action, initialResult,
-    );
-
-    // Extract data that exist and with price difference with doNetwork.
-    /*   const filteredData = completeData.filter((dt)=>{
-      if (dt.DO管理有無 === '無' ||
-      (dt.DO管理有無 === '有' && +(dt.DO価格差 ?? 0) !== 0)) {
-        return true;
-      }
-    });
- */
-    // logger.info(`Completed: ${completeData.length}, Filtered: ${filteredData.length}.`);
+    const dataWithType = handleAddPropertyType(action, initialResult);
 
     return dataWithType;
   };
