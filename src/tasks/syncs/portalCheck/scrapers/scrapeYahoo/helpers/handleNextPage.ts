@@ -5,6 +5,8 @@ export const handleNextPage = async (page: Page) => {
     return JSON.parse((el as HTMLElement).dataset.has_next_page ?? 'false');
   });
 
+  console.log(hasNextPage, page.url());
+
   if (hasNextPage) {
     const rawPage = page.url().split('&')?.at(-1) ?? '';
     const nextPageNum = +(rawPage?.split('=').at(-1) ?? 0) + 1;

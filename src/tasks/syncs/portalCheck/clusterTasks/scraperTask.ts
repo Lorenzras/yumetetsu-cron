@@ -43,7 +43,6 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
         let idx = 0;
         do {
           const formState = await handlePrepareForm(page, pref, type, idx);
-          console.log(formState);
           if (
             (typeof formState === 'boolean' && formState) ||
             (typeof formState !== 'boolean' && formState.success)

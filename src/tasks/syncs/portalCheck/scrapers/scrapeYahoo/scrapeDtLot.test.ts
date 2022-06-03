@@ -29,6 +29,9 @@ describe('scrapeDtLot', ()=>{
   }, browserTimeOut);
 
   it('all', async ()=>{
+    const testUrls = [
+      'https://realestate.yahoo.co.jp/land/search/05/21/?min_st=99&info_open=3&group_with_cond=1&sort=-buy_default+p_from+-area&lc=05&pf%5B%5D=21&geo%5B%5D=21202',
+    ];
     // Mock start
     const page = await openBrowserPage();
     await page.goto(testURL);

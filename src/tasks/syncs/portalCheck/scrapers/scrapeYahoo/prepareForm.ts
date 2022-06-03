@@ -58,11 +58,12 @@ export const prepareForm: THandlePrepareForm = async (
     }
 
     // 3日以内をクリックする(css)
-    await page.$eval('#_info_open3', (el) => {
+    await page.click('label[for="_info_open3"]');
+    /* await page.$eval('#_info_open3', (el) => {
       (el as HTMLInputElement).click();
-    });
-    await page.waitForNetworkIdle();
+    }); */
 
+    await page.waitForNetworkIdle();
     // 3日以内をクリックする(XPath)
     /*   const [spanBtn] = await page.$x('//input[@id="_info_open3"]');
     // サイトの構成上、puppeteerのクリックが使えないため、evaluateを使用する
@@ -95,11 +96,22 @@ export const prepareForm: THandlePrepareForm = async (
     }
 
     // 検索をクリックする
-    await page.$eval('#_FixedSearchButton', (el) => {
+    await page.waitForNetworkIdle();
+    await Promise.all([
+      page.waitForNavigation(),
+      page.click('#_FixedSearchButton'),
+    ]);
+    /*     await page.$eval('#_FixedSearchButton', (el) => {
       (el as HTMLAnchorElement).click();
-    });
+    }); */
 
-    await page.waitForSelector('#_ResultCountDisplay');
+    /* エラーページなら、待たずに次の処理に行く。
+    わざとスローもさせるか様子見る */
+    await Promise.race([
+      page.waitForSelector('#_ResultCountDisplay'),
+      page.waitForSelector('#usedListBox .error'),
+    ]);
+
     /* logger.info('検索をクリックする');
     await Promise.all([
       page.click('#_FixedSearchButton'),
