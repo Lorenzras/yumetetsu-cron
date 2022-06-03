@@ -122,9 +122,9 @@ const getSingleLink = async (page: Page) => {
   const $ = load(htmlBody);
 
   // 掲載企業名を取得する
-  let kigyoumei = $('._expandContainer')
-    .eq(0).children('.marBtm10').eq(0).text().trim();
-  kigyoumei = kigyoumei.split('（')[1].split('）')[0];
+  const kigyoumei = $('.DetailCompanyInfo2__companyName')
+    .eq(0).children('a').eq(0).text().trim();
+  // kigyoumei = kigyoumei.split('（')[1].split('）')[0];
 
   // 掲載企業の連絡先を取得する
   const tel = $('.DetailRichSummarySide__tips__popup__cont__phone')
