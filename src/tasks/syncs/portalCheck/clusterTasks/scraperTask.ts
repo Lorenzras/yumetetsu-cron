@@ -101,17 +101,18 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   });
 
   // Scrape company info
+  const filteredDataLength = filteredData.length;
   const finalResults = await Promise.all(
     _.shuffle(filteredData)
       .map(async (data, idx) => {
         return cluster.execute(({page})=>{
-          logger.info(`Fetching contact: ${idx} of ${filteredData.length} rows.`);
+          logger.info(`Fetching contact: ${idx + 1} of ${filteredDataLength} rows.`);
           return handleGetCompanyDetails(page, data);
         }) as Promise<IProperty>;
       }),
   );
 
-  logger.info(`Scraped: ${totalScrapeLength} Final: ${finalResults.length} rows.`);
+  logger.info(`Scraped: ${totalScrapeLength} Final: ${filteredDataLength} rows.`);
 
   // Finishing task
 
