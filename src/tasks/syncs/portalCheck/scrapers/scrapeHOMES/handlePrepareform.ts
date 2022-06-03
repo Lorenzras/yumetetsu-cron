@@ -5,6 +5,7 @@ import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
 import {changePublishedRange} from './citiesForm/prepareForm';
 import {selectTargetCities} from './citiesForm/selectTargetCities';
 
+// fixed filename casing
 
 const prefStr = {
   '愛知県': 'aichi',
