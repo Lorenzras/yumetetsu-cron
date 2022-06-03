@@ -9,7 +9,7 @@ import {scrapeDtLot} from './scrapeDtLot';
 
 export const yahooActions = (): IAction[] => {
   return [
-    /*  {
+    {
       pref: '愛知県',
       type: '中古マンション',
       handlePrepareForm: prepareForm,
@@ -22,8 +22,8 @@ export const yahooActions = (): IAction[] => {
       handlePrepareForm: prepareForm,
       handleScraper: scrapeDtMansion,
       handleContactScraper: scrapeContact,
-    }, */
-    /* {
+    },
+    {
       pref: '愛知県',
       type: '中古戸建',
       handlePrepareForm: prepareForm,
@@ -43,7 +43,7 @@ export const yahooActions = (): IAction[] => {
       handlePrepareForm: prepareForm,
       handleScraper: scrapeDtLot,
       handleContactScraper: scrapeContact,
-    }, */
+    },
     {
       pref: '岐阜県',
       type: '土地',
