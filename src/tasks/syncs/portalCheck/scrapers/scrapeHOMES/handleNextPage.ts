@@ -6,7 +6,7 @@ export const handleNextPage = async (page: Page) => {
   if (nextPageBtn) {
     logger.info(`Clicking nextPage ${page.url()}`);
     await Promise.all([
-      page.waitForNavigation(),
+      page.waitForNavigation({waitUntil: 'domcontentloaded'}),
       page.evaluate(()=>{
         $('.nextPage a')[0].click(); // force click next
       }),
