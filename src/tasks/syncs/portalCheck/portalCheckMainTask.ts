@@ -60,7 +60,7 @@ export const portalCheckMainTask = async () => {
 
   const actions = [
     ...actionsHOMES(),
-    ...actionsAtHome(),
+    // ...actionsAtHome(),
     // ...actionsSUUMO(),
     // actionsSUUMO()[2],
   ];

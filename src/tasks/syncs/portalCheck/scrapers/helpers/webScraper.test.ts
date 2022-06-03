@@ -4,15 +4,15 @@ import {webScraper} from './webScraper';
 
 test('Scraper', async () => {
   const page = await openBrowserPage();
-  const result =webScraper(
+  /*   const result = webScraper(
     {
       page,
-      handleScraper: ()=>[],
-      handleLastPage: ()=>true,
+      handleScraper: async ()=>[],
+      handleLastPage: async () => true,
     },
-  );
+  ); */
 
-  console.log(result);
+  // console.log(result);
 
   await page.close();
 }, browserTimeOut);

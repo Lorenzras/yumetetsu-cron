@@ -55,10 +55,15 @@ export const handlePrepareForm : THandlePrepareForm = async (
       page.waitForNavigation(),
     ]);
 
-    await page.waitForSelector('#item-list', {timeout: 300000})
-      .catch(()=> page.reload());
-    logger.info(`Succesfully navigated to ${page.url()}`);
-    return true;
+    /* await page.waitForSelector('#item-list', {timeout: 300000})
+      .catch(()=> page.reload()); */
+
+    return await Promise.race([
+      page.waitForSelector('#item-list', {visible: true, timeout: 30000})
+        .then(()=>true),
+      page.waitForSelector('.noContents', {visible: true, timeout: 30000})
+        .then(()=>false),
+    ]);
   } catch (err: any) {
     await logErrorScreenshot(
       page, `Failed to navigate ${page.url()} ${err.message}`,

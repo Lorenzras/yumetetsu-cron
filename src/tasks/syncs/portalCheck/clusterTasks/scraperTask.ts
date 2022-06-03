@@ -11,6 +11,7 @@ import _ from 'lodash';
 import {saveToExcel} from '../excelTask/saveToExcel';
 import {handleGetCompanyDetails} from './handleGetCompanyDetails';
 import {uploadTask} from './uploadTask';
+import {handleDonetCompare} from './handleDonetCompare';
 
 
 type TScraperTask = (
@@ -22,42 +23,10 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   const shuffledActions = _.shuffle(actions);
 
 
-  const handlePerProperty = async (action: IAction, dtArr: IProperty[]) => {
-    const dtArrLength = dtArr.length;
-    return await Promise.all(dtArr.map(async (dt, idx) => {
-      // const resultWithContact = dt;
-
-
-      const doNetComparedResults = await cluster.execute(async ({page}) => {
-        logger.info(`Comparing to donet at ${idx + 1 } / ${dtArrLength} items. ${dt.リンク} `);
-        return await searchDoProperty(
-          {page, inputData: dt},
-        ) ?? {
-          DO管理有無: '処理エラー',
-        } as IProperty;
-      }) as TSearchResult[];
-
-      const firstComparedResult = doNetComparedResults[0];
-
-      /*      if (firstComparedResult.DO管理有無 === '無' ||
-      (firstComparedResult.DO管理有無 === '有' && +firstComparedResult.DO価格差 !== 0)) {
-        resultWithContact = await cluster.execute(async ({page}) => {
-          return await action.handleContactScraper(page, dt);
-        }) as IProperty;
-      } else {
-        logger.warn(`It already exist in doNetwork, will not retrieve contact for ${dt.リンク}`);
-      } */
-
-
-      const completedData = {
-        // ...resultWithContact,
-        ...dt,
-        ...firstComparedResult,
-        物件種別: action.type,
-      } as IProperty;
-
-      logger.info(`Processed ${idx + 1 } / ${dtArrLength} items. ${dt.リンク} `);
-      return completedData;
+  const handleAddPropertyType = (action: IAction, dtArr: IProperty[]) => {
+    return dtArr.map((dt) => ({
+      ...dt,
+      物件種別: action.type,
     }));
   };
 
@@ -92,22 +61,9 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
         return res;
       });
 
+    const dataWithType = handleAddPropertyType(action, initialResult);
 
-    const completeData = await handlePerProperty(
-      action, initialResult,
-    );
-
-    // Extract data that exist and with price difference with doNetwork.
-    const filteredData = completeData.filter((dt)=>{
-      if (dt.DO管理有無 === '無' ||
-      (dt.DO管理有無 === '有' && +(dt.DO価格差 ?? 0) !== 0)) {
-        return true;
-      }
-    });
-
-    logger.info(`Completed: ${completeData.length}, Filtered: ${filteredData.length}.`);
-
-    return filteredData;
+    return dataWithType;
   };
 
 
@@ -116,24 +72,33 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     shuffledActions.map(async (action) => {
       return await handleAction(action);
     }),
-  )).flatMap((res) => {
-    logger.info(`Flattening ${res.length} rows.`);
-    return res;
+  )).flat();
+
+  const totalScrapeLength = intermediateResults.length;
+  // Compare to donet
+  const doComparedDt = await handleDonetCompare(cluster, intermediateResults);
+
+  // Filter data
+  const filteredData = doComparedDt.filter((dt)=>{
+    if (dt.DO管理有無 === '無' ||
+    (dt.DO管理有無 === '有' && +(dt.DO価格差 ?? 0) !== 0)) {
+      return true;
+    }
   });
 
-  const dataLength = intermediateResults.length;
-
+  // Scrape company info
+  const filteredDataLength = filteredData.length;
   const finalResults = await Promise.all(
-    _.shuffle(intermediateResults)
+    _.shuffle(filteredData)
       .map(async (data, idx) => {
         return cluster.execute(({page})=>{
-          logger.info(`Fetching contact: ${idx} of ${dataLength} rows.`);
+          logger.info(`Fetching contact: ${idx + 1} of ${filteredDataLength} rows.`);
           return handleGetCompanyDetails(page, data);
         }) as Promise<IProperty>;
       }),
   );
 
-  logger.info(`Final result has ${finalResults.length} rows.`);
+  logger.info(`Scraped: ${totalScrapeLength} Final: ${filteredDataLength} rows.`);
 
   // Finishing task
 
@@ -144,7 +109,6 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   }), finalResults);
 
   await saveToExcel(finalResults);
-
 
   const csvFile = await saveJSONToCSV(getFileName({
     appId: kintoneAppId,

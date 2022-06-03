@@ -30,7 +30,12 @@ export const navigateToPropertyPage = async (page: Page) => {
       visible: true,
       timeout: 60000,
     }),
-  await page.click(homeSelectors.propNav);
+  await Promise.all([
+    page.waitForNavigation(),
+    page.click(homeSelectors.propNav),
+
+  ]);
+
 
   return page;
 };
