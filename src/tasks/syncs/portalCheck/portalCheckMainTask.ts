@@ -24,7 +24,9 @@ export const initCluster = () => Cluster.launch({
   // monitor: true,
   retryLimit: 2,
   retryDelay: 2000,
+  workerCreationDelay: 300,
   puppeteerOptions: {
+    // slowMo: 100,
     headless: false,
   },
   timeout: browserTimeOut,
@@ -64,7 +66,7 @@ export const portalCheckMainTask = async () => {
     // ...actionsHOMES(),
     // ...actionsAtHome(),
     // ...actionsSUUMO(),
-    actionsYahoo()[0],
+    ...actionsYahoo(),
     // actionsSUUMO()[2],
   ];
 

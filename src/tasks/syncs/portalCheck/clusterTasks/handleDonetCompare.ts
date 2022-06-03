@@ -46,14 +46,38 @@ export const handleDonetCompare = async (
   cluster: Cluster<{page: Page}>,
   dtArr: IProperty[],
 ) => {
-  const clusterSize = +process.env.CLUSTER_MAXCONCURRENCY;
   const dtArrLength = dtArr.length;
+  /* const clusterSize = +process.env.CLUSTER_MAXCONCURRENCY;
+
   const chunkSize = Math.ceil(dtArrLength / clusterSize);
   const chunks = _.chunk(dtArr, chunkSize);
-  const chunkLength = chunks.length;
+  const chunkLength = chunks.length; */
+
+  const newDtArr = await Promise.all(dtArr.map(async (prop, idx) => {
+    return await cluster.execute(async ({page, worker}) => {
+      await setCookie(page, worker.id);
+
+      logger.info(`Donet compare progress: ${idx + 1} / ${dtArrLength}`);
+      const doNetComparedResults = await searchDoProperty(
+        {page, inputData: prop},
+      ) ?? {
+        DO管理有無: '処理エラー',
+      } as IProperty;
+
+      await saveCookie(page, worker.id);
+
+      const firstComparedResult = doNetComparedResults[0];
 
 
-  const chunkedResult = await Promise.all(chunks.map( async (props, psIdx) => {
+      return {
+        ...prop,
+        ...firstComparedResult,
+      };
+    }) as IProperty;
+  }));
+
+  /* const chunkedResult =
+  await Promise.all(chunks.map( async (props, psIdx) => {
     const propsLength = props.length;
     return await Promise.all(props.map( async (prop, pIdx)=>{
       return await cluster.execute(async ({page, worker}) => {
@@ -84,8 +108,8 @@ export const handleDonetCompare = async (
         };
       }) as IProperty;
     }));
-  }));
+  })); */
 
 
-  return chunkedResult.flat();
+  return newDtArr;
 };

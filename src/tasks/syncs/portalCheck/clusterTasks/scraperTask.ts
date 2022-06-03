@@ -38,32 +38,26 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
 
     const initialResult : IProperty[] = await cluster
       .execute(async ({page}) => {
-        let formState = await handlePrepareForm(page, pref, type);
         const res: IProperty[] = [];
-
-        console.log(formState);
-
-        if (typeof formState === 'boolean' ) {
-          if (formState) {
+        let isIterate = true;
+        let idx = 0;
+        do {
+          const formState = await handlePrepareForm(page, pref, type, idx);
+          console.log(formState);
+          if (
+            (typeof formState === 'boolean' && formState) ||
+            (typeof formState !== 'boolean' && formState.success)
+          ) {
             res.push(...await handleScraper(page));
           }
-        } else {
-          // This handles edge cases where the site limits the number of cities selected. e.g. Yahoo
-          // console.log('FORM', formState.chunkLength, formState.nextIdx);
-          while (
-            typeof formState !== 'boolean' &&
-            formState.nextIdx <= formState.chunkLength) {
-            console.log('FORM', formState.chunkLength, formState.nextIdx);
-            // if (formState.success) {
-            if (formState.success) {
-              res.push(...await handleScraper(page));
-            }
-            formState = await handlePrepareForm(page, pref, type, formState.nextIdx);
-            // } else {
-            //   logger.error(`handlePrepareForm failed. ${JSON.stringify(formState)}`);
-            // }
+
+          if (typeof formState !== 'boolean' ) {
+            isIterate = formState.nextIdx < formState.chunkLength;
+            idx = formState.nextIdx;
+          } else {
+            isIterate = false;
           }
-        }
+        } while (isIterate);
 
         logger.info(`Scraped total of ${res.length} from ${page.url()}`);
         return res;
