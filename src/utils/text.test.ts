@@ -3,6 +3,7 @@ import {extractNumber, extractPrice, extractTel, spreadAddress} from './text';
 describe(('stringManipulation'), ()=>{
   test('extractNumber', ()=>{
     const testVals = [
+      '376m²',
       '222.22m2',
       '600.00m² (181.49坪)',
       '284.00m² (85.90坪)',
@@ -21,6 +22,7 @@ describe(('stringManipulation'), ()=>{
 
   test('extractPrice', ()=>{
     const testVals = [
+
       '2万',
       '２万',
       '1億3万',

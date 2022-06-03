@@ -8,9 +8,10 @@ import {prepareForm} from './prepareForm';
 /* test comand:: jest scrapeYahoo/prepareForm -t check -u */
 test(('test1'), async () => {
   const page = await openMockBrowserPage();
-  await prepareForm(page, '愛知県', '中古マンション', 1);
+  const result = await prepareForm(page, '愛知県', '中古マンション', 0);
 
   page.browser().disconnect();
+  expect(result).toMatchSnapshot();
 }, browserTimeOut);
 
 /* test comand:: jest scrapeYahoo/prepareForm -t click -u */
