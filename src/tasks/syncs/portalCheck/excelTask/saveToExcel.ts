@@ -6,6 +6,7 @@ import {logger} from '../../../../utils/logger';
 import {spreadAddress} from '../../../../utils';
 import fs from 'fs';
 import {format} from 'date-fns';
+import {formatResult} from './formatResult';
 
 type UProperty = IProperty[] | IHouse[] | ILot[] | IMansion[]
 
@@ -107,8 +108,9 @@ export const saveFile = async (items: IProperty[], fileName: string) => {
 
     ws.addRows(rows);
 
+    formatResult(ws, rows, props);
 
-    rows.forEach((row, idx) => {
+    /*     rows.forEach((row, idx) => {
       const excelIdx = idx + 2;
       const propNameCell = ws.getCell('A' + excelIdx );
       propNameCell.font = {
@@ -120,7 +122,7 @@ export const saveFile = async (items: IProperty[], fileName: string) => {
         formula: `=HYPERLINK("${props[idx].リンク}", "${row[0]}")`,
         date1904: false,
       };
-    });
+    }); */
 
     // Styling
 
