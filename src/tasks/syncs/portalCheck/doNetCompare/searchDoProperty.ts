@@ -87,11 +87,7 @@ export const searchDoProperty = async ({
 
     result = await retry(async () => {
       logger.info('Starting search ' + JSON.stringify(inputData));
-      if (
-        await page.$('.btn_login') || // login page
-        await page.$('.error_navi td#error_area') || // error page
-        !await page.$('body div') // blank page
-      ) {
+      if (!await page.$('#m_estate_filters_fc_shop_id option')) {
         await login(page);
         await navigateToPropertyPage(page);
       }
