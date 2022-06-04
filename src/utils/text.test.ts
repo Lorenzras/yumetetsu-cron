@@ -10,6 +10,7 @@ describe(('stringManipulation'), ()=>{
       '1,035.00m² (313.08坪)',
       '2、335.00m²',
       '3LDK/73.18m2',
+      '125.38m2',
     ];
     const result =testVals.map((i)=>{
       const res = extractNumber(i);
