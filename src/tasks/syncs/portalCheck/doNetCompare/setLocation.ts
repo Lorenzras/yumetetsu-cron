@@ -24,23 +24,36 @@ export const setLocation = async (
     await page.click('#select_button_city1');
 
     // await selectByText(page, '#select_pref_id', '愛媛県' );
-    await selectByText(page, '#select_pref_id', pref );
+    // await selectByText(page, '#select_pref_id', pref );
 
     // await page.click('#modal_city_name_autocomplete_list_button');
+    await Promise.all([
+      selectByText(page, '#select_pref_id', pref ),
+      page.waitForResponse((resp) => {
+        return resp.url().includes('https://manage.do-network.com/m_city/list');
+      })]);
+
     await page.click('#modal_city_name_autocomplete', {clickCount: 3});
     await page.type('#modal_city_name_autocomplete', city);
 
-
-    /* Town field is disabled until triggering blur event on city field */
-    await page.$eval(
-      '#modal_city_name_autocomplete', (e) => {
-        (e as HTMLInputElement).blur();
-      });
-
     if (town) {
+      // On slow or laggy computers, donet's town API takes a very long time to respond or populate the town field
+      // Addressing it with the following lines
+
+      await Promise.all([
+        page.$eval(
+          '#modal_city_name_autocomplete', (e) => {
+            (e as HTMLInputElement).blur();
+          }),
+        page.waitForResponse((resp) => {
+          return resp.url().includes('https://manage.do-network.com/m_town/list');
+        }),
+      ]);
+
+
       await page.waitForSelector(
         '#modal_town_name_autocomplete:not(:disabled)',
-        {timeout: 10000},
+        {timeout: 15000},
       )
         .then(async ()=>{
           // There are times when blur doesn't fire to populate autocomplete.
