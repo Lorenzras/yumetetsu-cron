@@ -27,7 +27,7 @@ export const initCluster = () => Cluster.launch({
   workerCreationDelay: 300,
   puppeteerOptions: {
     // slowMo: 100,
-    headless: process.env.ENVIRONMENT === 'prod',
+    headless: process.env.BROWSER_TYPE === 'HEADLESS',
   },
   timeout: browserTimeOut,
 });
