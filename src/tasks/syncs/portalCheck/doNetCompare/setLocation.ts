@@ -5,26 +5,30 @@ import {logger} from '../../../../utils';
 import {selectByText} from './searchDoProperty';
 
 export const setLocation = async (
-  {page, data}:
+  {page, data, logSuffix}:
   {
     page: Page,
     data: {
       pref: string,
       city: string,
       town: string,
-    }
+    },
+    logSuffix: string
+
   }) => {
   const {pref, city, town} = data;
   await retry(async ()=>{
     // Test reset in case of retrying
     await page.click('#modal_clear_button').catch(()=>null);
 
-    logger.info(`Setting location. ${pref} ${city} ${town}`);
+    logger.info(`${logSuffix} is opening location modal.`);
 
     /* Open modal */
     await page.waitForSelector('#select_button_city1');
-    await page.click('#select_button_city1');
+    await page.click('#select_button_city1'),
 
+
+    logger.info(`${logSuffix} is setting prefecture.`);
     await Promise.all([
       selectByText(page, '#select_pref_id', pref ),
       page.waitForResponse((resp) => {
@@ -33,6 +37,7 @@ export const setLocation = async (
       }, {timeout: 10000}).catch(),
     ]);
 
+    logger.info(`${logSuffix} is setting city`);
     await page.click('#modal_city_name_autocomplete', {clickCount: 3});
     await page.type('#modal_city_name_autocomplete', city);
 
@@ -40,6 +45,7 @@ export const setLocation = async (
       // On slow or laggy computers, donet's town API takes a very long time to respond so
       // I addressing it with the following lines
 
+      logger.info(`${logSuffix} is waiting for town list reponse. `);
       await Promise.all([
         page.$eval(
           '#modal_city_name_autocomplete', (e) => {
@@ -61,20 +67,21 @@ export const setLocation = async (
         .then(async ()=>{
           // Setting the value directly does not reliably trigger autocomplete so
           // 3x click the field to simulate a person overwriting town field.
+          logger.info(`${logSuffix} is typing town`);
           await page.click('#modal_town_name_autocomplete', {clickCount: 3});
           return page.type('#modal_town_name_autocomplete', town);
         })
         .catch((err: any)=>{
-          throw new Error(`Failed to type town ${err.message}`);
+          throw new Error(`${logSuffix} failed to type town. ${err.message}`);
         });
     }
 
     await page.click('#modal_ok_button');
     await page.waitForSelector('#select_pref_id', {hidden: true});
   }, {
-    retries: 3,
+    retries: 5,
     onRetry: async (e, tries) => {
-      logger.error(`Failed. Retrying to populate location form. ${e.message} Attempt: ${tries}`);
+      logger.error(`${logSuffix} retried ${tries} time/s in retrying to populate location form. `);
     },
   });
 };

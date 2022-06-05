@@ -76,9 +76,17 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   )).flat();
 
   const totalScrapeLength = intermediateResults.length;
-  // Compare to donet
-  const doComparedDt = await handleDonetCompare(cluster, intermediateResults);
 
+  logger.info(`Scraped results ${totalScrapeLength}. Starting to compare to doNet.`);
+  // Compare to donet then save.
+  const doComparedDt = await handleDonetCompare(cluster, intermediateResults);
+  await saveJSON(getFileName({
+    appId: kintoneAppId,
+    dir: dlJSON,
+    suffix: '-doComparedDt-' + doComparedDt.length.toString(),
+  }), doComparedDt);
+
+  logger.info(`Done comparing to donet. Starting to filter.`);
   // Filter data
   const filteredData = doComparedDt.filter((dt)=>{
     if (dt.DO管理有無 === '無' ||
@@ -87,8 +95,11 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     }
   });
 
-  // Scrape company info
   const filteredDataLength = filteredData.length;
+
+  logger.info(`Filtered results ${filteredDataLength}. Starting to scrape contact. `);
+  // Scrape company info
+
   const finalResults = await Promise.all(
     _.shuffle(filteredData)
       .map(async (data, idx) => {
@@ -99,27 +110,36 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
       }),
   );
 
-  logger.info(`Scraped: ${totalScrapeLength} Final: ${filteredDataLength} rows.`);
+  const filteredJSONFname = `-finalResults-${finalResults.length.toString()}`;
+  logger.info(`Done scraping contact. Saving progress to ${filteredJSONFname}`);
 
-  // Finishing task
-
+  // Save final result to JSON
   await saveJSON(getFileName({
     appId: kintoneAppId,
     dir: dlJSON,
-    suffix: finalResults.length.toString(),
+    suffix: filteredJSONFname,
   }), finalResults);
 
+  logger.info(`Saving to excel.`);
+  // Final result Output
   await saveToExcel(finalResults);
+  logger.info(`Done saving to excel. Starting to save to CSV.`);
 
+  // Save to CSV then upload to kintone
   const csvFile = await saveJSONToCSV(getFileName({
     appId: kintoneAppId,
     dir: dlPortalCheck,
     suffix: `${finalResults.length.toString()}`,
   }), finalResults);
+  logger.info(`Done saving to CSV. Starting to save to upload to kintone.`);
 
   if (csvFile) {
-    await cluster.queue(({page})=> uploadTask(page, csvFile));
+    await cluster.execute(({page})=> uploadTask(page, csvFile));
+    logger.info(`Done uploading to kintone.`);
+  } else {
+    logger.info(`Did not upload to kintone. CSV file was empty.`);
   }
 
+  logger.info(`All done. scraped: ${totalScrapeLength} Final: ${filteredDataLength} rows.`);
   return finalResults;
 };

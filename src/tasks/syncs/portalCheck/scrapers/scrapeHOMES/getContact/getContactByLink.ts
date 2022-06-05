@@ -39,7 +39,9 @@ export const getContactByLink = async (page: Page, url: string) => {
         .waitForSelector('.mod-notFoundMsg',
           {visible: true, timeout: 20000})
         .then(()=> 3),
+
     ]);
+
     switch (task) {
       case 0: return scrapeSingleContact(page);
       case 1: return scrapeSingleContactLot(page);
@@ -52,7 +54,7 @@ export const getContactByLink = async (page: Page, url: string) => {
     }
   } catch (err :any) {
     await logErrorScreenshot(
-      page, `Failed to get contact ${page.url()} ${err.message}`);
+      page, `Failed to get contact ${url} ${err.message}`);
     return {
       掲載企業: '取得失敗',
       掲載企業TEL: '取得失敗',

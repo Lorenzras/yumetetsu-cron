@@ -54,10 +54,11 @@ const setLotArea = async (page: Page, area: string) => {
 
 
 export const searchDoProperty = async ({
-  page, inputData,
+  page, inputData, logSuffix,
 }:{
   page: Page,
   inputData: IProperty | IHouse | IMansion | ILot,
+  logSuffix: string
 }) => {
   const {
     所在地: address,
@@ -86,7 +87,7 @@ export const searchDoProperty = async ({
     ]);
 
     result = await retry(async () => {
-      logger.info('Starting search ' + JSON.stringify(inputData));
+      logger.info(`${logSuffix} is starting donet compare.`);
       if (!await page.$('#m_estate_filters_fc_shop_id option')) {
         await login(page);
         await navigateToPropertyPage(page);
@@ -104,26 +105,33 @@ export const searchDoProperty = async ({
         page,
         data: {
           pref, city, town,
-        }},
-      );
+        },
+        logSuffix,
+      });
 
 
       await setLotArea(page, area);
 
+      logger.info(`${logSuffix} clicked search.`);
       await Promise.all([
         page.waitForNavigation(),
         page.click('#btn_search'),
       ]);
 
-      return await compareData(page, inputData);
+      logger.info(`${logSuffix} is comparing data.`);
+      const comparedData = await compareData(page, inputData);
+      logger.info(`${logSuffix} is done comparing against ${comparedData.length} properties`);
+
+      return comparedData;
     }, {
-      retries: 3,
+      retries: 5,
+
       onRetry: async (e, attempt) => {
-        logger.warn(`Failed to compare data with ${attempt} attempt/s.  ${e.message} Retrying...`);
+        logger.warn(`${logSuffix} retried ${attempt} times to compare data.  ${e.message}`);
       },
     });
   } catch (err: any) {
-    await logErrorScreenshot(page, `I did my best but still failed to compare data.  ${err.message} `);
+    await logErrorScreenshot(page, `${logSuffix} did its best but still failed to compare data.  ${err.message} `);
   }
 
   return result;

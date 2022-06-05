@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import {Page} from 'puppeteer';
 import {Cluster} from 'puppeteer-cluster';
 import {IProperty} from '../types';
@@ -57,11 +58,16 @@ export const handleDonetCompare = async (
         'uploadThroughput': 250 * 1024 / 8,
         'latency': 100,
       }); */
+      const logSuffix = `Task ${idx + 1} of ${dtArrLength} at worker ${worker.id}`;
       await setCookie(page, worker.id);
 
-      logger.info(`Donet compare progress: ${idx + 1} / ${dtArrLength}`);
+      logger.info(`${logSuffix}`);
       const doNetComparedResults = await searchDoProperty(
-        {page, inputData: prop},
+        {
+          page,
+          inputData: prop,
+          logSuffix,
+        },
       ) ?? {
         DO管理有無: '処理エラー',
       } as IProperty;
@@ -77,41 +83,6 @@ export const handleDonetCompare = async (
       };
     }) as IProperty;
   }));
-
-  /* const chunkedResult =
-  await Promise.all(chunks.map( async (props, psIdx) => {
-    const propsLength = props.length;
-    return await Promise.all(props.map( async (prop, pIdx)=>{
-      return await cluster.execute(async ({page, worker}) => {
-        await setCookie(page, worker.id);
-
-        const doNetComparedResults = await searchDoProperty(
-          {page, inputData: prop},
-        ) ?? {
-          DO管理有無: '処理エラー',
-        } as IProperty;
-
-        await saveCookie(page, worker.id);
-
-        const firstComparedResult = doNetComparedResults[0];
-
-        logger.info(`Compared ${
-          [
-            (pIdx + 1) + ' IProperty ',
-            propsLength + ' IProperty[] ',
-            (psIdx + 1) + ' chunk ',
-            chunkLength + ' chunk[] ',
-          ].join(' / ')
-        }  with total length ${dtArrLength} `);
-
-        return {
-          ...prop,
-          ...firstComparedResult,
-        };
-      }) as IProperty;
-    }));
-  })); */
-
 
   return newDtArr;
 };

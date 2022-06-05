@@ -123,7 +123,16 @@ export const fetchCompanyDetails = async (url: string) =>{
   const html = await axios.post(url).then((resp)=> resp.data);
   const $ = load(html);
 
-  const companyName =$('.company-data_name-flex a').text().trim() ||
+  // Shortcircuit if page have errors
+  if ($('#error-header').length) {
+    return {
+      掲載企業: 'ページ無くなった',
+      掲載企業TEL: 'ページ無くなった',
+    };
+  }
+
+  // Actual scraping process
+  const companyName = $('.company-data_name-flex a').text().trim() ||
   $('.company-data_name-flex').text().trim();
   let dirtyContact = $('th:contains("TEL/FAX") ~ td').text().trim();
 
@@ -154,8 +163,10 @@ export const getContactByLink = async (
       {
         retries: 2,
         minTimeout: 2000,
-        onRetry: (e, tries) => logger
-          .error(`Retrying fetch ${url} with ${tries} tries.`),
+        onRetry: (e, tries) =>{
+          logger
+            .error(`Retrying fetch ${url} with ${tries} tries. ${e.message}`);
+        },
       },
     );
 
