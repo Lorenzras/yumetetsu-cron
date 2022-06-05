@@ -50,7 +50,8 @@ export const handleDonetCompare = async (
   const dtArrLength = dtArr.length;
 
   const newDtArr = await Promise.all(dtArr.map(async (prop, idx) => {
-    return await cluster.execute(async ({page, worker}) => {
+    try {
+      return await cluster.execute(async ({page, worker}) => {
       /*       const client = await page.target().createCDPSession();
       await client.send('Network.emulateNetworkConditions', {
         'offline': false,
@@ -58,31 +59,36 @@ export const handleDonetCompare = async (
         'uploadThroughput': 250 * 1024 / 8,
         'latency': 100,
       }); */
-      const logSuffix = `Worker ${worker.id} at task ${idx + 1} of ${dtArrLength} `;
-      await setCookie(page, worker.id);
+        const logSuffix = `Worker ${worker.id} at task ${idx + 1} of ${dtArrLength} `;
+        await setCookie(page, worker.id);
 
-      logger.info(`${logSuffix}`);
-      const doNetComparedResults = await searchDoProperty(
-        {
-          page,
-          inputData: prop,
-          logSuffix,
-        },
-      ) ?? {
-        DO管理有無: '処理エラー',
-      } as IProperty;
+        logger.info(`${logSuffix}`);
+        const doNetComparedResults = await searchDoProperty(
+          {
+            page,
+            inputData: prop,
+            logSuffix,
+          },
+        ) ?? {
+          DO管理有無: '処理エラー',
+        } as IProperty;
 
-      await saveCookie(page, worker.id);
+        await saveCookie(page, worker.id);
 
-      const firstComparedResult = doNetComparedResults[0];
+        const firstComparedResult = doNetComparedResults[0];
 
 
-      return {
-        ...prop,
-        ...firstComparedResult,
-      };
-    }) as IProperty;
+        return {
+          ...prop,
+          ...firstComparedResult,
+        };
+      }) as IProperty;
+    } catch (err: any) {
+      logger.error(`Unhandled error at clusterTasks.handleDonetCompare ${err.message}`);
+      return prop;
+    }
   }));
+
 
   return newDtArr;
 };
