@@ -35,18 +35,18 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     const {
       pref, type, handleScraper, handlePrepareForm,
     } = action;
-
+    const res: IProperty[] = [];
     try {
       const initialResult : IProperty[] = await cluster
         .execute(async ({page}) => {
-          const res: IProperty[] = [];
           let isIterate = true;
           let idx = 0;
           do {
             const formState = await handlePrepareForm(page, pref, type, idx);
+
             if (
               (typeof formState === 'boolean' && formState) ||
-            (typeof formState !== 'boolean' && formState.success)
+              (typeof formState !== 'boolean' && formState.success)
             ) {
               res.push(...await handleScraper(page));
             }
@@ -67,8 +67,8 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
 
       return dataWithType;
     } catch (err: any) {
-      logger.error(`Unhandled error at scraperTask.handleAction ${pref} ${type} ${err.message}`);
-      return [];
+      logger.error(`Unhandled error at scraperTask.handleAction ${pref} ${type} $ ${err.message}`);
+      return res;
     }
   };
 
@@ -115,7 +115,7 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
             return handleGetCompanyDetails(page, data);
           }) as Promise<IProperty>;
         } catch (err: any) {
-          logger.error(`Unhandled error at fetchingContact ${err.message}`);
+          logger.error(`Unhandled error at fetchingContact ${data.リンク} ${err.message}`);
           return data;
         }
       }),
@@ -145,8 +145,12 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   logger.info(`Done saving to CSV. Starting to save to upload to kintone.`);
 
   if (csvFile) {
-    await cluster.execute(({page})=> uploadTask(page, csvFile));
-    logger.info(`Done uploading to kintone.`);
+    try {
+      await cluster.execute(({page})=> uploadTask(page, csvFile));
+      logger.info(`Done uploading to kintone.`);
+    } catch (err: any) {
+      logger.error(`Upload to kintone might have failed. ${err.message}`);
+    }
   } else {
     logger.info(`Did not upload to kintone. CSV file was empty.`);
   }
