@@ -50,13 +50,13 @@ export const handleDonetCompare = async (
 
   const newDtArr = await Promise.all(dtArr.map(async (prop, idx) => {
     return await cluster.execute(async ({page, worker}) => {
-      const client = await page.target().createCDPSession();
+      /*       const client = await page.target().createCDPSession();
       await client.send('Network.emulateNetworkConditions', {
         'offline': false,
         'downloadThroughput': 750 * 1024 / 8,
         'uploadThroughput': 250 * 1024 / 8,
         'latency': 100,
-      });
+      }); */
       await setCookie(page, worker.id);
 
       logger.info(`Donet compare progress: ${idx + 1} / ${dtArrLength}`);
