@@ -22,14 +22,12 @@ export const initCluster = () => Cluster.launch({
   concurrency: Cluster.CONCURRENCY_CONTEXT,
   maxConcurrency: +process.env.CLUSTER_MAXCONCURRENCY || 5,
   // monitor: true,
-  retryLimit: 2,
-  retryDelay: 2000,
   workerCreationDelay: 300,
   puppeteerOptions: {
     // slowMo: 100,
     headless: process.env.BROWSER_TYPE === 'HEADLESS',
   },
-  timeout: browserTimeOut,
+  timeout: 1000 * 60 * 5,
 });
 
 /* const initFileWatcher = () => {

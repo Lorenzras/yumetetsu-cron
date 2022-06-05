@@ -58,7 +58,7 @@ export const handleDonetCompare = async (
         'uploadThroughput': 250 * 1024 / 8,
         'latency': 100,
       }); */
-      const logSuffix = `Task ${idx + 1} of ${dtArrLength} at worker ${worker.id}`;
+      const logSuffix = `Worker ${worker.id} at task ${idx + 1} of ${dtArrLength} `;
       await setCookie(page, worker.id);
 
       logger.info(`${logSuffix}`);

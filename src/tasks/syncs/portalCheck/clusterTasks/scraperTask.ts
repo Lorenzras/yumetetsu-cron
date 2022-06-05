@@ -36,35 +36,40 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
       pref, type, handleScraper, handlePrepareForm,
     } = action;
 
-    const initialResult : IProperty[] = await cluster
-      .execute(async ({page}) => {
-        const res: IProperty[] = [];
-        let isIterate = true;
-        let idx = 0;
-        do {
-          const formState = await handlePrepareForm(page, pref, type, idx);
-          if (
-            (typeof formState === 'boolean' && formState) ||
+    try {
+      const initialResult : IProperty[] = await cluster
+        .execute(async ({page}) => {
+          const res: IProperty[] = [];
+          let isIterate = true;
+          let idx = 0;
+          do {
+            const formState = await handlePrepareForm(page, pref, type, idx);
+            if (
+              (typeof formState === 'boolean' && formState) ||
             (typeof formState !== 'boolean' && formState.success)
-          ) {
-            res.push(...await handleScraper(page));
-          }
+            ) {
+              res.push(...await handleScraper(page));
+            }
 
-          if (typeof formState !== 'boolean' ) {
-            isIterate = formState.nextIdx < formState.chunkLength;
-            idx = formState.nextIdx;
-          } else {
-            isIterate = false;
-          }
-        } while (isIterate);
+            if (typeof formState !== 'boolean' ) {
+              isIterate = formState.nextIdx < formState.chunkLength;
+              idx = formState.nextIdx;
+            } else {
+              isIterate = false;
+            }
+          } while (isIterate);
 
-        logger.info(`Scraped total of ${res.length} from ${page.url()}`);
-        return res;
-      });
+          logger.info(`Scraped total of ${res.length} from ${page.url()}`);
+          return res;
+        });
 
-    const dataWithType = handleAddPropertyType(action, initialResult);
+      const dataWithType = handleAddPropertyType(action, initialResult);
 
-    return dataWithType;
+      return dataWithType;
+    } catch (err: any) {
+      logger.error(`Unhandled error at scraperTask.handleAction ${pref} ${type} ${err.message}`);
+      return [];
+    }
   };
 
 
