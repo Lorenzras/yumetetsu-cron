@@ -54,7 +54,7 @@ export const setLocation = async (
         page.waitForResponse((resp) => {
           return resp.url().includes('https://manage.do-network.com/m_town/list') &&
            resp.status() === 200;
-        }).catch(),
+        }).catch(()=>true),
       ]);
 
       // Click/Focus to trigger populate when trigger blur event failed due to network lag.
@@ -81,7 +81,7 @@ export const setLocation = async (
   }, {
     retries: 5,
     onRetry: async (e, tries) => {
-      logger.error(`${logSuffix} retried ${tries} time/s in retrying to populate location form. `);
+      logger.warn(`${logSuffix} retried ${tries} time/s in retrying to populate location form. ${e.message}`);
     },
   });
 };
