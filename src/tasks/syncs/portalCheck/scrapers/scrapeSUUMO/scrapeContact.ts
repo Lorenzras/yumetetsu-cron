@@ -23,10 +23,11 @@ export const getContactLink = async (
 ) => {
   try {
     // 物件詳細ページを表示する
-    await Promise.all([
-      page.goto(url, {waitUntil: 'domcontentloaded'}),
-      page.waitForNavigation(),
-    ]);
+
+    // await Promise.all([
+    await page.goto(url, {waitUntil: 'domcontentloaded'});
+    //  page.waitForNavigation(),
+    // ]);
 
     let info = await page.evaluate(() => {
       // マンションのみ、「所在階」を取得し、物件名に追加する
@@ -82,7 +83,8 @@ export const getContactLink = async (
     return info;
   } catch (error: any) {
     await logErrorScreenshot(page,
-      `企業情報の取得に失敗しました。${page.url()} ${error.message}`);
+      `企業情報の取得に失敗しました。 ${url} ${page.url()} ${error.message}`,
+    );
     return {
       階数: '',
       link: 'なし',
