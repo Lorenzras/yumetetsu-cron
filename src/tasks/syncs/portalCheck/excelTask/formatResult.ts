@@ -70,28 +70,11 @@ export const formatResult = (
     });
 
     // Link
-
     setHyperlinks({
       ws, row, rowIdx, props,
     });
-  /*   const propNameCell = ws.getCell('M' + excelIdx );
-    propNameCell.font = {
-      color: {argb: '004e47cc'},
-      bold: true,
-      underline: true,
-    };
-
-
-    const link = props[idx].リンク;
-    const site = getSite(link);
-
-    propNameCell.value = {
-      formula: `=HYPERLINK("${link}", "(${site}) ${row.at(-2)}")`,
-      date1904: false,
-    }; */
   });
 
-  console.log(widths);
   // set width base on longest string length of cell
   ws.columns.forEach((col, idx)=>col.width = widths[idx]);
 

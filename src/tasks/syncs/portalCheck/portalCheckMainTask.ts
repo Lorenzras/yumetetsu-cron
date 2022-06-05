@@ -27,7 +27,7 @@ export const initCluster = () => Cluster.launch({
     // slowMo: 100,
     headless: process.env.BROWSER_TYPE === 'HEADLESS',
   },
-  timeout: 1000 * 60 * 5,
+  timeout: 1000 * 60 * 10,
 });
 
 /* const initFileWatcher = () => {
@@ -61,9 +61,9 @@ export const portalCheckMainTask = async () => {
   });
 
   const actions = [
-    ...actionsHOMES(),
+    // ...actionsHOMES(),
     // ...actionsAtHome(),
-    // ...actionsSUUMO(),
+    ...actionsSUUMO(),
     // ...actionsYahoo(),
     // actionsSUUMO()[2],
   ];

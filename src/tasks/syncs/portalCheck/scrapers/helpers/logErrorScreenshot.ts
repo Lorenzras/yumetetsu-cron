@@ -12,15 +12,21 @@ import {dlImg} from '../../config';
  * @param message
  */
 export const logErrorScreenshot = async (page: Page, message: string) => {
-  const fileName = getFileName({
+  const filePath = getFileName({
     dir: dlImg,
   });
-  logger.error(`${message} ${path.basename(fileName)}` );
-  const body = await page.content();
+  const fileName = path.basename(filePath);
 
-  await saveFile(fileName + '.html', body);
+  try {
+    logger.error(`${message} ${fileName}` );
+    const body = await page.content();
 
-  await page.screenshot({
-    path: fileName + '.png',
-  });
+    await saveFile(filePath + '.html', body);
+
+    await page.screenshot({
+      path: filePath + '.png',
+    });
+  } catch (err: any) {
+    logger.error(`Failed to save screenshot. ${fileName}`);
+  }
 };
