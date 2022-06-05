@@ -94,10 +94,11 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   logger.info(`Done comparing to donet. Starting to filter.`);
   // Filter data
   const filteredData = doComparedDt.filter((dt)=>{
-    if (dt.DO管理有無 === '無' ||
-    (dt.DO管理有無 === '有' && +(dt.DO価格差 ?? 0) !== 0)) {
-      return true;
-    }
+    return (
+      !dt.DO管理有無 ||
+      dt.DO管理有無 === '無' ||
+      (dt.DO管理有無 === '有' && +(dt.DO価格差 ?? 0) !== 0)
+    );
   });
 
   const filteredDataLength = filteredData.length;
