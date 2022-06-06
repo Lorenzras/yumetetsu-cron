@@ -3,14 +3,13 @@ import {Page} from 'puppeteer';
 import {Cluster} from 'puppeteer-cluster';
 import {IProperty} from '../types';
 import {searchDoProperty} from '../doNetCompare/searchDoProperty';
-import {logger} from '../../../../utils';
+import {cookiesPath, logger} from '../../../../utils';
 import fs from 'fs';
 import path from 'path';
 
 
 export const cookieFile = (workerId: number) => {
-  return path.join(
-    __dirname, 'cookies', `donet-${workerId}.json`);
+  return path.join(cookiesPath, `donet-${workerId}.json`);
 };
 
 export const saveCookie = async (page: Page, workerId: number) => {
