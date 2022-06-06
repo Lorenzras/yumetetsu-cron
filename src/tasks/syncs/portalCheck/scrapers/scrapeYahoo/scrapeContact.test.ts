@@ -42,13 +42,19 @@ describe('scrapecontact', () => {
   }, browserTimeOut);
 
   /* test comand:: jest scrapeSUUMO/scrapeContact -t link -u */
+  /* 'https://realestate.yahoo.co.jp/used/house/detail_ag/A3jZbRxc46o5uSbr8vaxY/#company',
+      'https://realestate.yahoo.co.jp/used/house/detail_ag/15QfyySHRGLvhhtCQ829Xt/#company',
+      'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018596691/',
+      'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018762695/#tab', */
   test(('link'), async () => {
     const page = await openMockBrowserPage();
     const testLinks = [
-      'https://realestate.yahoo.co.jp/used/house/detail_ag/A3jZbRxc46o5uSbr8vaxY/#company',
-      'https://realestate.yahoo.co.jp/used/house/detail_ag/15QfyySHRGLvhhtCQ829Xt/#company',
+      'https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0018766861/',
+      'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018760118/',
       'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018596691/',
       'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018762695/#tab',
+      'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018775216/',
+      'https://realestate.yahoo.co.jp/land/detail_corp/b0018783353/',
     ];
 
     const result = [];

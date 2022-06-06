@@ -127,8 +127,11 @@ const getSingleLink = async (page: Page) => {
   // kigyoumei = kigyoumei.split('（')[1].split('）')[0];
 
   // 掲載企業の連絡先を取得する
-  const tel = $('.DetailRichSummarySide__tips__popup__cont__phone')
+  let tel = $('.DetailRichSummarySide__tips__popup__cont__phone')
     .eq(0).text().trim();
+  tel = tel !== '' ? tel :
+    $('.DetailSummarySide__tips__popup__cont__phone')
+      .eq(0).text().trim();
 
   return {
     掲載企業: kigyoumei,
