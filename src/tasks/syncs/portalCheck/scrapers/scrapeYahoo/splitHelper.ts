@@ -25,6 +25,7 @@ export const splitCities = (pref: string, idx: number) => {
  */
 export const chunkLengs = (pref: string) => {
   const tgtCities = Object.keys(cityLists[pref]);
-  return tgtCities.length / numOfChoices +
-    (tgtCities.length % numOfChoices) ? 1 : 0;
+  return Math.ceil(tgtCities.length / numOfChoices);
+  // return tgtCities.length / numOfChoices +
+  //  (tgtCities.length % numOfChoices) ? 1 : 0;
 };

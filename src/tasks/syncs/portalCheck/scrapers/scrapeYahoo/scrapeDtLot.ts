@@ -41,6 +41,7 @@ export const scrapeDtLot = async (
 
   const dataEndpoint = getDataEndpoint(page.url());
 
+  console.log('DataEndpoint ', dataEndpoint);
   await page.goto(dataEndpoint);
 
   return await webScraper<ILot>({

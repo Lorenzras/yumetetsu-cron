@@ -5,18 +5,22 @@ import path from 'path';
 
 export const uploadTask = async (page: Page, file: string) => {
   // await blockImages(page);
-  await uploadSingleCSVSmart({
-    page,
-    fileWithAppId: file,
-    keyField: '物件番号',
-  });
+  try {
+    await uploadSingleCSVSmart({
+      page,
+      fileWithAppId: file,
+      keyField: '物件番号',
+    });
 
-  // Clean up
-  // page.removeAllListeners();
-  await page.close();
-  await deleteFile(file);
+    // Clean up
+    // page.removeAllListeners();
+    // await page.close();
+    await deleteFile(file);
 
-  logger.info('Finished upload task for ' + path.basename(file));
-
-  return true;
+    logger.info('Finished upload task for ' + path.basename(file));
+    return true;
+  } catch {
+    logger.info('Failed upload task for ' + path.basename(file));
+    return false;
+  }
 };

@@ -136,3 +136,4 @@ cli-kintone*
 **/errImg/**.html
 **/data/json/**.json
 **/data/excel/**/**.xlsx
+**/cookies/**.json

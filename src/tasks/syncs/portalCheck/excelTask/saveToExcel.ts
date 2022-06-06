@@ -109,29 +109,6 @@ export const saveFile = async (items: IProperty[], fileName: string) => {
     ws.addRows(rows);
 
     formatResult(ws, rows, props);
-
-    /*     rows.forEach((row, idx) => {
-      const excelIdx = idx + 2;
-      const propNameCell = ws.getCell('A' + excelIdx );
-      propNameCell.font = {
-        color: {argb: '004e47cc'},
-        bold: true,
-        underline: true,
-      };
-      propNameCell.value = {
-        formula: `=HYPERLINK("${props[idx].リンク}", "${row[0]}")`,
-        date1904: false,
-      };
-    }); */
-
-    // Styling
-
-    /*     ws.getRow(1).font = {
-      // color: {argb: '004e47cc'},
-      bold: true,
-    }; */
-
-    // setStyles
   });
 
   await saveExcelResult(workbook, fileName, items.length);

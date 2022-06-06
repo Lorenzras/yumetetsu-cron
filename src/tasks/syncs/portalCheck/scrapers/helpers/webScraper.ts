@@ -32,7 +32,6 @@ export const webScraper = async <
       return produce(item, (draftState) => {
         draftState.比較用価格 = extractPrice(draftState.販売価格);
         if ('比較用土地面積' in draftState ) {
-          console.log('tochi', draftState.土地面積, extractNumber(draftState.土地面積));
           draftState.比較用土地面積 = extractNumber(draftState.土地面積);
         }
         if ('比較用専有面積' in draftState ) {

@@ -8,11 +8,13 @@ test('location', async () => {
   const page = await openMockBrowserPage();
   await page.screenshot({path: 'C:\\Users\\owner\\Pictures\\Camera Roll\\test.png'});
   await navigateToPropertyPage(page);
-  await setLocation({page, data: {
-    pref: '岐阜県',
-    city: '大垣市',
-    town: '水源町',
-  }});
+  await setLocation({
+    logSuffix: '',
+    page, data: {
+      pref: '岐阜県',
+      city: '大垣市',
+      town: '水源町',
+    }});
 
   page.browser().disconnect();
 }, browserTimeOut);

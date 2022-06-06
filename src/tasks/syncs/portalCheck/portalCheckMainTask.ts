@@ -13,19 +13,21 @@ import {actionsAtHome} from './scrapers/scrapeAtHome/actionsAtHome';
 import {
   suumoActions as actionsSUUMO,
 } from './scrapers/scrapeSUUMO/suumoActions';
-
+import {
+  yahooActions as actionsYahoo,
+} from './scrapers/scrapeYahoo/yahooActions';
 
 export const initCluster = () => Cluster.launch({
   puppeteer: getExtraPuppeteer(),
   concurrency: Cluster.CONCURRENCY_CONTEXT,
   maxConcurrency: +process.env.CLUSTER_MAXCONCURRENCY || 5,
   // monitor: true,
-  retryLimit: 2,
-  retryDelay: 2000,
+  workerCreationDelay: 300,
   puppeteerOptions: {
-    headless: false,
+    // slowMo: 100,
+    headless: process.env.BROWSER_TYPE === 'HEADLESS',
   },
-  timeout: browserTimeOut,
+  timeout: 1000 * 60 * 10,
 });
 
 /* const initFileWatcher = () => {
@@ -59,9 +61,10 @@ export const portalCheckMainTask = async () => {
   });
 
   const actions = [
-    ...actionsHOMES(),
+    // ...actionsHOMES(),
     // ...actionsAtHome(),
-    // ...actionsSUUMO(),
+    ...actionsSUUMO(),
+    // ...actionsYahoo(),
     // actionsSUUMO()[2],
   ];
 

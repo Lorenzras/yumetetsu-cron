@@ -35,35 +35,41 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     const {
       pref, type, handleScraper, handlePrepareForm,
     } = action;
+    const res: IProperty[] = [];
+    try {
+      const initialResult : IProperty[] = await cluster
+        .execute(async ({page}) => {
+          let isIterate = true;
+          let idx = 0;
+          do {
+            const formState = await handlePrepareForm(page, pref, type, idx);
 
-    const initialResult : IProperty[] = await cluster
-      .execute(async ({page}) => {
-        const formState = await handlePrepareForm(page, pref, type);
-        const res: IProperty[] = [];
-
-        if (typeof formState === 'boolean' ) {
-          if (formState) {
-            res.push(...await handleScraper(page));
-          }
-        } else {
-          // This handles edge cases where the site limits the number of cities selected. e.g. Yahoo
-          while (formState.chunkLength <= formState.nextIdx) {
-            if (formState.success) {
-              await handlePrepareForm(page, pref, type, formState.nextIdx);
+            if (
+              (typeof formState === 'boolean' && formState) ||
+              (typeof formState !== 'boolean' && formState.success)
+            ) {
               res.push(...await handleScraper(page));
-            } else {
-              logger.error(`handlePrepareForm failed. ${JSON.stringify(formState)}`);
             }
-          }
-        }
 
-        logger.info(`Scraped total of ${res.length} from ${page.url()}`);
-        return res;
-      });
+            if (typeof formState !== 'boolean' ) {
+              isIterate = formState.nextIdx < formState.chunkLength;
+              idx = formState.nextIdx;
+            } else {
+              isIterate = false;
+            }
+          } while (isIterate);
 
-    const dataWithType = handleAddPropertyType(action, initialResult);
+          logger.info(`Scraped total of ${res.length} from ${page.url()}`);
+          return res;
+        });
 
-    return dataWithType;
+      const dataWithType = handleAddPropertyType(action, initialResult);
+
+      return dataWithType;
+    } catch (err: any) {
+      logger.error(`Unhandled error at scraperTask.handleAction ${pref} ${type} $ ${err.message}`);
+      return res;
+    }
   };
 
 
@@ -75,50 +81,80 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   )).flat();
 
   const totalScrapeLength = intermediateResults.length;
-  // Compare to donet
+
+  logger.info(`Scraped results ${totalScrapeLength}. Starting to compare to doNet.`);
+  // Compare to donet then save.
   const doComparedDt = await handleDonetCompare(cluster, intermediateResults);
-
-  // Filter data
-  const filteredData = doComparedDt.filter((dt)=>{
-    if (dt.DO管理有無 === '無' ||
-    (dt.DO管理有無 === '有' && +(dt.DO価格差 ?? 0) !== 0)) {
-      return true;
-    }
-  });
-
-  // Scrape company info
-  const filteredDataLength = filteredData.length;
-  const finalResults = await Promise.all(
-    _.shuffle(filteredData)
-      .map(async (data, idx) => {
-        return cluster.execute(({page})=>{
-          logger.info(`Fetching contact: ${idx + 1} of ${filteredDataLength} rows.`);
-          return handleGetCompanyDetails(page, data);
-        }) as Promise<IProperty>;
-      }),
-  );
-
-  logger.info(`Scraped: ${totalScrapeLength} Final: ${filteredDataLength} rows.`);
-
-  // Finishing task
-
   await saveJSON(getFileName({
     appId: kintoneAppId,
     dir: dlJSON,
-    suffix: finalResults.length.toString(),
+    suffix: '-doComparedDt-' + doComparedDt.length.toString(),
+  }), doComparedDt);
+
+  logger.info(`Done comparing to donet. Starting to filter.`);
+  // Filter data
+  const filteredData = doComparedDt.filter((dt)=>{
+    return (
+      !dt.DO管理有無 ||
+      dt.DO管理有無 === '無' ||
+      (dt.DO管理有無 === '有' && +(dt.DO価格差 ?? 0) !== 0)
+    );
+  });
+
+  const filteredDataLength = filteredData.length;
+
+  logger.info(`Filtered results ${filteredDataLength}. Starting to scrape contact. `);
+  // Scrape company info
+
+  const finalResults = await Promise.all(
+    _.shuffle(filteredData)
+      .map(async (data, idx) => {
+        try {
+          return await cluster.execute(({page})=>{
+            logger.info(`Fetching contact: ${idx + 1} of ${filteredDataLength} rows.`);
+            return handleGetCompanyDetails(page, data);
+          }) as Promise<IProperty>;
+        } catch (err: any) {
+          logger.error(`Unhandled error at fetchingContact ${data.リンク} ${err.message}`);
+          return data;
+        }
+      }),
+  );
+
+  const filteredJSONFname = `-finalResults-${finalResults.length.toString()}`;
+  logger.info(`Done scraping contact. Saving progress to ${filteredJSONFname}`);
+
+  // Save final result to JSON
+  await saveJSON(getFileName({
+    appId: kintoneAppId,
+    dir: dlJSON,
+    suffix: filteredJSONFname,
   }), finalResults);
 
+  logger.info(`Saving to excel.`);
+  // Final result Output
   await saveToExcel(finalResults);
+  logger.info(`Done saving to excel. Starting to save to CSV.`);
 
+  // Save to CSV then upload to kintone
   const csvFile = await saveJSONToCSV(getFileName({
     appId: kintoneAppId,
     dir: dlPortalCheck,
     suffix: `${finalResults.length.toString()}`,
   }), finalResults);
+  logger.info(`Done saving to CSV. Starting to save to upload to kintone.`);
 
   if (csvFile) {
-    await cluster.queue(({page})=> uploadTask(page, csvFile));
+    try {
+      await cluster.execute(({page})=> uploadTask(page, csvFile));
+      logger.info(`Done uploading to kintone.`);
+    } catch (err: any) {
+      logger.error(`Upload to kintone might have failed. ${err.message}`);
+    }
+  } else {
+    logger.info(`Did not upload to kintone. CSV file was empty.`);
   }
 
+  logger.info(`All done. scraped: ${totalScrapeLength} Final: ${filteredDataLength} rows.`);
   return finalResults;
 };

@@ -22,7 +22,7 @@ export const goToImportPage = async (page: Page, appId: string) => {
 
   await page.goto(uploadUrl);
 
-  const btnLogin = (await page.$(loginSels.btnLogin)) || '';
+  const btnLogin = (await page.$(loginSels.btnLogin));
   if (btnLogin) {
     await login(page);
   }

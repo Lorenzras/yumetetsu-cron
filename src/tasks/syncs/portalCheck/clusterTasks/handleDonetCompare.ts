@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import {Page} from 'puppeteer';
 import {Cluster} from 'puppeteer-cluster';
 import {IProperty} from '../types';
@@ -46,21 +47,28 @@ export const handleDonetCompare = async (
   cluster: Cluster<{page: Page}>,
   dtArr: IProperty[],
 ) => {
-  const clusterSize = +process.env.CLUSTER_MAXCONCURRENCY;
   const dtArrLength = dtArr.length;
-  const chunkSize = Math.ceil(dtArrLength / clusterSize);
-  const chunks = _.chunk(dtArr, chunkSize);
-  const chunkLength = chunks.length;
 
-
-  const chunkedResult = await Promise.all(chunks.map( async (props, psIdx) => {
-    const propsLength = props.length;
-    return await Promise.all(props.map( async (prop, pIdx)=>{
+  const newDtArr = await Promise.all(dtArr.map(async (prop, idx) => {
+    try {
       return await cluster.execute(async ({page, worker}) => {
+      /*       const client = await page.target().createCDPSession();
+      await client.send('Network.emulateNetworkConditions', {
+        'offline': false,
+        'downloadThroughput': 750 * 1024 / 8,
+        'uploadThroughput': 250 * 1024 / 8,
+        'latency': 100,
+      }); */
+        const logSuffix = `Worker ${worker.id} at task ${idx + 1} of ${dtArrLength} `;
         await setCookie(page, worker.id);
 
+        logger.info(`${logSuffix}`);
         const doNetComparedResults = await searchDoProperty(
-          {page, inputData: prop},
+          {
+            page,
+            inputData: prop,
+            logSuffix,
+          },
         ) ?? {
           DO管理有無: '処理エラー',
         } as IProperty;
@@ -69,23 +77,18 @@ export const handleDonetCompare = async (
 
         const firstComparedResult = doNetComparedResults[0];
 
-        logger.info(`Compared ${
-          [
-            (pIdx + 1) + ' IProperty ',
-            propsLength + ' IProperty[] ',
-            (psIdx + 1) + ' chunk ',
-            chunkLength + ' chunk[] ',
-          ].join(' / ')
-        }  with total length ${dtArrLength} `);
 
         return {
           ...prop,
           ...firstComparedResult,
         };
       }) as IProperty;
-    }));
+    } catch (err: any) {
+      logger.error(`Unhandled error at clusterTasks.handleDonetCompare ${err.message}`);
+      return prop;
+    }
   }));
 
 
-  return chunkedResult.flat();
+  return newDtArr;
 };
