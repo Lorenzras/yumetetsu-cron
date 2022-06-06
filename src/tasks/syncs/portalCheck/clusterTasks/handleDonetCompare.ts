@@ -19,8 +19,8 @@ const saveCookie = async (page: Page, workerId: number) => {
     const workerCookie = await page.cookies();
     const cookiePath = cookieFile(workerId);
     fs.writeFileSync(cookiePath, JSON.stringify(workerCookie));
-  } catch (err) {
-    logger.warn('I was not able to save the cookie.');
+  } catch (err: any) {
+    logger.error(`I was not able to save the cookie. ${err.message}`);
   }
 };
 
