@@ -8,7 +8,6 @@ export const scrapeContact: THandleContactScraper = async (
   data: IProperty,
 ) => {
   const info = await getContactLink(page, data.リンク);
-
   return {
     ...data,
     物件名: data.物件名 + info.階数,

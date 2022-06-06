@@ -68,6 +68,7 @@ export const searchDoProperty = async ({
 
   let result: TSearchResult[] = [];
   page.setDefaultTimeout(60000);
+
   try {
     if ('比較用土地面積' in inputData) {
       area = inputData.比較用土地面積.toString();
