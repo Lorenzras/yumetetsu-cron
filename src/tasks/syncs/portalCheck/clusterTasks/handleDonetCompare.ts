@@ -6,25 +6,26 @@ import {searchDoProperty} from '../doNetCompare/searchDoProperty';
 import {logger} from '../../../../utils';
 import fs from 'fs';
 import path from 'path';
-import _ from 'lodash';
 
-const cookieFile = (workerId: number) => {
+
+export const cookieFile = (workerId: number) => {
   return path.join(
     __dirname, 'cookies', `donet-${workerId}.json`);
 };
 
-const saveCookie = async (page: Page, workerId: number) => {
-  logger.info(`Wordker ${workerId} is saving cookie.`);
+export const saveCookie = async (page: Page, workerId: number) => {
+  logger.info(`Worker ${workerId} is saving cookie.`);
   try {
     const workerCookie = await page.cookies();
     const cookiePath = cookieFile(workerId);
     fs.writeFileSync(cookiePath, JSON.stringify(workerCookie));
+    logger.info(`Worker ${workerId} is successfully saved cookie.`);
   } catch (err: any) {
     logger.error(`I was not able to save the cookie. ${err.message}`);
   }
 };
 
-const setCookie = async (page: Page, workerId: number) => {
+export const setCookie = async (page: Page, workerId: number) => {
   logger.info(`Worker ${workerId} is setting cookie to page.`);
   try {
     const cookiePath = cookieFile(workerId);
@@ -33,6 +34,8 @@ const setCookie = async (page: Page, workerId: number) => {
     const cookies = JSON.parse(cookiesString);
     await page.setCookie(...cookies);
     await page.goto('https://manage.do-network.com/estate');
+    await page.waitForSelector('#m_estate_filters_fc_shop_id option');
+    logger.info(`Worker ${workerId} is successfully set cookie.`);
   } catch (err) {
     logger.warn('I was not able to load the cookie.');
   }
