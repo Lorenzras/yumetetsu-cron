@@ -8,17 +8,26 @@ import fs from 'fs';
 import path from 'path';
 import _ from 'lodash';
 
-const saveCookie = async (page: Page, workerId: number) => {
-  const workerCookie = await page.cookies();
-  const cookiePath = path.join(
+const cookieFile = (workerId: number) => {
+  return path.join(
     __dirname, 'cookies', `donet-${workerId}.json`);
-  fs.writeFileSync(cookiePath, JSON.stringify(workerCookie));
+};
+
+const saveCookie = async (page: Page, workerId: number) => {
+  logger.info(`Wordker ${workerId} is saving cookie.`);
+  try {
+    const workerCookie = await page.cookies();
+    const cookiePath = cookieFile(workerId);
+    fs.writeFileSync(cookiePath, JSON.stringify(workerCookie));
+  } catch (err) {
+    logger.warn('I was not able to save the cookie.');
+  }
 };
 
 const setCookie = async (page: Page, workerId: number) => {
+  logger.info(`Worker ${workerId} is setting cookie to page.`);
   try {
-    const cookiePath = path.join(
-      __dirname, 'cookies', `donet-${workerId}.json`);
+    const cookiePath = cookieFile(workerId);
     const cookiesString = fs.readFileSync(cookiePath, 'utf8');
 
     const cookies = JSON.parse(cookiesString);
