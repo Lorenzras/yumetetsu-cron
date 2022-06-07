@@ -3,7 +3,7 @@ import {Page} from 'puppeteer';
 import {scraperTask} from './clusterTasks/scraperTask';
 import {getExtraPuppeteer} from '../../common/browser';
 import {Cluster} from 'puppeteer-cluster';
-import {browserTimeOut} from '../../common/browser/config';
+import {browserTimeOut, minimalArgs} from '../../common/browser/config';
 // import chokidar from 'chokidar';
 // import {dlPortalCheck} from './config';
 import {logger, sleep} from '../../../utils';
@@ -26,6 +26,7 @@ export const initCluster = () => Cluster.launch({
   puppeteerOptions: {
     // slowMo: 100,
     headless: process.env.BROWSER_TYPE === 'HEADLESS',
+    args: minimalArgs,
   },
   timeout: 1000 * 60 * 10,
 });
