@@ -84,7 +84,7 @@ export const setLocation = async (
         throw new Error(`${logSuffix} Failed to click ok.`);
       });
   }, {
-    retries: 5,
+    retries: 3,
     onRetry: async (e, tries) => {
       logger.warn(`${logSuffix} retried ${tries} time/s in retrying to populate location form. ${e.message}`);
     },
