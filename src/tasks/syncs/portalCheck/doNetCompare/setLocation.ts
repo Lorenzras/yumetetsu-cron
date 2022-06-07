@@ -73,6 +73,7 @@ export const setLocation = async (
         })
         .catch(async (err: any)=>{
           await page.click('#modal_clear_button', {delay: 1000}).catch(()=>true);
+          await page.waitForSelector('#modal_clear_button', {hidden: true});
           throw new Error(`${logSuffix} failed to type town, clicking clear. ${err.message}`);
         });
     }
