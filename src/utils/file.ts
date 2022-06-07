@@ -40,7 +40,12 @@ export const saveCSV = (filePath: string, data: string) => {
   return filePath;
 };
 
-
+/**
+ * Save json to csv
+ * @param filePath
+ * @param json
+ * @returns {string} file path
+ */
 export const saveJSONToCSV = async (
   filePath: string,
   json: {[k: string]: any}[],
@@ -49,6 +54,12 @@ export const saveJSONToCSV = async (
   return saveCSV(filePath + '.csv', await json2csvAsync(json));
 };
 
+/**
+ * Save Serializable object into JSON file.
+ *
+ * @param filePath
+ * @param data
+ */
 export const saveJSON = async (
   filePath: string,
   data: {[k: string]: any}[],
@@ -60,6 +71,12 @@ export const saveJSON = async (
   }
 };
 
+/**
+ * Save any type of file.
+ *
+ * @param filePath
+ * @param data
+ */
 export const saveFile = async (
   filePath: string,
   data: string,

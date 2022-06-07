@@ -12,6 +12,7 @@ import {saveToExcel} from '../excelTask/saveToExcel';
 import {handleGetCompanyDetails} from './handleGetCompanyDetails';
 import {uploadTask} from './uploadTask';
 import {handleDonetCompare} from './handleDonetCompare';
+import {saveMeta} from '../helpers/saveMeta';
 
 
 type TScraperTask = (
@@ -131,10 +132,10 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     suffix: filteredJSONFname,
   }), finalResults);
 
-  logger.info(`Saving to excel.`);
+
   // Final result Output
   await saveToExcel(finalResults);
-  logger.info(`Done saving to excel. Starting to save to CSV.`);
+
 
   // Save to CSV then upload to kintone
   const csvFile = await saveJSONToCSV(getFileName({
@@ -155,6 +156,6 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     logger.info(`Did not upload to kintone. CSV file was empty.`);
   }
 
-  logger.info(`All done. scraped: ${totalScrapeLength} Final: ${filteredDataLength} rows.`);
+  saveMeta(intermediateResults, finalResults);
   return finalResults;
 };

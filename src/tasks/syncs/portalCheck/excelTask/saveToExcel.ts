@@ -116,6 +116,8 @@ export const saveFile = async (items: IProperty[], fileName: string) => {
 
 
 export const saveToExcel = async (items: IProperty[]) => {
+  logger.info(`Saving to excel.`);
+
   try {
     if (!items.length) {
       logger.warn('Result is empty. Stopping saveToExcel.');
@@ -128,6 +130,7 @@ export const saveToExcel = async (items: IProperty[]) => {
       logger.info(`Processing Excel: ${city}`);
       await saveFile(props, city);
     }
+    logger.info(`Done saving to excel. Starting to save to CSV.`);
   } catch (err: any) {
     logger.error(`Error saving excel ${err.message}`);
   }
