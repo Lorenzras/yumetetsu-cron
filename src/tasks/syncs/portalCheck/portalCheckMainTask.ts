@@ -6,7 +6,7 @@ import {Cluster} from 'puppeteer-cluster';
 import {browserTimeOut} from '../../common/browser/config';
 // import chokidar from 'chokidar';
 // import {dlPortalCheck} from './config';
-import {logger} from '../../../utils';
+import {logger, sleep} from '../../../utils';
 import {uploadTask} from './clusterTasks/uploadTask';
 import {actionsHOMES} from './scrapers/scrapeHOMES';
 import {actionsAtHome} from './scrapers/scrapeAtHome/actionsAtHome';
@@ -46,14 +46,7 @@ export const initCluster = () => Cluster.launch({
  */
 export const portalCheckMainTask = async () => {
   const cluster : Cluster<{page: Page}> = await initCluster();
-  // const watcher = initFileWatcher();
 
-
-  /*   watcher.on('add', (path)=>{
-    cluster
-      .execute(({page}) => uploadTask(page, path));
-  });
- */
   logger.info(`Starting cluster.`);
 
   cluster.on('taskerror', (err, data) => {
@@ -71,8 +64,9 @@ export const portalCheckMainTask = async () => {
   await scraperTask(actions, cluster);
 
 
-  // logger.info('Closing watcher');
-  // await watcher.close();
+  // Rest, to make sure all tasks got registered especially for slow computers
+
+  await sleep(10000);
 
   await cluster.idle();
   logger.info('Cluster is now idle.');

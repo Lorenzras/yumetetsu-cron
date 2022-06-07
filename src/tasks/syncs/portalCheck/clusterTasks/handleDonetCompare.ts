@@ -63,17 +63,16 @@ export const handleDonetCompare = async (
   const newDtArr = await Promise.all(dtArr.map(async (prop, idx) => {
     try {
       return await cluster.execute(async ({page, worker}) => {
-      /*       const client = await page.target().createCDPSession();
-      await client.send('Network.emulateNetworkConditions', {
-        'offline': false,
-        'downloadThroughput': 750 * 1024 / 8,
-        'uploadThroughput': 250 * 1024 / 8,
-        'latency': 100,
-      }); */
+        /*       const client = await page.target().createCDPSession();
+        await client.send('Network.emulateNetworkConditions', {
+          'offline': false,
+          'downloadThroughput': 750 * 1024 / 8,
+          'uploadThroughput': 250 * 1024 / 8,
+          'latency': 1500,
+        }); */
         const logSuffix = `Worker ${worker.id} at task ${idx + 1} of ${dtArrLength} `;
         await setCookie(page, worker.id);
 
-        logger.info(`${logSuffix}`);
         const doNetComparedResults = await searchDoProperty(
           {
             page,

@@ -19,7 +19,7 @@ export const setLocation = async (
   const {pref, city, town} = data;
   await retry(async ()=>{
     // Test reset in case of retrying
-    await page.click('#modal_clear_button').catch(()=>null);
+    // await page.click('#modal_clear_button').catch(()=>true);
 
     logger.info(`${logSuffix} is opening location modal.`);
 
@@ -62,7 +62,7 @@ export const setLocation = async (
 
       await page.waitForSelector(
         '#modal_town_name_autocomplete:not(:disabled)',
-        {timeout: 15000},
+        {timeout: 5000},
       )
         .then(async ()=>{
           // Setting the value directly does not reliably trigger autocomplete so
@@ -71,8 +71,9 @@ export const setLocation = async (
           await page.click('#modal_town_name_autocomplete', {clickCount: 3});
           return page.type('#modal_town_name_autocomplete', town);
         })
-        .catch((err: any)=>{
-          throw new Error(`${logSuffix} failed to type town. ${err.message}`);
+        .catch(async (err: any)=>{
+          await page.click('#modal_clear_button', {delay: 1000}).catch(()=>true);
+          throw new Error(`${logSuffix} failed to type town, clicking clear. ${err.message}`);
         });
     }
 

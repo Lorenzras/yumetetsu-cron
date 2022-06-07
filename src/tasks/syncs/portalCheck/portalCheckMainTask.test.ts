@@ -1,3 +1,4 @@
+import {scraperTask} from './clusterTasks/scraperTask';
 import {browserTimeOut} from '../../common/browser/config';
 import {initCluster, portalCheckMainTask} from './portalCheckMainTask';
 import _ from 'lodash';
@@ -9,6 +10,14 @@ import {dlJSON} from './config';
 import {saveToExcel} from './excelTask/saveToExcel';
 import {IProperty} from './types';
 import {handleGetCompanyDetails} from './clusterTasks/handleGetCompanyDetails';
+import {actionsHOMES} from './scrapers/scrapeHOMES';
+import {actionsAtHome} from './scrapers/scrapeAtHome/actionsAtHome';
+import {
+  suumoActions as actionsSUUMO,
+} from './scrapers/scrapeSUUMO/suumoActions';
+import {
+  yahooActions as actionsYahoo,
+} from './scrapers/scrapeYahoo/yahooActions';
 
 const getJSONData = (fName: string) => {
   const res = fs.readFileSync(path.join(dlJSON, fName), 'utf8');
@@ -19,6 +28,23 @@ describe('portalCheckMainProcess', ()=>{
   test('main', async ()=>{
     await portalCheckMainTask();
     expect('');
+  }, browserTimeOut);
+
+  test('lite', async ()=>{
+    const cluster: Cluster<{page: Page}> = await initCluster();
+    const actions = [
+      actionsHOMES()[1],
+      // ...actionsAtHome(),
+      // ...actionsSUUMO(),
+      // ...actionsYahoo(),
+      // actionsSUUMO()[2],
+    ];
+
+    await scraperTask(actions, cluster);
+
+
+    await cluster.idle();
+    await cluster.close();
   }, browserTimeOut);
 
   test('contacts', async ()=>{

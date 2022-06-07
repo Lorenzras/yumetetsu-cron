@@ -3,11 +3,13 @@ import retry from 'async-retry';
 import {openBrowserPage} from '../../../../common/browser';
 import {browserTimeOut} from '../../../../common/browser/config';
 import {logErrorScreenshot} from './logErrorScreenshot';
+import {Cluster} from 'puppeteer-cluster';
+import {Page} from 'puppeteer';
 
 test('log', async ()=>{
-  const cluster = await initCluster();
+  const cluster: Cluster<{page: Page}> = await initCluster();
 
-  const result = await retry(async (bail, attempts)=>{
+  /*   const result = await retry(async (bail, attempts)=>{
     return await cluster.execute(()=>{
       if (attempts >= 3 ) {
         return 'Successfully failed';
@@ -23,15 +25,18 @@ test('log', async ()=>{
     },
   });
 
-  console.log(result);
-  /* try {
-    await page.goto('https://suumo.jp/tokai/');
-    throw new Error('わざとエラー');
-  } catch (err: any) {
-    await logErrorScreenshot(page, `Test image ${err.message}` );
-  } finally {
-    await page.close();
-  } */
+  console.log(result); */
+  cluster.execute(async ({page}) => {
+    try {
+      await page.goto('https://suumo.jp/tokai/');
+      throw new Error('わざとエラー');
+    } catch (err: any) {
+      await logErrorScreenshot(page, `Test image ${err.message}` );
+    } finally {
+      await page.close();
+    }
+  });
+
   await cluster.idle();
   await cluster.close();
   expect('');
