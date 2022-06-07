@@ -62,7 +62,7 @@ export const setLocation = async (
 
       await page.waitForSelector(
         '#modal_town_name_autocomplete:not(:disabled)',
-        {timeout: 5000},
+        {timeout: 10000},
       )
         .then(async ()=>{
           // Setting the value directly does not reliably trigger autocomplete so
@@ -79,7 +79,10 @@ export const setLocation = async (
     }
 
     await page.click('#modal_ok_button');
-    await page.waitForSelector('#select_pref_id', {hidden: true});
+    await page.waitForSelector('#select_pref_id', {hidden: true, timeout: 10000})
+      .catch(()=>{
+        throw new Error(`${logSuffix} Failed to click ok.`);
+      });
   }, {
     retries: 5,
     onRetry: async (e, tries) => {
