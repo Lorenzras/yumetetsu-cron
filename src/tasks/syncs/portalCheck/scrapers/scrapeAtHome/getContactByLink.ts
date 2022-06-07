@@ -1,7 +1,7 @@
 import {TCompanyContact} from '../../types';
 import {Page} from 'puppeteer';
 import {extractTel, logger} from '../../../../../utils';
-import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
+import {logErrorScreenshot} from '../../helpers/logErrorScreenshot';
 import axios from 'axios';
 import {load} from 'cheerio';
 import retry from 'async-retry';

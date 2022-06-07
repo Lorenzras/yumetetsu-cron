@@ -112,7 +112,7 @@ export const getFileName = (
     suffix?: string,
     ext?: string
   }) => {
-  fs.existsSync(dir) || fs.mkdirSync(dir);
+  fs.existsSync(dir) || fs.mkdirSync(dir, {recursive: true});
 
   const randomize = format(new Date(), `yyyyMMdd-HHmmss`) + `-${nanoid(5)}`;
 

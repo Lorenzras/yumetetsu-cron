@@ -1,7 +1,7 @@
 import {Page} from 'puppeteer';
 import {logger} from '../../../../../utils';
 import {IProperty} from '../../types';
-import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
+import {logErrorScreenshot} from '../../helpers/logErrorScreenshot';
 
 export const scrapeLoop =
   async (page: Page, func: (page: Page) => Promise<IProperty[]>) => {

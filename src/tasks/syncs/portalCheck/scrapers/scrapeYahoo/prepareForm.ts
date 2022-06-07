@@ -1,7 +1,7 @@
 import {Page} from 'puppeteer';
 import {logger} from '../../../../../utils';
 import {THandlePrepareForm, TProperty} from '../../types';
-import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
+import {logErrorScreenshot} from '../../helpers/logErrorScreenshot';
 import {chunkLengs, splitCities} from './splitHelper';
 
 // 物件種別によって、開くサイトアドレスを設定する

@@ -2,7 +2,7 @@ import {Page} from 'puppeteer';
 import {logger} from '../../../../../utils';
 import {cityLists} from '../../config';
 import {THandlePrepareForm, TProperty} from '../../types';
-import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
+import {logErrorScreenshot} from '../../helpers/logErrorScreenshot';
 
 /**
  * 検索条件を設定する

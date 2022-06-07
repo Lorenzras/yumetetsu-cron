@@ -1,7 +1,7 @@
 import {Page} from 'puppeteer';
 import {logger} from '../../../../../utils';
 import {ILot} from '../../types';
-import {webScraper} from '../helpers/webScraper';
+import {webScraper} from '../../helpers/webScraper';
 
 export const scrapeDtLotPage = async (page: Page) => {
   logger.info('Scraping atHOME dtLot page.');

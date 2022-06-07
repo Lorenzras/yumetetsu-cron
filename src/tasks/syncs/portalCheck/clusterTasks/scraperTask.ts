@@ -1,3 +1,4 @@
+import {resultJSONPath, kintoneAppId, resultCSVPath} from './../config';
 /* eslint-disable max-len */
 import {saveJSONToCSV, saveJSON, getFileName} from './../../../../utils/file';
 import {Page} from 'puppeteer';
@@ -5,7 +6,6 @@ import {Cluster} from 'puppeteer-cluster';
 import {TSearchResult} from '../doNetCompare/compareData';
 import {searchDoProperty} from '../doNetCompare/searchDoProperty';
 import {IAction, IProperty} from '../types';
-import {dlJSON, dlPortalCheck, kintoneAppId} from '../config';
 import {logger} from '../../../../utils';
 import _ from 'lodash';
 import {saveToExcel} from '../excelTask/saveToExcel';
@@ -87,7 +87,7 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   const doComparedDt = await handleDonetCompare(cluster, intermediateResults);
   await saveJSON(getFileName({
     appId: kintoneAppId,
-    dir: dlJSON,
+    dir: resultJSONPath,
     suffix: '-doComparedDt-' + doComparedDt.length.toString(),
   }), doComparedDt);
 
@@ -127,7 +127,7 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   // Save final result to JSON
   await saveJSON(getFileName({
     appId: kintoneAppId,
-    dir: dlJSON,
+    dir: resultJSONPath,
     suffix: filteredJSONFname,
   }), finalResults);
 
@@ -139,7 +139,7 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   // Save to CSV then upload to kintone
   const csvFile = await saveJSONToCSV(getFileName({
     appId: kintoneAppId,
-    dir: dlPortalCheck,
+    dir: resultCSVPath,
     suffix: `${finalResults.length.toString()}`,
   }), finalResults);
   logger.info(`Done saving to CSV. Starting to save to upload to kintone.`);

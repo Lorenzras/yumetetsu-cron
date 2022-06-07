@@ -2,8 +2,8 @@ import {load} from 'cheerio';
 import {Page} from 'puppeteer';
 import {getTextByXPath, logger} from '../../../../../utils';
 import {IHouse} from '../../types';
-import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
-import {webScraper} from '../helpers/webScraper';
+import {logErrorScreenshot} from '../../helpers/logErrorScreenshot';
+import {webScraper} from '../../helpers/webScraper';
 import {getDataEndpoint} from './helpers/getDataEndpoint';
 
 export const scrapeDtHousePage = async (

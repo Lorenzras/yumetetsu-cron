@@ -1,7 +1,7 @@
 import {Page} from 'puppeteer';
 import {extractPrice, logger} from '../../../../../utils';
 import {IHouse, THandleScraper} from '../../types';
-import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
+import {logErrorScreenshot} from '../../helpers/logErrorScreenshot';
 
 export const scrapeDtHouse: THandleScraper = async (
   page: Page,

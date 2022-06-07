@@ -1,7 +1,7 @@
 import {produce} from 'immer';
 import {Page} from 'puppeteer';
-import {extractNumber, extractPrice, logger} from '../../../../../utils';
-import {IHouse, ILot, IMansion, IProperty} from '../../types';
+import {extractNumber, extractPrice, logger} from '../../../../utils';
+import {IHouse, ILot, IMansion, IProperty} from '../types';
 import {logErrorScreenshot} from './logErrorScreenshot';
 
 export const webScraper = async <

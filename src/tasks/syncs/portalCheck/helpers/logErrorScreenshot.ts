@@ -1,8 +1,9 @@
+import {logsDatedPath} from './../../../../utils/logger';
 
 import path from 'path';
 import {Page} from 'puppeteer';
-import {getFileName, logger, saveFile} from '../../../../../utils';
-import {dlImg} from '../../config';
+import {getFileName, logger, saveFile} from '../../../../utils';
+
 
 /**
  * Saves the screenshot, message, and the page content.
@@ -13,7 +14,7 @@ import {dlImg} from '../../config';
  */
 export const logErrorScreenshot = async (page: Page, message: string) => {
   const filePath = getFileName({
-    dir: dlImg,
+    dir: logsDatedPath,
   });
   const fileName = path.basename(filePath);
 

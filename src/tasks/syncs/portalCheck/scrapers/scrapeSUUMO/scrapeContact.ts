@@ -1,7 +1,7 @@
 import {Page} from 'puppeteer';
 import {extractTel, logger} from '../../../../../utils';
 import {IProperty, THandleContactScraper} from '../../types';
-import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
+import {logErrorScreenshot} from '../../helpers/logErrorScreenshot';
 
 export const scrapeContact: THandleContactScraper = async (
   page: Page,

@@ -1,7 +1,7 @@
 import {logger} from '../../../../../utils';
 import {cityLists} from '../../config';
 import {THandlePrepareForm, TProperty} from '../../types';
-import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
+import {logErrorScreenshot} from '../../helpers/logErrorScreenshot';
 
 
 type TPropertyConvert = Record<TProperty, string>

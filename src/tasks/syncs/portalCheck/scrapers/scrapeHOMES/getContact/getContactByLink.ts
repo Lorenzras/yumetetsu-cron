@@ -6,7 +6,7 @@ import {Page} from 'puppeteer';
 
 import {scrapeContactNew} from './scrapeContactNew';
 
-import {logErrorScreenshot} from '../../helpers/logErrorScreenshot';
+import {logErrorScreenshot} from '../../../helpers/logErrorScreenshot';
 
 export const getContactByLink = async (page: Page, url: string) => {
   const initialVal = {

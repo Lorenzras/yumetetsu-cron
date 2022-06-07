@@ -1,7 +1,7 @@
 import {IMansion} from '../../types';
 import {Page} from 'puppeteer';
 import {logger} from '../../../../../utils';
-import {webScraper} from '../helpers/webScraper';
+import {webScraper} from '../../helpers/webScraper';
 import {handleNextPage} from './handleNextPage';
 
 export const scrapeDtMansionPage = async (page: Page) => {

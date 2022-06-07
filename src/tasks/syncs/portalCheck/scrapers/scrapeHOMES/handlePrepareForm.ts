@@ -1,7 +1,7 @@
 import {logger} from '../../../../../utils';
 import {cityLists} from '../../config';
 import {THandlePrepareForm, TProperty, TPropertyConvert} from '../../types';
-import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
+import {logErrorScreenshot} from '../../helpers/logErrorScreenshot';
 import {changePublishedRange} from './citiesForm/prepareForm';
 import {selectTargetCities} from './citiesForm/selectTargetCities';
 

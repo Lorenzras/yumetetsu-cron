@@ -1,6 +1,6 @@
 import {IHouse, ILot, IMansion, IProperty, TProperty} from '../types';
 import Excel, {Workbook} from 'exceljs';
-import {dlExcelResult, resultFileTemplate} from '../config';
+import {excelResultPath, resultFileTemplate} from '../config';
 import path from 'path';
 import {logger} from '../../../../utils/logger';
 import {spreadAddress} from '../../../../utils';
@@ -72,7 +72,7 @@ export const saveExcelResult = async (
   workbook: Workbook, fileName: string, length: number,
 ) => {
   const saveFolder = path.join(
-    dlExcelResult,
+    excelResultPath,
     `【JS】${format(new Date(), 'yyyy.MM.dd')}新着物件情報`);
 
   if (!fs.existsSync(saveFolder)) {

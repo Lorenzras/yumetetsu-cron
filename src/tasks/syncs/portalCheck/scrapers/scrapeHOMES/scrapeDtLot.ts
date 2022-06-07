@@ -1,7 +1,7 @@
 import {Page} from 'puppeteer';
 import {extractNumber, extractPrice, logger} from '../../../../../utils';
 import {ILot} from '../../types';
-import {webScraper} from '../helpers/webScraper';
+import {webScraper} from '../../helpers/webScraper';
 import {handleNextPage} from './handleNextPage';
 
 export const scrapeDtLotPage = async (page: Page) => {

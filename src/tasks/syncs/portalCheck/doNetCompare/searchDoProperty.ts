@@ -10,7 +10,7 @@ import {
   setPropertyTypes,
   TPropTypes} from '../../../common/doNet/pages/properties';
 import {cityLists} from '../config';
-import {logErrorScreenshot} from '../scrapers/helpers/logErrorScreenshot';
+import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
 import {IHouse, ILot, IMansion, IProperty, TProperty, TPropertyConvert} from '../types';
 import {compareData, TSearchResult} from './compareData';
 import {setLocation} from './setLocation';

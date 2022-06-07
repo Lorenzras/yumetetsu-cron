@@ -1,7 +1,7 @@
 import {logger} from './../../../../../utils/logger';
 import {Page} from 'puppeteer';
 import {IHouse} from '../../types';
-import {webScraper} from '../helpers/webScraper';
+import {webScraper} from '../../helpers/webScraper';
 import {handleNextPage} from './handleNextPage';
 
 export const scrapeDtHousePage = async (page: Page) => {

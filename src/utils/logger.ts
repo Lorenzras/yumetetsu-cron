@@ -5,7 +5,10 @@ import {logsPath} from './paths';
 const {combine, timestamp, json, prettyPrint} = format;
 import {format as dateFormat} from 'date-fns';
 
-const dateToday = dateFormat(new Date(), 'yyyy.MM.dd');
+export const logsDatedPath = path.join(
+  logsPath,
+  dateFormat(new Date(), 'yyyy.MM.dd'),
+);
 
 export const logger = winston.createLogger({
   level: 'info',
@@ -17,10 +20,14 @@ export const logger = winston.createLogger({
   transports: [
     new winston.transports.Console(),
     new winston.transports.File({
-      filename: path.join(logsPath, `error-${dateToday}.log`),
+      filename: path.join(
+        logsDatedPath, `error.log`,
+      ),
       level: 'error'}),
     new winston.transports.File({
-      filename: path.join(logsPath, `combined-${dateToday}.log`),
+      filename: path.join(
+        logsDatedPath, `combined.log`,
+      ),
     }),
   ],
   exceptionHandlers: [
