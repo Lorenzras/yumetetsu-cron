@@ -69,7 +69,8 @@ export const setLocation = async (
           // 3x click the field to simulate a person overwriting town field.
           logger.info(`${logSuffix} is typing town`);
           await page.click('#modal_town_name_autocomplete', {clickCount: 3});
-          return page.type('#modal_town_name_autocomplete', town);
+          await page.type('#modal_town_name_autocomplete', town);
+          logger.info(`${logSuffix} succesfully typed town.`);
         })
         .catch(async (err: any)=>{
           await page.click('#modal_clear_button', {delay: 1000}).catch(()=>true);
