@@ -116,15 +116,19 @@ export const saveFile = async (items: IProperty[], fileName: string) => {
 
 
 export const saveToExcel = async (items: IProperty[]) => {
-  if (!items.length) {
-    logger.warn('Result is empty. Stopping saveToExcel.');
-    return;
-  }
+  try {
+    if (!items.length) {
+      logger.warn('Result is empty. Stopping saveToExcel.');
+      return;
+    }
 
-  const groupByCity = getGroupByCity(items);
+    const groupByCity = getGroupByCity(items);
 
-  for (const [city, props] of Object.entries(groupByCity)) {
-    logger.info(`Processing Excel: ${city}`);
-    await saveFile(props, city);
+    for (const [city, props] of Object.entries(groupByCity)) {
+      logger.info(`Processing Excel: ${city}`);
+      await saveFile(props, city);
+    }
+  } catch (err: any) {
+    logger.error(`Error saving excel ${err.message}`);
   }
 };
