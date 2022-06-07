@@ -1,19 +1,20 @@
 import path from 'path';
+import {portalCheckPath} from '../../../utils';
 import {ILocations} from './types';
 
-export const dirPortalCheck = __dirname;
-export const dlPortalCheck = path.join(dirPortalCheck, 'data');
+
+export const dlPortalCheck = path.join(portalCheckPath, 'data');
 export const dlJSON = path.join(dlPortalCheck, 'json');
 
 export const dlExcelResult = process.env.ENVIRONMENT === 'prod' ?
   path.join('\\\\192.168.11.150', 'Data01', '★サポート共有', '【ポータル新着物件】') :
-  path.join(dlPortalCheck, 'excel');
+  path.join(portalCheckPath, 'excel');
 
 export const resultFileTemplate = path.join(
-  dirPortalCheck, 'excelTask', 'template.xlsx',
+  portalCheckPath, 'excelTask', 'template.xlsx',
 );
 
-export const dlImg = path.join(dirPortalCheck, 'errImg');
+export const dlImg = path.join(portalCheckPath, 'errImg');
 
 export const kintoneAppId = 199;
 

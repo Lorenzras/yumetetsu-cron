@@ -124,6 +124,7 @@ export const saveToExcel = async (items: IProperty[]) => {
   const groupByCity = getGroupByCity(items);
 
   for (const [city, props] of Object.entries(groupByCity)) {
+    logger.info(`Processing Excel: ${city}`);
     await saveFile(props, city);
   }
 };
