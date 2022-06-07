@@ -125,7 +125,7 @@ export const searchDoProperty = async ({
 
       return comparedData;
     }, {
-      retries: 5,
+      retries: 3,
 
       onRetry: async (e, attempt) => {
         logger.warn(`${logSuffix} retried ${attempt} times to compare data.  ${e.message}`);
