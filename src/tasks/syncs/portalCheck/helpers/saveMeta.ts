@@ -1,9 +1,9 @@
+import {resolveResultDir, cityLists, excelResultPath} from './../config';
 import {format} from 'date-fns';
 import {logsDatedPath} from './../../../../utils/logger';
 import {saveFile, spreadAddress} from '../../../../utils';
 import {IProperty} from './../types';
 import path from 'path';
-import {cityLists, excelResultPath} from '../config';
 import beautify from 'json-beautify';
 export const saveMeta = (
   beforeGetContact: IProperty[],
@@ -139,5 +139,5 @@ export const saveMeta = (
   }, null as any, 2, 80);
 
   saveFile(path.join(logsDatedPath, 'meta.json'), prettyResult );
-  saveFile(path.join(excelResultPath, 'meta.json'), prettyResult );
+  saveFile(path.join(resolveResultDir(), 'meta.json'), prettyResult );
 };

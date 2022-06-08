@@ -1,6 +1,8 @@
+import {
+  resolveResultDir,
+  resultFileTemplate} from './../config';
 import {IHouse, ILot, IMansion, IProperty, TProperty} from '../types';
 import Excel, {Workbook} from 'exceljs';
-import {excelResultPath, resultFileTemplate} from '../config';
 import path from 'path';
 import {logger} from '../../../../utils/logger';
 import {spreadAddress} from '../../../../utils';
@@ -71,9 +73,7 @@ export const extractRows = (items: UProperty) => {
 export const saveExcelResult = async (
   workbook: Workbook, fileName: string, length: number,
 ) => {
-  const saveFolder = path.join(
-    excelResultPath,
-    `【JS】${format(new Date(), 'yyyy.MM.dd')}新着物件情報`);
+  const saveFolder = resolveResultDir();
 
   if (!fs.existsSync(saveFolder)) {
     fs.mkdirSync(saveFolder, {recursive: true});
