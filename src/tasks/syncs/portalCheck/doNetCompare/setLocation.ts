@@ -31,13 +31,7 @@ export const setLocation = async (
 
     logger.info(`${logSuffix} is setting prefecture.`);
     await Promise.all([
-      /* page.waitForResponse((resp) => {
-        return resp.url().includes('/list') &&
-        resp.status() === 200;
-      }, {timeout: 10000}).catch(()=>{
-        logger.warn(`${logSuffix} failed to retrieve m_city.`);
-      }), */
-      page.waitForNetworkIdle(),
+      page.waitForNetworkIdle({idleTime: 500}),
       selectByText(page, '#select_pref_id', pref ),
     ]);
 
