@@ -48,6 +48,8 @@ export const handleDownload = async (
 
     if (!result) return;
 
+    fs.existsSync(downloadDir) || fs.mkdirSync(downloadDir, {recursive: true});
+
     const filePath = path.join(
       downloadDir,
       format(new Date(), `${appId}-yyyyMMdd-HHmmss`),

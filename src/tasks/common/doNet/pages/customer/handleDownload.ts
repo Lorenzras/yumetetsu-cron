@@ -1,13 +1,14 @@
 
 import {Page} from 'puppeteer';
 import fs from 'fs';
-import {dumpPath, logger, notifyDev} from '../../../../../utils';
+import {csvPath, dumpPath, logger, notifyDev} from '../../../../../utils';
 import {custDlDir} from '../../config';
 import path from 'path';
 import {format} from 'date-fns';
 import {APP_IDS} from '../../../../../api/kintone';
 import iconv from 'iconv-lite';
 import {nanoid} from 'nanoid/non-secure';
+import {donetDownloadPath} from '../../../../syncs/doNet/config';
 
 
 /**
@@ -15,6 +16,7 @@ import {nanoid} from 'nanoid/non-secure';
  *
  * @param page
  * @return {string} data
+ * @deprecated in favor of donet/helpers/handleDownload
  */
 export const handleDownload = async (page: Page) => {
   logger.info(`Download path is ${custDlDir}`);
@@ -41,7 +43,7 @@ export const handleDownload = async (page: Page) => {
     );
 
     const filePath = path.join(
-      dumpPath,
+      donetDownloadPath,
       format(new Date(), `${APP_IDS.customers}-yyyyMMdd-HHmmss`),
     ) + `-${nanoid(5)}.csv`;
 
