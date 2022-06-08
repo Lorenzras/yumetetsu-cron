@@ -23,7 +23,12 @@ export const changePublishedRange = async (page: Page) => {
       // page.waitForResponse((r) => r.url() === 'https://t.karte.io/track' && r.status() === 200),
     ]);
 
-    await page.waitForSelector('#prg-loadingIcon', {hidden: true});
+    // await page.waitForSelector('#prg-loadingIcon', {hidden: true});
+
+    await Promise.race([
+      page.waitForSelector('#prg-loadingIcon', {hidden: true}),
+      page.waitForSelector('.mod-noSearchResult'),
+    ]);
     await page.waitForSelector('.homes-ui-notifier-totalhits', {hidden: true});
 
     logger.info(`Loading icon is gone.`);
