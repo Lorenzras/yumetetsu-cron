@@ -3,7 +3,7 @@ import {logsDatedPath} from './../../../../utils/logger';
 import {saveFile, spreadAddress} from '../../../../utils';
 import {IProperty} from './../types';
 import path from 'path';
-import {cityLists} from '../config';
+import {cityLists, excelResultPath} from '../config';
 import beautify from 'json-beautify';
 export const saveMeta = (
   beforeGetContact: IProperty[],
@@ -130,12 +130,14 @@ export const saveMeta = (
     },
   } as Record<string, any>);
 
-
-  saveFile(path.join(logsDatedPath, 'meta.json'), beautify({
+  const prettyResult = beautify({
     日時: format(new Date(), 'yyyy.MM.dd HH:mm:ss'),
     取得件数: totalLength,
     結果件数: resultLength,
     ...rawDetails,
     ...processedDetails,
-  }, null as any, 2, 80) );
+  }, null as any, 2, 80);
+
+  saveFile(path.join(logsDatedPath, 'meta.json'), prettyResult );
+  saveFile(path.join(excelResultPath, 'meta.json'), prettyResult );
 };
