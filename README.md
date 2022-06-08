@@ -2,6 +2,9 @@
 
 [日本語版](README.ja.md)
 
+This project is a collection of automation projects
+for Yumetetsu and Cocosumo written in Typescript.
+
 - [Yumecoco CronJobs](#yumecoco-cronjobs)
   - [Usage](#usage)
   - [Settings](#settings)
@@ -10,8 +13,6 @@
   - [Paths](#paths)
   - [Definition of Terms](#definition-of-terms)
 
-This project is a monorepo of automation
-for Yumetetsu and Cocosumo written in Typescript.
 
 ## Usage
 
