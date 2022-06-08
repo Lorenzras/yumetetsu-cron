@@ -6,7 +6,7 @@ import {Cluster} from 'puppeteer-cluster';
 import {Page} from 'puppeteer';
 import fs from 'fs';
 import path from 'path';
-import {dlJSON} from './config';
+
 import {saveToExcel} from './excelTask/saveToExcel';
 import {IProperty} from './types';
 import {handleGetCompanyDetails} from './clusterTasks/handleGetCompanyDetails';
@@ -18,9 +18,10 @@ import {
 import {
   yahooActions as actionsYahoo,
 } from './scrapers/scrapeYahoo/yahooActions';
+import {resultJSONPath} from './config';
 
 const getJSONData = (fName: string) => {
-  const res = fs.readFileSync(path.join(dlJSON, fName), 'utf8');
+  const res = fs.readFileSync(path.join(resultJSONPath, fName), 'utf8');
   return JSON.parse(res);
 };
 

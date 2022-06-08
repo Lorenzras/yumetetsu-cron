@@ -13,8 +13,12 @@ test(('yahooActions'), async () => {
       nextIdx: 0,
     };
     do {
-      state = await actions
+      const formState = await actions
         .handlePrepareForm(page, actions.pref, actions.type, state.nextIdx);
+      if (typeof formState === 'boolean') return;
+
+      state = formState;
+
       if (state.success) {
         const datas = await actions.handleScraper(page);
         for (const prop of datas) {
