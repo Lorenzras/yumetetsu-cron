@@ -26,12 +26,12 @@ const getJSONData = (fName: string) => {
 };
 
 describe('portalCheckMainProcess', ()=>{
-  test('main', async ()=>{
+  it('mainprocess', async ()=>{
     await portalCheckMainTask();
     expect(true);
   }, browserTimeOut);
 
-  test('lite', async ()=>{
+  it('lite', async ()=>{
     const cluster: Cluster<{page: Page}> = await initCluster();
     const actions = [
       actionsHOMES()[1],
@@ -48,7 +48,7 @@ describe('portalCheckMainProcess', ()=>{
     await cluster.close();
   }, browserTimeOut);
 
-  test('contacts', async ()=>{
+  it('contacts', async ()=>{
     // 失敗したものを取得させる
     const jsonFName = '199-20220606-120516-TFVph--finalResults-2435.json';
     const cluster: Cluster<{page: Page}> = await initCluster();

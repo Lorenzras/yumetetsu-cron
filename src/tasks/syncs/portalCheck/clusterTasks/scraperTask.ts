@@ -74,7 +74,9 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   };
 
 
-  // Main thread emitter
+  /**
+   * Stores all scraped properties from designated actions.
+   */
   const intermediateResults = (await Promise.all(
     shuffledActions.map(async (action) => {
       return await handleAction(action);
@@ -82,18 +84,23 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   )).flat();
 
   const totalScrapeLength = intermediateResults.length;
-
   logger.info(`Scraped results ${totalScrapeLength}. Starting to compare to doNet.`);
-  // Compare to donet then save.
+
+  /**
+   * Stores properties that were collated with donetwork
+   */
   const doComparedDt = await handleDonetCompare(cluster, intermediateResults);
   await saveJSON(getFileName({
     appId: kintoneAppId,
     dir: resultJSONPath,
     suffix: '-doComparedDt-' + doComparedDt.length.toString(),
   }), doComparedDt);
-
   logger.info(`Done comparing to donet. Starting to filter.`);
-  // Filter data
+
+  /**
+   * Stores filtered properties that do not exist in donetwork and
+   * those that exist but with price diffence.
+   */
   const filteredData = doComparedDt.filter((dt)=>{
     return (
       !dt.DO管理有無 ||
@@ -101,18 +108,22 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
       (dt.DO管理有無 === '有' && +(dt.DO価格差 ?? 0) !== 0)
     );
   });
-
   const filteredDataLength = filteredData.length;
 
   logger.info(`Filtered results ${filteredDataLength}. Starting to scrape contact. `);
   // Scrape company info
 
+  /**
+   * Stores properties with contact information.
+   * This shuffles the array prior to processing
+   * to minimize simultaneous request against a single site.
+   */
   const finalResults = await Promise.all(
     _.shuffle(filteredData)
       .map(async (data, idx) => {
         try {
-          return await cluster.execute(({page})=>{
-            logger.info(`Fetching contact: ${idx + 1} of ${filteredDataLength} rows.`);
+          return await cluster.execute(({page, worker})=>{
+            logger.info(`${worker.id} is fetching contact: ${idx + 1} of ${filteredDataLength} rows.`);
             return handleGetCompanyDetails(page, data);
           }) as Promise<IProperty>;
         } catch (err: any) {
