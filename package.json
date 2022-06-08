@@ -69,6 +69,7 @@
     "iconv-lite": "^0.6.3",
     "immer": "^9.0.14",
     "json-2-csv": "^3.17.1",
+    "json-beautify": "^1.1.1",
     "libphonenumber-js": "^1.10.4",
     "lodash": "^4.17.21",
     "nanoid": "^3.3.1",
