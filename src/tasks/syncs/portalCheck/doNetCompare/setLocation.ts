@@ -19,7 +19,7 @@ export const setLocation = async (
   const {pref, city, town} = data;
   await retry(async ()=>{
     // Test reset in case of retrying
-    await page.click('#modal_clear_button', {delay: 1000}).catch(()=>true);
+    await page.click('#modal_clear_button').catch(()=>true);
 
     logger.info(`${logSuffix} is opening location modal.`);
 
@@ -30,11 +30,8 @@ export const setLocation = async (
 
 
     logger.info(`${logSuffix} is setting prefecture.`);
-    await Promise.all([
-      page.waitForNetworkIdle({idleTime: 500}),
-      selectByText(page, '#select_pref_id', pref ),
-    ]);
-
+    await selectByText(page, '#select_pref_id', pref ),
+    await page.waitForNetworkIdle({idleTime: 500}),
 
     logger.info(`${logSuffix} is setting city`);
     await page.click('#modal_city_name_autocomplete', {clickCount: 3});
