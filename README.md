@@ -13,7 +13,6 @@ for Yumetetsu and Cocosumo written in Typescript.
   - [Paths](#paths)
   - [Definition of Terms](#definition-of-terms)
 
-
 ## Usage
 
 1. Run the following commands in order on the root folder.
