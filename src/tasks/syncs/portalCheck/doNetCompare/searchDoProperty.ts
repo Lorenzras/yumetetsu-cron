@@ -34,6 +34,7 @@ export const selectByText = async (
   text: string,
 ) => {
   await page.waitForSelector(`${selector} option`);
+  logger.info(`${selector} appeared.`);
   const prefId = await page.$eval(selector, (el, text) => {
     const prefId = $(el)
       .children(`option:contains(${text})`).val() as string;
@@ -42,7 +43,9 @@ export const selectByText = async (
     return prefId;
   }, text);
 
+
   await page.select(selector, prefId);
+  logger.info(`Selected  ${prefId} at ${selector}.`);
 };
 
 const setLotArea = async (page: Page, area: string) => {

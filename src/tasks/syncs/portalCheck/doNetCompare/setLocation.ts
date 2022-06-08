@@ -30,11 +30,13 @@ export const setLocation = async (
 
     logger.info(`${logSuffix} is setting prefecture.`);
     await Promise.all([
-      selectByText(page, '#select_pref_id', pref ),
       page.waitForResponse((resp) => {
-        return resp.url().includes('https://manage.do-network.com/m_city/list') &&
+        return resp.url().includes('https://manage.do-network.com/m_town/list') &&
         resp.status() === 200;
-      }, {timeout: 10000}).catch(),
+      }, {timeout: 10000}).catch(()=>{
+        logger.warn(`${logSuffix} failed to retrieve m_city.`);
+      }),
+      selectByText(page, '#select_pref_id', pref ),
     ]);
 
     logger.info(`${logSuffix} is setting city`);
@@ -54,7 +56,7 @@ export const setLocation = async (
         page.waitForResponse((resp) => {
           return resp.url().includes('https://manage.do-network.com/m_town/list') &&
            resp.status() === 200;
-        }).catch(()=>true),
+        }).catch(()=>logger.warn(`${logSuffix} failed to retrieve m_town.`)),
       ]);
 
       // Click/Focus to trigger populate when trigger blur event failed due to network lag.
