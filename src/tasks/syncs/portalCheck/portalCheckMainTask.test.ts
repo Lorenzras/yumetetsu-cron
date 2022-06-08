@@ -28,7 +28,7 @@ const getJSONData = (fName: string) => {
 describe('portalCheckMainProcess', ()=>{
   test('main', async ()=>{
     await portalCheckMainTask();
-    expect('');
+    expect(true);
   }, browserTimeOut);
 
   test('lite', async ()=>{
