@@ -10,22 +10,23 @@
   - [Paths](#paths)
   - [Definition of Terms](#definition-of-terms)
 
-
 This project is a monorepo of automation
 for Yumetetsu and Cocosumo written in Typescript.
 
 ## Usage
 
-1. Run the following commands on the root folder.
+1. Run the following commands in order on the root folder.
 
    ```bash
    git fetch
+   npm i
    npm run build
    ```
 
 2. Execute **start.bat** at the root folder.
 
 3. Done. Jobs will now be automatically executed according to
+
 
 ## Settings
 
