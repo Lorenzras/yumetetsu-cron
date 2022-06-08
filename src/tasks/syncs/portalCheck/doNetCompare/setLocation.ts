@@ -19,9 +19,10 @@ export const setLocation = async (
   const {pref, city, town} = data;
   await retry(async ()=>{
     // Test reset in case of retrying
-    // await page.click('#modal_clear_button').catch(()=>true);
+    await page.click('#modal_clear_button', {delay: 1000}).catch(()=>true);
 
     logger.info(`${logSuffix} is opening location modal.`);
+
 
     /* Open modal */
     await page.waitForSelector('#select_button_city1');
@@ -30,19 +31,22 @@ export const setLocation = async (
 
     logger.info(`${logSuffix} is setting prefecture.`);
     await Promise.all([
-      page.waitForResponse((resp) => {
-        return resp.url().includes('https://manage.do-network.com/m_town/list') &&
+      /* page.waitForResponse((resp) => {
+        return resp.url().includes('/list') &&
         resp.status() === 200;
       }, {timeout: 10000}).catch(()=>{
         logger.warn(`${logSuffix} failed to retrieve m_city.`);
-      }),
+      }), */
+      page.waitForNetworkIdle(),
       selectByText(page, '#select_pref_id', pref ),
     ]);
+
 
     logger.info(`${logSuffix} is setting city`);
     await page.click('#modal_city_name_autocomplete', {clickCount: 3});
     await page.type('#modal_city_name_autocomplete', city);
 
+    // throw new Error('test');
     if (town) {
       // On slow or laggy computers, donet's town API takes a very long time to respond so
       // I addressing it with the following lines
@@ -75,8 +79,6 @@ export const setLocation = async (
           logger.info(`${logSuffix} succesfully typed town.`);
         })
         .catch(async (err: any)=>{
-          await page.click('#modal_clear_button', {delay: 1000}).catch(()=>true);
-          await page.waitForSelector('#modal_clear_button', {hidden: true});
           throw new Error(`${logSuffix} failed to type town, clicking clear. ${err.message}`);
         });
     }
@@ -91,5 +93,7 @@ export const setLocation = async (
     onRetry: async (e, tries) => {
       logger.warn(`${logSuffix} retried ${tries} time/s in retrying to populate location form. ${e.message}`);
     },
+    maxTimeout: 1000,
+    minTimeout: 500,
   });
 };
