@@ -78,12 +78,12 @@ export const getContactLink = async (
     // 「こちら」のリンクがある場合
     if (info.link !== 'なし' && info.link) {
       // リンク先にジャンプする
-      await Promise.all([
-        page.goto(info.link, {waitUntil: 'domcontentloaded'}),
-        page.waitForNavigation(),
-      ]);
+    
+      await page.goto(info.link, {waitUntil: 'domcontentloaded'});
+  
 
       // 企業情報を取得する
+      await page.waitForSelector(".bkdt-shop-name")
       info = await page.evaluate((info) => {
         const kigyoumei = $('.bkdt-shop-name').children('em').text();
         const tel = $('.bkdt-shop-name ~ ul')
