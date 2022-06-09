@@ -1,7 +1,12 @@
 import {browserTimeOut} from '../../../common/browser/config';
 import {getGroupByCity, saveToExcel} from './saveToExcel';
-import jsonData from './test/199-20220531-063130-XVAu1.json';
+import jsonData from './../../../../../downloads/json/portalCheck/199-20220608-235456-N5T8V--finalResults-2426.json';
 import {IProperty} from './../types';
+import path from 'path';
+import { resultJSONPath } from '../config';
+
+
+
 
 describe('SaveToExcel', ()=>{
   test('main', async ()=>{

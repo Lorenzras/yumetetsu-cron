@@ -7,6 +7,7 @@ import {Page} from 'puppeteer';
 import fs from 'fs';
 import path from 'path';
 
+
 import {saveToExcel} from './excelTask/saveToExcel';
 import {IProperty} from './types';
 import {handleGetCompanyDetails} from './clusterTasks/handleGetCompanyDetails';
@@ -19,6 +20,8 @@ import {
   yahooActions as actionsYahoo,
 } from './scrapers/scrapeYahoo/yahooActions';
 import {resultJSONPath} from './config';
+import { saveMeta } from './helpers/saveMeta';
+import { logger } from '../../../utils';
 
 const getJSONData = (fName: string) => {
   const res = fs.readFileSync(path.join(resultJSONPath, fName), 'utf8');
@@ -50,13 +53,24 @@ describe('portalCheckMainProcess', ()=>{
 
   it('contacts', async ()=>{
     // 失敗したものを取得させる
-    const jsonFName = '199-20220606-120516-TFVph--finalResults-2435.json';
+    const jsonFName = '199-20220609-035919-2E3du--doComparedDt-5231.json';
     const cluster: Cluster<{page: Page}> = await initCluster();
     const data: IProperty[] = getJSONData(jsonFName);
+    const filteredData = data
+    .filter((dt)=>{
+      return (
+        !dt.DO管理有無 ||
+        dt.DO管理有無 === '無' ||
+        (dt.DO管理有無 === '有' && +(dt.DO価格差 ?? 0) !== 0)
+      );
+    })
 
-    const newData = await Promise.all(data.map(async (item) => {
+    const filterDataLength = filteredData.length
+    const newData = await Promise.all(_.shuffle(filteredData)
+      .map(async (item, idx) => {
       if (!item.掲載企業TEL?.trim()) {
-        return await cluster.execute(({page}) => {
+        return await cluster.execute(({page, worker}) => {
+          logger.info(`Worker ${worker.id} at ${idx} of ${filterDataLength} is fetching contact from ${item.リンク}`)
           return handleGetCompanyDetails(page, item);
         }) as IProperty;
       }
@@ -65,8 +79,8 @@ describe('portalCheckMainProcess', ()=>{
     }));
 
     await saveToExcel(newData);
-    console.log(newData.filter((item)=>!item.掲載企業TEL?.trim()).length);
-
+    saveMeta(data,newData )
+ 
     // saveToExcel(data)
     await cluster.idle();
     await cluster.close();

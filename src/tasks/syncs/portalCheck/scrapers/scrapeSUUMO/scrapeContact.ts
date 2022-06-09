@@ -27,6 +27,24 @@ export const getContactLink = async (
     await page.goto(url, {waitUntil: 'domcontentloaded'});
     //  page.waitForNavigation(),
     // ]);
+    await Promise.race([
+      page.waitForSelector(".btnRequest.jscBukkenshiryou"),
+      page.waitForSelector(".error_content-inner-pc"),
+      page.waitForSelector('img[src*="suumo_gomen"]'),
+      page.waitForSelector('table[summary="表"]')
+    ]).catch(()=>{
+      logger.error("SUUMO scrapeContact failed to resolve any of the selectors.")
+    })
+
+    if(!await page.$(".btnRequest.jscBukkenshiryou")){
+      return {
+        階数: '',
+        link: 'なし',
+        掲載企業: 'ページ無くなった',
+        掲載企業TEL: 'ページ無くなった',
+      };
+    }
+
 
     let info = await page.evaluate(() => {
       // マンションのみ、「所在階」を取得し、物件名に追加する
