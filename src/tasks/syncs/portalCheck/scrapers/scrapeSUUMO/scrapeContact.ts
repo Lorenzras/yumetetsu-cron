@@ -23,10 +23,8 @@ export const getContactLink = async (
   try {
     // 物件詳細ページを表示する
 
-    // await Promise.all([
     await page.goto(url, {waitUntil: 'domcontentloaded'});
-    //  page.waitForNavigation(),
-    // ]);
+
     await Promise.race([
       page.waitForSelector(".btnRequest.jscBukkenshiryou"),
       page.waitForSelector(".error_content-inner-pc"),
