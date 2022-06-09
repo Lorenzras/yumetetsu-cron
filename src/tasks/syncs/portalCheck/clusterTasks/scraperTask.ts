@@ -155,6 +155,7 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     suffix: `${finalResults.length.toString()}`,
   }), finalResults);
   logger.info(`Done saving to CSV. Starting to save to upload to kintone.`);
+  saveMeta(intermediateResults, finalResults);
 
   if (csvFile) {
     try {
@@ -167,6 +168,6 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     logger.info(`Did not upload to kintone. CSV file was empty.`);
   }
 
-  saveMeta(intermediateResults, finalResults);
+
   return finalResults;
 };

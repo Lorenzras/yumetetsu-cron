@@ -36,16 +36,17 @@ export const getContactByLink = async (page: Page, url: string) => {
           {visible: true, timeout: 30000})
         .then(()=>2),
       page
-        .waitForSelector('.mod-notFoundMsg',
+        .waitForSelector(
+          '.mod-notFoundMsg, .mod-bukkenNotFound, .mod-expiredInformation',
           {visible: true, timeout: 20000})
         .then(()=> 3),
 
     ]);
 
     switch (task) {
-      case 0: return scrapeSingleContact(page);
-      case 1: return scrapeSingleContactLot(page);
-      case 2: return scrapeContactNew(page);
+      case 0: return await scrapeSingleContact(page);
+      case 1: return await scrapeSingleContactLot(page);
+      case 2: return await scrapeContactNew(page);
       case 3: return {
         掲載企業: '取得失敗 3',
         掲載企業TEL: '取得失敗 3',

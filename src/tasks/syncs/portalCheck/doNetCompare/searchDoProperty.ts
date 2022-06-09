@@ -91,6 +91,7 @@ export const searchDoProperty = async ({
         page.waitForSelector('body div', {hidden: true}),
         page.waitForSelector('.error_navi td#error_area'),
       ]);
+
       logger.info(`${logSuffix} is starting donet compare.`);
       if (!await page.$('#m_estate_filters_fc_shop_id option')) {
         await login(page);
@@ -131,7 +132,6 @@ export const searchDoProperty = async ({
       retries: 3,
 
       onRetry: async (e, attempt) => {
-        await page.reload();
         logger.warn(`${logSuffix} retried ${attempt} times to compare data.  ${e.message}`);
       },
     });
