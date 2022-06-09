@@ -21,7 +21,7 @@ import {
 } from './scrapers/scrapeYahoo/yahooActions';
 import {resultJSONPath} from './config';
 import { saveMeta } from './helpers/saveMeta';
-import { logger } from '../../../utils';
+import { logger, sleep } from '../../../utils';
 
 const getJSONData = (fName: string) => {
   const res = fs.readFileSync(path.join(resultJSONPath, fName), 'utf8');
@@ -37,7 +37,7 @@ describe('portalCheckMainProcess', ()=>{
   it('lite', async ()=>{
     const cluster: Cluster<{page: Page}> = await initCluster();
     const actions = [
-      actionsHOMES()[1],
+      ...actionsHOMES(),
       // ...actionsAtHome(),
       // ...actionsSUUMO(),
       // ...actionsYahoo(),
@@ -45,7 +45,7 @@ describe('portalCheckMainProcess', ()=>{
     ];
 
     await scraperTask(actions, cluster);
-
+    await sleep(10000);
 
     await cluster.idle();
     await cluster.close();
@@ -81,6 +81,7 @@ describe('portalCheckMainProcess', ()=>{
     await saveToExcel(newData);
     saveMeta(data,newData )
  
+    await sleep(10000);
     // saveToExcel(data)
     await cluster.idle();
     await cluster.close();
