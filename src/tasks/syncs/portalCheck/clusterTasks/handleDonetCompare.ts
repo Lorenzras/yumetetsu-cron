@@ -26,6 +26,7 @@ export const saveCookie = async (page: Page, workerId: number) => {
 
 export const setCookie = async (page: Page, workerId: number) => {
   logger.info(`Worker ${workerId} is setting cookie to page.`);
+
   try {
     const cookiePath = cookieFile(workerId);
     const cookiesString = fs.readFileSync(cookiePath, 'utf8');

@@ -8,13 +8,17 @@ import {
   portalCheckMainTask,
 } from './tasks/syncs/portalCheck/portalCheckMainTask';
 
+const options = {
+  scheduled: true,
+  timezone: 'Asia/Tokyo',
+};
 
 /**
  * Portal Check.
  *
  * At 04:00.
  */
-cron.schedule('20 9 * * *', () => portalCheckMainTask());
+cron.schedule('44 12 * * *', () => portalCheckMainTask(), options);
 
 /**
  * Still alive log.
