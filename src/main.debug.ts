@@ -18,7 +18,7 @@ const options = {
  *
  * At 04:00.
  */
-cron.schedule('44 12 * * *', () => portalCheckMainTask(), options);
+cron.schedule('22 22 * * *', () => portalCheckMainTask(), options);
 
 /**
  * Still alive log.
