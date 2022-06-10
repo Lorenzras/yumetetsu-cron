@@ -45,16 +45,6 @@ export const scrapeDtLot: THandleScraper = async (
   } catch (error: any) {
     await logErrorScreenshot(page,
       `土地のスクレイピングに失敗しました。${page.url()} ${error.message}`);
-    return ([{
-      物件種別: '土地',
-      物件番号: '取得失敗',
-      物件名: '取得失敗',
-      リンク: '取得失敗',
-      所在地: '取得失敗',
-      販売価格: '取得失敗',
-      比較用価格: 0,
-      土地面積: '取得失敗',
-      比較用土地面積: 0,
-    }]);
+    return [];
   }
 };

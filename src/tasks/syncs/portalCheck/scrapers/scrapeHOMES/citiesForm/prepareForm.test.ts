@@ -6,7 +6,7 @@ import {openMockBrowserPage} from './../../../../../common/browser/openBrowser';
 describe('Form', ()=>{
   test('main', async ()=>{
     const page = await openMockBrowserPage();
-    await prepareForm(page, Object.keys(cityLists.愛知県));
+    await prepareForm(page, Object.keys(cityLists.岐阜県));
     page.browser().disconnect();
   }, browserTimeOut);
 

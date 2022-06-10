@@ -18,17 +18,21 @@ export const scrapeLoop =
         nextButton = await page.$x(`//a[contains(text(), "次へ")]`)
           .then(([next]) => next);
         result = [...result, ...await func(page)];
+        logger.info(`Scraped ${result.length} items. ${page.url()}`);
         // 次へをクリックする
         if (nextButton) {
+          logger.info(`Clicking next at ${page.url()}`);
           await Promise.all([
             nextButton.click(),
-            page.waitForNavigation({waitUntil: 'networkidle2'})
-            .catch(()=> {throw new Error("Failed to navigated after clicking next.")}),
+            page.waitForNavigation({waitUntil: 'domcontentloaded'})
+              .catch(()=> {
+                throw new Error('Failed to navigated after clicking next.');
+              }),
           ]);
+          logger.info(`Succesfully clicked next at ${page.url()}`);
         }
       } while (nextButton);
 
-      console.log(result.length);
       return result;
     } catch (error: any) {
       await logErrorScreenshot(page,
