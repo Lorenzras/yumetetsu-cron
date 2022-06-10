@@ -9,6 +9,7 @@ import {spreadAddress} from '../../../../utils';
 import fs from 'fs';
 import {format} from 'date-fns';
 import {formatResult} from './formatResult';
+import { saveMeta } from '../helpers/saveMeta';
 
 type UProperty = IProperty[] | IHouse[] | ILot[] | IMansion[]
 
@@ -123,6 +124,7 @@ export const saveToExcel = async (items: IProperty[]) => {
       logger.warn('Result is empty. Stopping saveToExcel.');
       return;
     }
+
 
     const groupByCity = getGroupByCity(items);
 

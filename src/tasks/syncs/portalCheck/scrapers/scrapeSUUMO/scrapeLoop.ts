@@ -22,7 +22,8 @@ export const scrapeLoop =
         if (nextButton) {
           await Promise.all([
             nextButton.click(),
-            page.waitForNavigation({waitUntil: 'networkidle2'}),
+            page.waitForNavigation({waitUntil: 'networkidle2'})
+            .catch(()=> {throw new Error("Failed to navigated after clicking next.")}),
           ]);
         }
       } while (nextButton);

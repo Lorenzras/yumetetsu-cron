@@ -34,7 +34,7 @@ export const getContactLink = async (
       logger.error("SUUMO scrapeContact failed to resolve any of the selectors.")
     })
 
-    if(!await page.$(".btnRequest.jscBukkenshiryou")){
+    if(!await page.$('table[summary="表"]')){
       return {
         階数: '',
         link: 'なし',

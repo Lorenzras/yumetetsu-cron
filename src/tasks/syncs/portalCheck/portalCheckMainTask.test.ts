@@ -56,7 +56,7 @@ describe('portalCheckMainProcess', ()=>{
 
   it('contacts', async ()=>{
     // 失敗したものを取得させる
-    const jsonFName = '199-20220609-035919-2E3du--doComparedDt-5231.json';
+    const jsonFName = '199-20220610-074022-QkBts--doComparedDt-5198.json';
     const cluster: Cluster<{page: Page}> = await initCluster();
     const data: IProperty[] = getJSONData(jsonFName);
     const filteredData = data
@@ -72,9 +72,9 @@ describe('portalCheckMainProcess', ()=>{
     const newData = await Promise.all(_.shuffle(filteredData)
       .map(async (item, idx) => {
         if (!item.掲載企業TEL?.trim()) {
-          return await cluster.execute(({page, worker}) => {
+          return await cluster.execute(async ({page, worker}) => {
             logger.info(`Worker ${worker.id} at ${idx} of ${filterDataLength} is fetching contact from ${item.リンク}`);
-            return handleGetCompanyDetails(page, item);
+            return await handleGetCompanyDetails(page, item);
           }) as IProperty;
         }
 
@@ -82,9 +82,9 @@ describe('portalCheckMainProcess', ()=>{
       }));
 
     await saveToExcel(newData);
-    saveMeta(data, newData );
+    saveMeta(data, newData)
 
-    await sleep(10000);
+    //await sleep(10000);
     // saveToExcel(data)
     await cluster.idle();
     await cluster.close();

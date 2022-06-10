@@ -26,10 +26,11 @@ export const getContactLink = async (
   url: string,
 ) => {
   // 物件詳細ページを表示する
-  await Promise.all([
+  await page.goto(url, {waitUntil: 'domcontentloaded'});
+ /*  await Promise.all([
     page.goto(url, {waitUntil: 'domcontentloaded'}),
     page.waitForNavigation(),
-  ]);
+  ]); */
 
   const info = url.indexOf('_corp') !== -1 ? getSingleLink(page) :
     url.indexOf('_ag') !== -1 ? getMultipleLink(page) :
