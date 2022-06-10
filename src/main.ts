@@ -9,7 +9,7 @@ import {
 } from './tasks/syncs/portalCheck/portalCheckMainTask';
 
 
-const options = {
+export const cronOptions = {
   scheduled: true,
   timezone: 'Asia/Tokyo',
 };
@@ -17,14 +17,14 @@ const options = {
 /**
  * Reminds about longterm customers every day at 9:30 am
  */
-cron.schedule('30 9 * * *', remindOnLongtermCust, options);
+cron.schedule('30 9 * * *', remindOnLongtermCust, cronOptions);
 
 /**
  * Full sync donet customers to kintone.
  *
  * At 22:00 on Sunday.
  */
-cron.schedule('0 22 * * Sun', () => syncDoNetCust(true), options);
+cron.schedule('0 22 * * Sun', () => syncDoNetCust(true), cronOptions);
 
 /**
  * Full sync donet customers to kintone.
@@ -39,7 +39,7 @@ cron.schedule('*/10 8-19 * * 1-6', () => syncDoNetCust());
  *
  * At 10:00.
  */
-cron.schedule('0 22 * * *', () => portalCheckMainTask(), options);
+cron.schedule('0 10 * * *', () => portalCheckMainTask(), cronOptions);
 
 /**
  * Still alive log.
