@@ -19,16 +19,14 @@ export const logErrorScreenshot = async (page: Page, message: string) => {
   const fileName = path.basename(filePath);
 
   try {
+    logger.error(`${message} ${fileName}` );
+    if (page.isClosed()) return;
+
     await page.screenshot({
       path: filePath + '.png',
     });
-    
-    logger.error(`${message} ${fileName}` );
     const body = await page.content();
-
     await saveFile(filePath + '.html', body);
-
-
   } catch (err: any) {
     logger.error(`Failed to save screenshot. ${fileName} ${err.message}` );
   }

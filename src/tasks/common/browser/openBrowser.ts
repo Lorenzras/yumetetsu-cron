@@ -9,7 +9,6 @@ import adblockerPlugin from 'puppeteer-extra-plugin-adblocker';
 puppeteer.use(stealthPlugin());
 puppeteer.use(adblockerPlugin({
   blockTrackers: true,
-  useCache: true,
 }));
 
 interface OpenBrowserParam {
