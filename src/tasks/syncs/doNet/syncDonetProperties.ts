@@ -20,7 +20,7 @@ const initCluster = async (
     puppeteer: getExtraPuppeteer(),
     concurrency,
     maxConcurrency,
-    timeout: 6000000,
+    timeout: 600000,
     retryLimit: 2,
     puppeteerOptions: {
       headless: false,

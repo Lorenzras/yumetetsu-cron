@@ -28,7 +28,9 @@ export const initCluster = () => Cluster.launch({
     headless: process.env.BROWSER_TYPE === 'HEADLESS',
     // args: minimalArgs,
   },
-  timeout: 1000 * 60 * 10,
+  retryLimit: 1,
+  retryDelay: 5000,
+  timeout: 1000 * 60 * 8,
 });
 
 /* const initFileWatcher = () => {

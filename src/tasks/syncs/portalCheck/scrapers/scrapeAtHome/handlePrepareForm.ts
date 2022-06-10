@@ -55,9 +55,6 @@ export const handlePrepareForm : THandlePrepareForm = async (
       page.waitForNavigation(),
     ]);
 
-    /* await page.waitForSelector('#item-list', {timeout: 300000})
-      .catch(()=> page.reload()); */
-
     return await Promise.race([
       page.waitForSelector('#item-list', {visible: true, timeout: 30000})
         .then(()=>true),
