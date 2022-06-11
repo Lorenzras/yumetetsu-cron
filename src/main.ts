@@ -1,4 +1,3 @@
-import {cronOptions} from './config/index';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
@@ -9,6 +8,8 @@ import {
   portalCheckMainTask,
 } from './tasks/syncs/portalCheck/portalCheckMainTask';
 import {logger} from './utils';
+import {cronOptions} from './config/index';
+
 
 /**
  * Reminds about longterm customers every day at 9:30 am
