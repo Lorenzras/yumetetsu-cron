@@ -1,3 +1,4 @@
+import {cronOptions} from './config/index';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
@@ -7,12 +8,7 @@ import {syncDoNetCust} from './tasks/syncs/';
 import {
   portalCheckMainTask,
 } from './tasks/syncs/portalCheck/portalCheckMainTask';
-
-
-export const cronOptions = {
-  scheduled: true,
-  timezone: 'Asia/Tokyo',
-};
+import {logger} from './utils';
 
 /**
  * Reminds about longterm customers every day at 9:30 am
@@ -37,12 +33,13 @@ cron.schedule('*/10 8-19 * * 1-6', () => syncDoNetCust());
 /**
  * Portal Check.
  *
- * At 10:00.
+ * At 22:00.
  */
-cron.schedule('0 10 * * *', () => portalCheckMainTask(), cronOptions);
+cron.schedule('0 22 * * *', () => portalCheckMainTask(), cronOptions);
 
 /**
  * Still alive log.
  */
 // cron.schedule('*/5 * * * * *', ()=> notifyDev(formattedTime() + ': Alive'));
 
+logger.info('MAIN CRON PROCESS RUNNING.');
