@@ -9,7 +9,7 @@ import {spreadAddress} from '../../../../utils';
 import fs from 'fs';
 import {format} from 'date-fns';
 import {formatResult} from './formatResult';
-import { saveMeta } from '../helpers/saveMeta';
+import {saveMeta} from '../helpers/saveMeta';
 
 type UProperty = IProperty[] | IHouse[] | ILot[] | IMansion[]
 
@@ -72,7 +72,9 @@ export const extractRows = (items: UProperty) => {
 };
 
 export const saveExcelResult = async (
-  workbook: Workbook, fileName: string, length: number,
+  workbook: Workbook,
+  fileName: string, length: number,
+  saveToNetWorkDrive = true,
 ) => {
   const saveFolder = resolveResultDir();
 
@@ -94,7 +96,11 @@ export const saveExcelResult = async (
 };
 
 
-export const saveFile = async (items: IProperty[], fileName: string) => {
+export const saveFile = async (
+  items: IProperty[],
+  fileName: string,
+  saveToNetWorkDrive = true,
+) => {
   const workbook = new Excel.Workbook();
   await workbook.xlsx.readFile(resultFileTemplate);
 
@@ -116,7 +122,9 @@ export const saveFile = async (items: IProperty[], fileName: string) => {
 };
 
 
-export const saveToExcel = async (items: IProperty[]) => {
+export const saveToExcel = async (
+  items: IProperty[],
+  saveToNetWorkDrive = true) => {
   logger.info(`Saving to excel.`);
 
   try {
@@ -130,7 +138,7 @@ export const saveToExcel = async (items: IProperty[]) => {
 
     for (const [city, props] of Object.entries(groupByCity)) {
       logger.info(`Processing Excel: ${city}`);
-      await saveFile(props, city);
+      await saveFile(props, city, saveToNetWorkDrive);
     }
     logger.info(`Done saving to excel. Starting to save to CSV.`);
   } catch (err: any) {

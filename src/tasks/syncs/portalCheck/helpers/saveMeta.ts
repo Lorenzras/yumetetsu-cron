@@ -1,6 +1,5 @@
-import {resolveResultDir, cityLists, excelResultPath} from './../config';
+import {resolveResultDir, cityLists} from './../config';
 import {format} from 'date-fns';
-import {logsDatedPath} from './../../../../utils/logger';
 import {saveFile, spreadAddress} from '../../../../utils';
 import {IProperty} from './../types';
 import path from 'path';
@@ -8,6 +7,7 @@ import beautify from 'json-beautify';
 export const saveMeta = (
   beforeGetContact: IProperty[],
   afterGetContact: IProperty[],
+  saveToNetWorkDrive = true,
 ) => {
   const totalLength = beforeGetContact.length;
   const resultLength = afterGetContact.length;
@@ -138,8 +138,9 @@ export const saveMeta = (
     ...processedDetails,
   }, null as any, 2, 80);
 
-  saveFile(path.join(logsDatedPath, 'meta.json'), prettyResult );
-  if (process.env.ENVIRONMENT === 'prod') {
-    saveFile(path.join(resolveResultDir(), 'meta.json'), prettyResult );
-  }
+
+  saveFile(
+    path.join(resolveResultDir(saveToNetWorkDrive), 'meta.json'),
+    prettyResult,
+  );
 };
