@@ -1,28 +1,28 @@
 /* eslint-disable max-len */
-import { scraperTask } from './clusterTasks/scraperTask';
-import { browserTimeOut } from '../../common/browser/config';
-import { initCluster, portalCheckMainTask } from './portalCheckMainTask';
+import {scraperTask} from './clusterTasks/scraperTask';
+import {browserTimeOut} from '../../common/browser/config';
+import {initCluster, portalCheckMainTask} from './portalCheckMainTask';
 import _ from 'lodash';
-import { Cluster } from 'puppeteer-cluster';
-import { Page } from 'puppeteer';
+import {Cluster} from 'puppeteer-cluster';
+import {Page} from 'puppeteer';
 import fs from 'fs';
 import path from 'path';
 
 
-import { saveToExcel } from './excelTask/saveToExcel';
-import { IProperty } from './types';
-import { handleGetCompanyDetails } from './clusterTasks/handleGetCompanyDetails';
-import { actionsHOMES } from './scrapers/scrapeHOMES';
-import { actionsAtHome } from './scrapers/scrapeAtHome/actionsAtHome';
+import {saveToExcel} from './excelTask/saveToExcel';
+import {IProperty} from './types';
+import {handleGetCompanyDetails} from './clusterTasks/handleGetCompanyDetails';
+import {actionsHOMES} from './scrapers/scrapeHOMES';
+import {actionsAtHome} from './scrapers/scrapeAtHome/actionsAtHome';
 import {
   suumoActions as actionsSUUMO,
 } from './scrapers/scrapeSUUMO/suumoActions';
 import {
   yahooActions as actionsYahoo,
 } from './scrapers/scrapeYahoo/yahooActions';
-import { resultJSONPath } from './config';
-import { saveMeta } from './helpers/saveMeta';
-import { logger, sleep } from '../../../utils';
+import {resultJSONPath} from './config';
+import {saveMeta} from './helpers/saveMeta';
+import {logger, sleep} from '../../../utils';
 
 const getJSONData = (fName: string) => {
   const res = fs.readFileSync(path.join(resultJSONPath, fName), 'utf8');
@@ -71,24 +71,18 @@ describe('portalCheckMainProcess', () => {
     const filterDataLength = filteredData.length;
     const newData = await Promise.all(_.shuffle(filteredData)
       .map(async (item, idx) => {
-
-        
-
-        return await cluster.execute(async ({ page, worker }) => {
+        return await cluster.execute(async ({page, worker}) => {
           logger.info(`Worker ${worker.id} at ${idx} of ${filterDataLength} is fetching contact from ${item.リンク}`);
-          const res = await handleGetCompanyDetails(page, item)
-          logger.info(`Worker ${worker.id} at ${idx} of ${filterDataLength} is DONE fetching contact from ${item.リンク}`)
+          const res = await handleGetCompanyDetails(page, item);
+          logger.info(`Worker ${worker.id} at ${idx} of ${filterDataLength} is DONE fetching contact from ${item.リンク}`);
           return res;
-          
         }) as IProperty;
-
-        
       }));
 
     await saveToExcel(newData);
-    saveMeta(data, newData)
+    saveMeta(data, newData);
 
-    //await sleep(10000);
+    // await sleep(10000);
     // saveToExcel(data)
     await cluster.idle();
     await cluster.close();

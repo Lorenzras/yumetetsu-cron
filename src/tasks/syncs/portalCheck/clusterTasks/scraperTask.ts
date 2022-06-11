@@ -16,10 +16,13 @@ import {saveMeta} from '../helpers/saveMeta';
 
 
 type TScraperTask = (
-  actions: IAction[], cluster: Cluster<{page: Page}>
+  actions: IAction[],
+  cluster: Cluster<{page: Page}>,
+  saveToNetWorkDrive?: boolean,
+
 ) => Promise<IProperty[]>
 
-export const scraperTask: TScraperTask = async (actions, cluster) => {
+export const scraperTask: TScraperTask = async (actions, cluster, saveToNetWorkDrive = true) => {
   // Shuffle actions to spread network traffic between sites.
   const shuffledActions = _.shuffle(actions);
 
@@ -145,7 +148,7 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
 
 
   // Final result Output
-  await saveToExcel(finalResults);
+  await saveToExcel(finalResults, saveToNetWorkDrive);
 
 
   // Save to CSV then upload to kintone
@@ -155,7 +158,7 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     suffix: `${finalResults.length.toString()}`,
   }), finalResults);
   logger.info(`Done saving to CSV. Starting to save to upload to kintone.`);
-  saveMeta(intermediateResults, finalResults);
+  saveMeta(intermediateResults, finalResults, saveToNetWorkDrive);
 
   if (csvFile) {
     try {
