@@ -54,6 +54,7 @@ export const handleDownloadCust = async (page: Page) => {
       fileWithAppId: filePath,
       keyField: 'custId',
     });
+    await deleteFile(filePath);
   }
 };
 
