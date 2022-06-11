@@ -139,5 +139,7 @@ export const saveMeta = (
   }, null as any, 2, 80);
 
   saveFile(path.join(logsDatedPath, 'meta.json'), prettyResult );
-  saveFile(path.join(resolveResultDir(), 'meta.json'), prettyResult );
+  if (process.env.ENVIRONMENT === 'prod') {
+    saveFile(path.join(resolveResultDir(), 'meta.json'), prettyResult );
+  }
 };
