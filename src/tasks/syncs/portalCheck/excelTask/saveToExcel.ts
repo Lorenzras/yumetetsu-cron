@@ -76,7 +76,7 @@ export const saveExcelResult = async (
   fileName: string, length: number,
   saveToNetWorkDrive = true,
 ) => {
-  const saveFolder = resolveResultDir();
+  const saveFolder = resolveResultDir(saveToNetWorkDrive);
 
   if (!fs.existsSync(saveFolder)) {
     fs.mkdirSync(saveFolder, {recursive: true});
@@ -118,13 +118,14 @@ export const saveFile = async (
     formatResult(ws, rows, props);
   });
 
-  await saveExcelResult(workbook, fileName, items.length);
+  await saveExcelResult(workbook, fileName, items.length, saveToNetWorkDrive);
 };
 
 
 export const saveToExcel = async (
   items: IProperty[],
-  saveToNetWorkDrive = true) => {
+  saveToNetWorkDrive = true,
+) => {
   logger.info(`Saving to excel.`);
 
   try {

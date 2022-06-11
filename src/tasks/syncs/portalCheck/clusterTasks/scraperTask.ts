@@ -125,10 +125,10 @@ export const scraperTask: TScraperTask = async (actions, cluster, saveToNetWorkD
     _.shuffle(filteredData)
       .map(async (data, idx) => {
         try {
-          return await cluster.execute(({page, worker})=>{
+          return await cluster.execute(async ({page, worker})=>{
             logger.info(`${worker.id} is fetching contact: ${idx + 1} of ${filteredDataLength} rows.`);
-            return handleGetCompanyDetails(page, data);
-          }) as Promise<IProperty>;
+            return await handleGetCompanyDetails(page, data);
+          }) as IProperty;
         } catch (err: any) {
           logger.error(`Unhandled error at fetchingContact ${data.リンク} ${err.message}`);
           return data;

@@ -2,6 +2,7 @@ import {Page} from 'puppeteer';
 import {extractTel, logger} from '../../../../../utils';
 import {IProperty, THandleContactScraper} from '../../types';
 import {logErrorScreenshot} from '../../helpers/logErrorScreenshot';
+import retry from 'async-retry';
 
 export const scrapeContact: THandleContactScraper = async (
   page: Page,
@@ -23,18 +24,30 @@ export const getContactLink = async (
   try {
     // 物件詳細ページを表示する
 
-    await page.goto(url, {waitUntil: 'domcontentloaded'});
+    await retry(async ()=>{
+      await page.goto(url, {waitUntil: 'domcontentloaded'});
+    }, {
+      retries: 3,
+      minTimeout: 5000,
+      maxTimeout: 10000,
+      onRetry: (e, attempts)=>{
+        logger.error(
+          `Retrying to navigate to ${url} with ${attempts} attempt/s`);
+      },
+    });
+
 
     await Promise.race([
-      page.waitForSelector(".btnRequest.jscBukkenshiryou"),
-      page.waitForSelector(".error_content-inner-pc"),
+      page.waitForSelector('.btnRequest.jscBukkenshiryou'),
+      page.waitForSelector('.error_content-inner-pc'),
       page.waitForSelector('img[src*="suumo_gomen"]'),
-      page.waitForSelector('table[summary="表"]')
+      page.waitForSelector('table[summary="表"]'),
     ]).catch(()=>{
-      logger.error("SUUMO scrapeContact failed to resolve any of the selectors.")
-    })
+      logger.error(
+        'SUUMO scrapeContact failed to resolve any of the selectors.');
+    });
 
-    if(!await page.$('table[summary="表"]')){
+    if (!await page.$('table[summary="表"]')) {
       return {
         階数: '',
         link: 'なし',
@@ -76,12 +89,22 @@ export const getContactLink = async (
     // 「こちら」のリンクがある場合
     if (info.link !== 'なし' && info.link) {
       // リンク先にジャンプする
-    
-      await page.goto(info.link, {waitUntil: 'domcontentloaded'});
-  
+
+      await retry(async ()=>{
+        await page.goto(info.link, {waitUntil: 'domcontentloaded'});
+      }, {
+        retries: 3,
+        minTimeout: 5000,
+        maxTimeout: 10000,
+        onRetry: (e, attempts)=>{
+          logger.error(
+            `Retrying to crawl to ${info.link} with ${attempts} attempt/s`);
+        },
+      });
+
 
       // 企業情報を取得する
-      await page.waitForSelector(".bkdt-shop-name")
+      await page.waitForSelector('.bkdt-shop-name');
       info = await page.evaluate((info) => {
         const kigyoumei = $('.bkdt-shop-name').children('em').text();
         const tel = $('.bkdt-shop-name ~ ul')
