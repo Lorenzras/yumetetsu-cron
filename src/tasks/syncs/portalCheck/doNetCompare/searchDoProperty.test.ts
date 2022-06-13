@@ -7,9 +7,7 @@ import {login} from '../../../common/doNet';
 
 describe('form', ()=>{
   test('search', async () => {
-    const page = await openBrowserPage({
-
-    });
+    const page = await openMockBrowserPage();
 
     /*     await login(page);
     // await navigateToPropertyPage(page);
@@ -40,8 +38,8 @@ describe('form', ()=>{
         '掲載企業TEL': '0566-52-5200',
       }}))[0];
 
-    // page.browser().disconnect();
-    await page.browser().close();
+    page.browser().disconnect();
+    // await page.browser().close();
     expect(result).toMatchSnapshot();
   }, browserTimeOut);
 

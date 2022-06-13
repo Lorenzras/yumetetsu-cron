@@ -40,25 +40,43 @@ export const handleFileWatcher = async (filePath: string, browser: Browser) => {
   }
 };
 
+export const handleDownloadCust = async (page: Page) => {
+  const filePath = await handleDownload({
+    page,
+    appId: APP_IDS.customers,
+    downloadDir: donetDownloadPath,
+    requestURL: donetCSVEndpoint,
+  });
+
+  if (filePath) {
+    await uploadSingleCSVSmart({
+      page,
+      fileWithAppId: filePath,
+      keyField: 'custId',
+    });
+    await deleteFile(filePath);
+  }
+};
+
 export const syncDoNetCust = async (isFullSync = false) => {
-  const watcher = chokidar.watch(donetDownloadPath, {
+/*   const watcher = chokidar.watch(donetDownloadPath, {
     ignored: /(^|[/\\])\../, // ignore dotfiles
     persistent: true,
     depth: 0,
-  });
+  }); */
   try {
     /** File watcher */
 
 
     process.setMaxListeners(20);
     const page = await openBrowserPage();
-    const kintoneBrowser = page.browser();
+    // const kintoneBrowser = page.browser();
 
-    const uploadTasks : Promise<void>[] = [];
+    // const uploadTasks : Promise<void>[] = [];
 
-    watcher.on('add', (filePath)=>{
+    /*   watcher.on('add', (filePath)=>{
       uploadTasks.push(handleFileWatcher(filePath, kintoneBrowser));
-    });
+    }); */
 
     await login(page);
     await navigateToCustPage(page);
@@ -76,26 +94,35 @@ export const syncDoNetCust = async (isFullSync = false) => {
           dateStr: format(subDays(new Date(), 1), 'yyyy-MM-dd')},
       );
       await selectStoreThenSearch(page, '');
+      await handleDownloadCust(page);
       // await handleDownload(page);
-      await handleDownload({
+      /* const filePath = await handleDownload({
         page,
         appId: APP_IDS.customers,
         downloadDir: donetDownloadPath,
         requestURL: donetCSVEndpoint,
       });
+
+      if (filePath) {
+        await uploadSingleCSVSmart({
+          page,
+          fileWithAppId: filePath,
+          keyField: 'custId',
+        });
+      } */
     }
 
     // Wait a second to register all promises upload promises to stack.
     await page.waitForTimeout(2000);
 
-    console.log('prmise', uploadTasks.length);
-    await Promise.all(uploadTasks);
 
+    // await Promise.all(uploadTasks);
 
-    await kintoneBrowser.close();
-    await watcher.close();
+    await page.browser().close();
+    // await kintoneBrowser.close();
+    // await watcher.close();
   } catch (error: any) {
-    await watcher.close();
+    // await watcher.close();
     await notifyDev(`Error with syncDoNetCust. ${error.message}`);
   }
 };

@@ -21,6 +21,7 @@ export const compareData = async (
       '.sf_admin_list p.big', {timeout: 60000}), // 検索結果が見つかりませんでした
   ]);
 
+  // await page.waitForFunction('jQuery');
   const result = await page.evaluate(
     (data: IProperty) : TSearchResult[]=>{
       const rows = Array.from(document.querySelectorAll('.ui-sortable tr'));

@@ -3,7 +3,7 @@ import {getOptionsEmployee} from './content';
 import {logger} from '../../../../../utils';
 import {selectors} from './selectors';
 import {clickSearch} from './clickSearch';
-import {handleDownload} from './handleDownload';
+import {handleDownloadCust} from '../../../../syncs';
 
 export const downloadPerAgent = async (page: Page) =>{
   const agents = await getOptionsEmployee(page);
@@ -15,7 +15,8 @@ export const downloadPerAgent = async (page: Page) =>{
     await page.select(selectors.ddAgents, agent.value);
     const count = await clickSearch(page);
     if (count > 0 ) {
-      await handleDownload(page);
+      // await handleDownload(page);
+      await handleDownloadCust(page);
     }
   }
 

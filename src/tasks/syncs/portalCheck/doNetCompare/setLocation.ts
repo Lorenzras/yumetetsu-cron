@@ -19,9 +19,10 @@ export const setLocation = async (
   const {pref, city, town} = data;
   await retry(async ()=>{
     // Test reset in case of retrying
-    // await page.click('#modal_clear_button').catch(()=>true);
+    await page.click('#modal_clear_button').catch(()=>true);
 
     logger.info(`${logSuffix} is opening location modal.`);
+
 
     /* Open modal */
     await page.waitForSelector('#select_button_city1');
@@ -29,18 +30,14 @@ export const setLocation = async (
 
 
     logger.info(`${logSuffix} is setting prefecture.`);
-    await Promise.all([
-      selectByText(page, '#select_pref_id', pref ),
-      page.waitForResponse((resp) => {
-        return resp.url().includes('https://manage.do-network.com/m_city/list') &&
-        resp.status() === 200;
-      }, {timeout: 10000}).catch(),
-    ]);
+    await selectByText(page, '#select_pref_id', pref ),
+    await page.waitForNetworkIdle({idleTime: 500}),
 
     logger.info(`${logSuffix} is setting city`);
     await page.click('#modal_city_name_autocomplete', {clickCount: 3});
     await page.type('#modal_city_name_autocomplete', city);
 
+    // throw new Error('test');
     if (town) {
       // On slow or laggy computers, donet's town API takes a very long time to respond so
       // I addressing it with the following lines
@@ -54,7 +51,7 @@ export const setLocation = async (
         page.waitForResponse((resp) => {
           return resp.url().includes('https://manage.do-network.com/m_town/list') &&
            resp.status() === 200;
-        }).catch(()=>true),
+        }).catch(()=>logger.warn(`${logSuffix} failed to retrieve m_town.`)),
       ]);
 
       // Click/Focus to trigger populate when trigger blur event failed due to network lag.
@@ -73,8 +70,6 @@ export const setLocation = async (
           logger.info(`${logSuffix} succesfully typed town.`);
         })
         .catch(async (err: any)=>{
-          await page.click('#modal_clear_button', {delay: 1000}).catch(()=>true);
-          await page.waitForSelector('#modal_clear_button', {hidden: true});
           throw new Error(`${logSuffix} failed to type town, clicking clear. ${err.message}`);
         });
     }
@@ -89,5 +84,7 @@ export const setLocation = async (
     onRetry: async (e, tries) => {
       logger.warn(`${logSuffix} retried ${tries} time/s in retrying to populate location form. ${e.message}`);
     },
+    maxTimeout: 1000,
+    minTimeout: 500,
   });
 };

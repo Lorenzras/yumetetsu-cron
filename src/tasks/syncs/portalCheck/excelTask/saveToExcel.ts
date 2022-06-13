@@ -1,12 +1,15 @@
+import {
+  resolveResultDir,
+  resultFileTemplate} from './../config';
 import {IHouse, ILot, IMansion, IProperty, TProperty} from '../types';
 import Excel, {Workbook} from 'exceljs';
-import {excelResultPath, resultFileTemplate} from '../config';
 import path from 'path';
 import {logger} from '../../../../utils/logger';
 import {spreadAddress} from '../../../../utils';
 import fs from 'fs';
 import {format} from 'date-fns';
 import {formatResult} from './formatResult';
+import {saveMeta} from '../helpers/saveMeta';
 
 type UProperty = IProperty[] | IHouse[] | ILot[] | IMansion[]
 
@@ -69,11 +72,11 @@ export const extractRows = (items: UProperty) => {
 };
 
 export const saveExcelResult = async (
-  workbook: Workbook, fileName: string, length: number,
+  workbook: Workbook,
+  fileName: string, length: number,
+  saveToNetWorkDrive = true,
 ) => {
-  const saveFolder = path.join(
-    excelResultPath,
-    `【JS】${format(new Date(), 'yyyy.MM.dd')}新着物件情報`);
+  const saveFolder = resolveResultDir(saveToNetWorkDrive);
 
   if (!fs.existsSync(saveFolder)) {
     fs.mkdirSync(saveFolder, {recursive: true});
@@ -93,7 +96,11 @@ export const saveExcelResult = async (
 };
 
 
-export const saveFile = async (items: IProperty[], fileName: string) => {
+export const saveFile = async (
+  items: IProperty[],
+  fileName: string,
+  saveToNetWorkDrive = true,
+) => {
   const workbook = new Excel.Workbook();
   await workbook.xlsx.readFile(resultFileTemplate);
 
@@ -111,11 +118,14 @@ export const saveFile = async (items: IProperty[], fileName: string) => {
     formatResult(ws, rows, props);
   });
 
-  await saveExcelResult(workbook, fileName, items.length);
+  await saveExcelResult(workbook, fileName, items.length, saveToNetWorkDrive);
 };
 
 
-export const saveToExcel = async (items: IProperty[]) => {
+export const saveToExcel = async (
+  items: IProperty[],
+  saveToNetWorkDrive = true,
+) => {
   logger.info(`Saving to excel.`);
 
   try {
@@ -124,11 +134,12 @@ export const saveToExcel = async (items: IProperty[]) => {
       return;
     }
 
+
     const groupByCity = getGroupByCity(items);
 
     for (const [city, props] of Object.entries(groupByCity)) {
       logger.info(`Processing Excel: ${city}`);
-      await saveFile(props, city);
+      await saveFile(props, city, saveToNetWorkDrive);
     }
     logger.info(`Done saving to excel. Starting to save to CSV.`);
   } catch (err: any) {

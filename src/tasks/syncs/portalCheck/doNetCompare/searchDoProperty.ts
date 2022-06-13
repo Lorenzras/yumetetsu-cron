@@ -34,15 +34,20 @@ export const selectByText = async (
   text: string,
 ) => {
   await page.waitForSelector(`${selector} option`);
+  // await page.waitForTimeout(2000);
+  logger.info(`${selector} appeared.`);
   const prefId = await page.$eval(selector, (el, text) => {
     const prefId = $(el)
       .children(`option:contains(${text})`).val() as string;
+    (el as HTMLInputElement).value = prefId;
     // $(el).val(prefId);
-    // $(el).trigger('change');
+    $(el).trigger('change');
     return prefId;
   }, text);
 
-  await page.select(selector, prefId);
+
+  // await page.select(selector, prefId);
+  logger.info(`Selected  ${prefId} at ${selector}.`);
 };
 
 const setLotArea = async (page: Page, area: string) => {
@@ -67,7 +72,7 @@ export const searchDoProperty = async ({
   let area = '';
 
   let result: TSearchResult[] = [];
-  page.setDefaultTimeout(60000);
+  page.setDefaultTimeout(40000);
 
   try {
     if ('比較用土地面積' in inputData) {
@@ -88,6 +93,7 @@ export const searchDoProperty = async ({
         page.waitForSelector('body div', {hidden: true}),
         page.waitForSelector('.error_navi td#error_area'),
       ]);
+
       logger.info(`${logSuffix} is starting donet compare.`);
       if (!await page.$('#m_estate_filters_fc_shop_id option')) {
         await login(page);
@@ -128,7 +134,6 @@ export const searchDoProperty = async ({
       retries: 3,
 
       onRetry: async (e, attempt) => {
-        await page.reload();
         logger.warn(`${logSuffix} retried ${attempt} times to compare data.  ${e.message}`);
       },
     });

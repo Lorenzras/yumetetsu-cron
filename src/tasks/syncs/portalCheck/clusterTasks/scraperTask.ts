@@ -3,8 +3,6 @@ import {resultJSONPath, kintoneAppId, resultCSVPath} from './../config';
 import {saveJSONToCSV, saveJSON, getFileName} from './../../../../utils/file';
 import {Page} from 'puppeteer';
 import {Cluster} from 'puppeteer-cluster';
-import {TSearchResult} from '../doNetCompare/compareData';
-import {searchDoProperty} from '../doNetCompare/searchDoProperty';
 import {IAction, IProperty} from '../types';
 import {logger} from '../../../../utils';
 import _ from 'lodash';
@@ -16,10 +14,13 @@ import {saveMeta} from '../helpers/saveMeta';
 
 
 type TScraperTask = (
-  actions: IAction[], cluster: Cluster<{page: Page}>
+  actions: IAction[],
+  cluster: Cluster<{page: Page}>,
+  saveToNetWorkDrive?: boolean,
+
 ) => Promise<IProperty[]>
 
-export const scraperTask: TScraperTask = async (actions, cluster) => {
+export const scraperTask: TScraperTask = async (actions, cluster, saveToNetWorkDrive = true) => {
   // Shuffle actions to spread network traffic between sites.
   const shuffledActions = _.shuffle(actions);
 
@@ -74,47 +75,59 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
   };
 
 
-  // Main thread emitter
-  const intermediateResults = (await Promise.all(
+  /**
+   * Stores all scraped properties from designated actions.
+   */
+  const scrapedProps = (await Promise.all(
     shuffledActions.map(async (action) => {
       return await handleAction(action);
     }),
   )).flat();
 
-  const totalScrapeLength = intermediateResults.length;
-
+  const totalScrapeLength = scrapedProps.length;
   logger.info(`Scraped results ${totalScrapeLength}. Starting to compare to doNet.`);
-  // Compare to donet then save.
-  const doComparedDt = await handleDonetCompare(cluster, intermediateResults);
+
+  /**
+   * Stores properties that were collated with donetwork
+   */
+  const doComparedDt = await handleDonetCompare(cluster, scrapedProps);
+
   await saveJSON(getFileName({
     appId: kintoneAppId,
     dir: resultJSONPath,
     suffix: '-doComparedDt-' + doComparedDt.length.toString(),
   }), doComparedDt);
-
   logger.info(`Done comparing to donet. Starting to filter.`);
-  // Filter data
+
+  /**
+   * Stores filtered properties that do not exist in donetwork and
+   * those that exist but with price diffence.
+   */
   const filteredData = doComparedDt.filter((dt)=>{
     return (
-      !dt.DO管理有無 ||
+      !dt.DO管理有無?.trim() ||
       dt.DO管理有無 === '無' ||
       (dt.DO管理有無 === '有' && +(dt.DO価格差 ?? 0) !== 0)
     );
   });
-
   const filteredDataLength = filteredData.length;
 
   logger.info(`Filtered results ${filteredDataLength}. Starting to scrape contact. `);
   // Scrape company info
 
+  /**
+   * Stores properties with contact information.
+   * This shuffles the array prior to processing
+   * to minimize simultaneous request against a single site.
+   */
   const finalResults = await Promise.all(
     _.shuffle(filteredData)
       .map(async (data, idx) => {
         try {
-          return await cluster.execute(({page})=>{
-            logger.info(`Fetching contact: ${idx + 1} of ${filteredDataLength} rows.`);
-            return handleGetCompanyDetails(page, data);
-          }) as Promise<IProperty>;
+          return await cluster.execute(async ({page, worker})=>{
+            logger.info(`${worker.id} is fetching contact: ${idx + 1} of ${filteredDataLength} rows.`);
+            return await handleGetCompanyDetails(page, data);
+          }) as IProperty;
         } catch (err: any) {
           logger.error(`Unhandled error at fetchingContact ${data.リンク} ${err.message}`);
           return data;
@@ -134,7 +147,7 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
 
 
   // Final result Output
-  await saveToExcel(finalResults);
+  await saveToExcel(finalResults, saveToNetWorkDrive);
 
 
   // Save to CSV then upload to kintone
@@ -143,8 +156,10 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     dir: resultCSVPath,
     suffix: `${finalResults.length.toString()}`,
   }), finalResults);
-  logger.info(`Done saving to CSV. Starting to save to upload to kintone.`);
+  saveMeta(doComparedDt, finalResults, saveToNetWorkDrive);
 
+
+  logger.info(`Done saving to CSV. Starting to save to upload to kintone.`);
   if (csvFile) {
     try {
       await cluster.execute(({page})=> uploadTask(page, csvFile));
@@ -156,6 +171,6 @@ export const scraperTask: TScraperTask = async (actions, cluster) => {
     logger.info(`Did not upload to kintone. CSV file was empty.`);
   }
 
-  saveMeta(intermediateResults, finalResults);
+
   return finalResults;
 };

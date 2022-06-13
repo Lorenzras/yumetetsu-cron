@@ -26,9 +26,11 @@ export const initCluster = () => Cluster.launch({
   puppeteerOptions: {
     // slowMo: 100,
     headless: process.env.BROWSER_TYPE === 'HEADLESS',
-    args: minimalArgs,
+    // args: minimalArgs,
   },
-  timeout: 1000 * 60 * 10,
+  retryLimit: 1,
+  retryDelay: 5000,
+  timeout: 1000 * 60 * 8,
 });
 
 /* const initFileWatcher = () => {
@@ -44,8 +46,10 @@ export const initCluster = () => Cluster.launch({
 /**
  * Concurrent processing of actions defined above.
  * Refer to scrapeHOMES for synchronous processing.
+ *
+ * @param saveToNetWorkDrive Save to networkdrive or not.
  */
-export const portalCheckMainTask = async () => {
+export const portalCheckMainTask = async (saveToNetWorkDrive = true) => {
   const cluster : Cluster<{page: Page}> = await initCluster();
 
   logger.info(`Starting cluster.`);
@@ -62,7 +66,7 @@ export const portalCheckMainTask = async () => {
     // actionsSUUMO()[2],
   ];
 
-  await scraperTask(actions, cluster);
+  await scraperTask(actions, cluster, saveToNetWorkDrive);
 
 
   // Rest, to make sure all tasks got registered especially for slow computers

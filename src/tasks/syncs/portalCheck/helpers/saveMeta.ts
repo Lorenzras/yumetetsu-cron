@@ -1,13 +1,13 @@
+import {resolveResultDir, cityLists} from './../config';
 import {format} from 'date-fns';
-import {logsDatedPath} from './../../../../utils/logger';
 import {saveFile, spreadAddress} from '../../../../utils';
 import {IProperty} from './../types';
 import path from 'path';
-import {cityLists, excelResultPath} from '../config';
 import beautify from 'json-beautify';
 export const saveMeta = (
   beforeGetContact: IProperty[],
   afterGetContact: IProperty[],
+  saveToNetWorkDrive = true,
 ) => {
   const totalLength = beforeGetContact.length;
   const resultLength = afterGetContact.length;
@@ -18,13 +18,22 @@ export const saveMeta = (
       DO管理有無: doNetExist,
       リンク: link,
       物件種別: propType = '無',
+      所在地,
     })=>{
       switch (doNetExist) {
-        case '無': accu.doNet無 += 1;
+        case '無':
+          accu.doNet無 += 1;
           break;
-        case '有': accu.doNet有 += 1;
+        case '有':
+          accu.doNet有 += 1;
           break;
-        default: accu.doNetエラー += 1;
+        default:
+          accu.doNetエラー.件数 += 1;
+          accu.doNetエラー.詳細.push([
+            spreadAddress(所在地).市区,
+            propType,
+          ].join(' - '));
+          break;
       }
 
       const resolveCount = (siteName: string) => {
@@ -46,7 +55,10 @@ export const saveMeta = (
     }, {
       doNet無: 0,
       doNet有: 0,
-      doNetエラー: 0,
+      doNetエラー: {
+        件数: 0,
+        詳細: [],
+      },
       siteAtHome全: {
         件数: 0,
       },
@@ -138,6 +150,9 @@ export const saveMeta = (
     ...processedDetails,
   }, null as any, 2, 80);
 
-  saveFile(path.join(logsDatedPath, 'meta.json'), prettyResult );
-  saveFile(path.join(excelResultPath, 'meta.json'), prettyResult );
+
+  saveFile(
+    path.join(resolveResultDir(saveToNetWorkDrive), 'meta.json'),
+    prettyResult,
+  );
 };

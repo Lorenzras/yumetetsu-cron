@@ -36,7 +36,6 @@ export const handleNextPage = async (page: Page) => {
     logger.info('Clicking next page.');
 
     await Promise.allSettled([
-      // page.waitForNavigation(),
       nextPageBtn.click(),
       page.waitForSelector('#loading', {visible: true, timeout: 1500}),
     ]);

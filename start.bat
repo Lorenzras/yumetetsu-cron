@@ -1,1 +1,1 @@
-node build/main.js
+npm run build && node build/main.js
