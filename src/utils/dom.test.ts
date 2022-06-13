@@ -2,7 +2,7 @@ import {launchBrowser} from './../tasks/common/browser/openBrowser';
 import puppeteer from 'puppeteer-extra';
 import {openMockBrowserPage} from '../tasks/common/browser';
 import {browserTimeOut} from '../tasks/common/browser/config';
-import {getTextByXPath} from './dom';
+import {getTextByXPath, select} from './dom';
 
 describe('dom', ()=>{
   test('getTextByXPath', async ()=>{
@@ -30,11 +30,16 @@ describe('dom', ()=>{
 
     await page.goto('https://www.w3docs.com/learn-html/html-select-tag.html');
 
-
+    /*
     await page.waitForSelector('select[aria-label="Books"]')
-      .then((s) => s?.select('js'));
+      .then((s) => s?.select('js')); */
 
 
+    await select({
+      page,
+      selector: 'select[aria-label="Books"',
+      value: 'php',
+    });
     await page.waitForTimeout(5000);
 
     await page.browser().close();

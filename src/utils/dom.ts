@@ -21,3 +21,17 @@ export const getTextByXPath = async (
       return (ch as HTMLElement)?.innerText ?? '';
     }, xEl));
 };
+
+
+export const select = (
+  {page, selector, value} :
+  {
+    page: Page,
+    selector: string
+    value: string
+  },
+) => page.$eval(
+  selector,
+  (el, value) => (<HTMLSelectElement>el).value = <string>value,
+  value,
+);
