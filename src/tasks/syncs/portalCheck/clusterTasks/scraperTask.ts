@@ -3,8 +3,6 @@ import {resultJSONPath, kintoneAppId, resultCSVPath} from './../config';
 import {saveJSONToCSV, saveJSON, getFileName} from './../../../../utils/file';
 import {Page} from 'puppeteer';
 import {Cluster} from 'puppeteer-cluster';
-import {TSearchResult} from '../doNetCompare/compareData';
-import {searchDoProperty} from '../doNetCompare/searchDoProperty';
 import {IAction, IProperty} from '../types';
 import {logger} from '../../../../utils';
 import _ from 'lodash';
@@ -80,19 +78,20 @@ export const scraperTask: TScraperTask = async (actions, cluster, saveToNetWorkD
   /**
    * Stores all scraped properties from designated actions.
    */
-  const intermediateResults = (await Promise.all(
+  const scrapedProps = (await Promise.all(
     shuffledActions.map(async (action) => {
       return await handleAction(action);
     }),
   )).flat();
 
-  const totalScrapeLength = intermediateResults.length;
+  const totalScrapeLength = scrapedProps.length;
   logger.info(`Scraped results ${totalScrapeLength}. Starting to compare to doNet.`);
 
   /**
    * Stores properties that were collated with donetwork
    */
-  const doComparedDt = await handleDonetCompare(cluster, intermediateResults);
+  const doComparedDt = await handleDonetCompare(cluster, scrapedProps);
+
   await saveJSON(getFileName({
     appId: kintoneAppId,
     dir: resultJSONPath,
@@ -106,7 +105,7 @@ export const scraperTask: TScraperTask = async (actions, cluster, saveToNetWorkD
    */
   const filteredData = doComparedDt.filter((dt)=>{
     return (
-      !dt.DO管理有無 ||
+      !dt.DO管理有無?.trim() ||
       dt.DO管理有無 === '無' ||
       (dt.DO管理有無 === '有' && +(dt.DO価格差 ?? 0) !== 0)
     );
@@ -157,9 +156,10 @@ export const scraperTask: TScraperTask = async (actions, cluster, saveToNetWorkD
     dir: resultCSVPath,
     suffix: `${finalResults.length.toString()}`,
   }), finalResults);
-  logger.info(`Done saving to CSV. Starting to save to upload to kintone.`);
-  saveMeta(intermediateResults, finalResults, saveToNetWorkDrive);
+  saveMeta(doComparedDt, finalResults, saveToNetWorkDrive);
 
+
+  logger.info(`Done saving to CSV. Starting to save to upload to kintone.`);
   if (csvFile) {
     try {
       await cluster.execute(({page})=> uploadTask(page, csvFile));

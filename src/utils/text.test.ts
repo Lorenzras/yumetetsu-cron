@@ -11,6 +11,7 @@ describe(('stringManipulation'), ()=>{
       '2、335.00m²',
       '3LDK/73.18m2',
       '125.38m2',
+      '350.98㎡（106.17坪）（登記）、路地状部分：39㎡含、傾斜部分：72...',
     ];
     const result =testVals.map((i)=>{
       const res = extractNumber(i);
