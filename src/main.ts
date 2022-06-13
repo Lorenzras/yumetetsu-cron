@@ -26,7 +26,8 @@ cron.schedule('0 18 * * Sun', () => syncDoNetCust(true), cronOptions);
 /**
  * Full sync donet customers to kintone.
  *
- * At every 5th minute past every hour
+ * At every 10th minute past
+ * every hour from 8 through 19
  * on every day-of-week from Monday through Saturday.
  */
 cron.schedule('*/10 8-19 * * 1-6', () => syncDoNetCust());
@@ -38,9 +39,5 @@ cron.schedule('*/10 8-19 * * 1-6', () => syncDoNetCust());
  */
 cron.schedule('0 22 * * *', () => portalCheckMainTask(), cronOptions);
 
-/**
- * Still alive log.
- */
-// cron.schedule('*/5 * * * * *', ()=> notifyDev(formattedTime() + ': Alive'));
 
 logger.info('MAIN CRON PROCESS RUNNING.');
