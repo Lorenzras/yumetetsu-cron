@@ -19,9 +19,9 @@ cron.schedule('30 9 * * *', remindOnLongtermCust, cronOptions);
 /**
  * Full sync donet customers to kintone.
  *
- * At 22:00 on Sunday.
+ * At 18:00 on Sunday.
  */
-cron.schedule('0 22 * * Sun', () => syncDoNetCust(true), cronOptions);
+cron.schedule('0 18 * * Sun', () => syncDoNetCust(true), cronOptions);
 
 /**
  * Full sync donet customers to kintone.
