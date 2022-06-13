@@ -26,11 +26,11 @@ cron.schedule('0 20 * * Sun', () => syncDoNetCust(true), cronOptions);
 /**
  * Full sync donet customers to kintone.
  *
- * At every 10th minute past
+ * At every 30th minute past
  * every hour from 8 through 19
  * on every day-of-week from Monday through Saturday.
  */
-cron.schedule('*/10 8-19 * * 1-6', () => syncDoNetCust());
+cron.schedule('*/30 8-19 * * 1-6', () => syncDoNetCust());
 
 /**
  * Portal Check.
