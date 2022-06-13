@@ -2,7 +2,7 @@
 
 [日本語版](README.ja.md)
 
-This project is a collection of automation projects
+This repo is a collection of automation projects
 for Yumetetsu and Cocosumo written in Typescript.
 
 - [Yumecoco CronJobs](#yumecoco-cronjobs)
