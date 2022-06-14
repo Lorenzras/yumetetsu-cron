@@ -18,7 +18,6 @@ export const saveMeta = (
       DO管理有無: doNetExist,
       リンク: link,
       物件種別: propType = '無',
-      所在地,
     })=>{
       switch (doNetExist) {
         case '無':
@@ -26,13 +25,6 @@ export const saveMeta = (
           break;
         case '有':
           accu.doNet有 += 1;
-          break;
-        default:
-          accu.doNetエラー.件数 += 1;
-          accu.doNetエラー.詳細.push([
-            spreadAddress(所在地).市区,
-            propType,
-          ].join(' - '));
           break;
       }
 
@@ -55,10 +47,7 @@ export const saveMeta = (
     }, {
       doNet無: 0,
       doNet有: 0,
-      doNetエラー: {
-        件数: 0,
-        詳細: [],
-      },
+
       siteAtHome全: {
         件数: 0,
       },
@@ -75,12 +64,15 @@ export const saveMeta = (
 
 
   const processedDetails = afterGetContact.reduce((accu, {
-    掲載企業TEL: tel,
+    掲載企業: company,
     リンク: link,
     物件種別: propType = '無',
     所在地: address,
+    DO管理有無,
   }) => {
-    const isFail = !tel || tel.includes('失敗');
+    const isFail = !company || company.includes('失敗');
+    const isGone = !company || company.includes('無くなった');
+    const {市区} = spreadAddress(address);
 
     const resolveCounter = (fieldPart: string) => {
       let field = accu[`${fieldPart}済` as keyof typeof accu];
@@ -91,7 +83,6 @@ export const saveMeta = (
       field['件数'] = currCount + 1;
 
       // Count per city
-      const {市区} = spreadAddress(address);
       const currCountJur = field[市区]?.['件数'] || 0;
       field[市区] = field[市区] ?? Object.create(null);
       field[市区]['件数'] = currCountJur + 1;
@@ -102,6 +93,7 @@ export const saveMeta = (
     };
 
     if (isFail) accu.企業取得失敗件数 += 1;
+    if (isGone) accu.無くなった件数 += 1;
 
     if (link.includes('athome')) {
       resolveCounter('siteAtHome');
@@ -113,9 +105,22 @@ export const saveMeta = (
       resolveCounter('siteYahoo');
     }
 
+    if (!DO管理有無?.trim()) {
+      accu.doNetエラー.件数 += 1;
+      accu.doNetエラー.詳細.push([
+        市区,
+        propType,
+      ].join(' - '));
+    }
+
     return accu;
   }, {
     企業取得失敗件数: 0,
+    無くなった件数: 0,
+    doNetエラー: {
+      件数: 0,
+      詳細: [],
+    },
     siteAtHome済: {
       件数: 0,
     },

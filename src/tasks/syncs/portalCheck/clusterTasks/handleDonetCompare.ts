@@ -34,7 +34,7 @@ export const setCookie = async (page: Page, workerId: number) => {
     const cookies = JSON.parse(cookiesString);
     await page.setCookie(...cookies);
     await page.goto('https://manage.do-network.com/estate');
-    await page.waitForSelector('#m_estate_filters_fc_shop_id option');
+    // await page.waitForSelector('#m_estate_filters_fc_shop_id option');
     logger.info(`Worker ${workerId} is successfully set cookie.`);
   } catch (err) {
     logger.warn('I was not able to load the cookie.');
@@ -63,14 +63,11 @@ export const handleDonetCompare = async (
 
   const newDtArr = await Promise.all(dtArr.map(async (prop, idx) => {
     try {
+      // For retries, if already processed, ignore.
+      if (prop.DO管理有無?.trim()) return prop;
+
+      // Actual process
       return await cluster.execute(async ({page, worker}) => {
-        /*       const client = await page.target().createCDPSession();
-        await client.send('Network.emulateNetworkConditions', {
-          'offline': false,
-          'downloadThroughput': 750 * 1024 / 8,
-          'uploadThroughput': 250 * 1024 / 8,
-          'latency': 1500,
-        }); */
         const logSuffix = `Worker ${worker.id} at task ${idx + 1} of ${dtArrLength} `;
         await setCookie(page, worker.id);
 

@@ -87,6 +87,7 @@ export const searchDoProperty = async ({
 
 
     result = await retry(async () => {
+      logger.info('Checking donet page type.');
       await Promise.race([
         page.waitForSelector('.btn_login'),
         page.waitForSelector('#m_estate_filters_fc_shop_id option'),
