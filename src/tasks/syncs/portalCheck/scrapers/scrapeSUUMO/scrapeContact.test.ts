@@ -57,6 +57,7 @@ describe('scrapecontact', () => {
       'https://suumo.jp/chukoikkodate/__JJ_JJ010FJ100_arz1050z2bsz1021z2ncz198271927.html',
       'https://gggg',
       'https://suumo.jp/tochi/__JJ_JJ010FJ100_arz1050z2bsz1030z2ncz197157686.html',
+      'https://suumo.jp/tochi/__JJ_JJ010FJ100_arz1050z2bsz1030z2ncz196937454.html',
     ];
 
     const result = [];

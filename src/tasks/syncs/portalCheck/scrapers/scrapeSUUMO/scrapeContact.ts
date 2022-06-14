@@ -163,5 +163,5 @@ export const scrapeContact: THandleContactScraper = async (
     };
   }
 
-  return data;
+  return {...data, ...info};
 };
