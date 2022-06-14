@@ -31,7 +31,7 @@ const getJSONData = (fName: string) => {
 };
 
 describe('portalCheckMainProcess', () => {
-  it('mainprocess', async () => {
+  it('mainTest', async () => {
     await portalCheckMainTask();
     expect(true);
   }, browserTimeOut);
