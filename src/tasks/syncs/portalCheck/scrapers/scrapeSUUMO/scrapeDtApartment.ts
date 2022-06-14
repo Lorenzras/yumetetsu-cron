@@ -1,5 +1,5 @@
 import {Page} from 'puppeteer';
-import {extractPrice, logger} from '../../../../../utils';
+import {extractNumber, extractPrice, logger} from '../../../../../utils';
 import {IMansion, THandleScraper} from '../../types';
 import {logErrorScreenshot} from '../../helpers/logErrorScreenshot';
 
@@ -33,7 +33,7 @@ export const scrapeDtApartment: THandleScraper = async (
 
     datas = datas.map<IMansion>((val) => {
       const price = extractPrice(val.販売価格.split('円')[0]);
-      const area = val.専有面積.split('m')[0];
+      const area = extractNumber(val.専有面積);
       return {
         ...val,
         比較用価格: price,
