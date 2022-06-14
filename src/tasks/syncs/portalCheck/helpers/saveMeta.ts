@@ -4,6 +4,9 @@ import {saveFile, spreadAddress} from '../../../../utils';
 import {IProperty} from './../types';
 import path from 'path';
 import beautify from 'json-beautify';
+import {hostname} from 'os';
+
+
 export const saveMeta = (
   beforeGetContact: IProperty[],
   afterGetContact: IProperty[],
@@ -132,7 +135,6 @@ export const saveMeta = (
     return accu;
   }, {
 
-
     siteAtHome済: {
       件数: 0,
     },
@@ -169,6 +171,7 @@ export const saveMeta = (
 
   const prettyResult = beautify({
     日時: format(new Date(), 'yyyy.MM.dd HH:mm:ss'),
+    パソコン名: hostname(),
     取得件数: totalLength,
     結果件数: resultLength,
     ...rawDetails,
