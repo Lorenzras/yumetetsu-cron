@@ -77,14 +77,11 @@ export const handleDonetCompare = async (
             inputData: prop,
             logSuffix,
           },
-        ) ?? {
-          DO管理有無: '処理エラー',
-        } as IProperty;
+        );
 
         await saveCookie(page, worker.id);
 
         const firstComparedResult = doNetComparedResults[0];
-
 
         return {
           ...prop,
@@ -92,7 +89,7 @@ export const handleDonetCompare = async (
         };
       }) as IProperty;
     } catch (err: any) {
-      logger.error(`Unhandled error at clusterTasks.handleDonetCompare ${err.message}`);
+      logger.error(`Unhandled error at clusterTasks.handleDonetCompare ${JSON.stringify(prop)} ${err.message} `);
       return prop;
     }
   }));

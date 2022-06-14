@@ -140,6 +140,7 @@ export const searchDoProperty = async ({
     });
   } catch (err: any) {
     await logErrorScreenshot(page, `${logSuffix} did its best but still failed to compare data.  ${err.message} `);
+    throw new Error('Failed to compare data.');
   }
 
   return result;
