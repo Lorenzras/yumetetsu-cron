@@ -40,7 +40,7 @@ const data: IProperty = {
 }; */
 
 describe('scrapecontact', () => {
-  test(('scrapeContact'), async () => {
+  test(('main'), async () => {
     const page = await openMockBrowserPage();
     const result = await scrapeContact(page, data);
 

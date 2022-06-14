@@ -4,6 +4,9 @@ require('dotenv').config();
 import cron from 'node-cron';
 import {remindOnLongtermCust} from './tasks';
 import {syncDoNetCust} from './tasks/syncs/';
+import {
+  portalCheckMainTask,
+} from './tasks/syncs/portalCheck/portalCheckMainTask';
 
 
 const options = {
@@ -30,6 +33,13 @@ cron.schedule('0 22 * * Sun', () => syncDoNetCust(true), options);
  * on every day-of-week from Monday through Saturday.
  */
 cron.schedule('*/10 8-19 * * 1-6', () => syncDoNetCust());
+
+/**
+ * Portal Check.
+ *
+ * At 04:00.
+ */
+cron.schedule('0 4 * * *', () => portalCheckMainTask());
 
 /**
  * Still alive log.

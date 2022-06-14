@@ -1,7 +1,7 @@
 import {Page} from 'puppeteer';
 import {logger} from '../../../../../utils';
 import {IHouse} from '../../types';
-import {webScraper} from '../helpers/webScraper';
+import {webScraper} from '../../helpers/webScraper';
 
 export const scrapeDtHousePage = async (page: Page) => {
   logger.info('Scraping atHOME dtHouse page.');
@@ -36,7 +36,6 @@ export const handleNextPage = async (page: Page) => {
     logger.info('Clicking next page.');
 
     await Promise.allSettled([
-      // page.waitForNavigation(),
       nextPageBtn.click(),
       page.waitForSelector('#loading', {visible: true, timeout: 1500}),
     ]);

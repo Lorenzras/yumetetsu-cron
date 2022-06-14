@@ -4,7 +4,7 @@ import {TCompanyContact} from '../../../types';
 
 export const scrapeSingleContactLot = async (page: Page) => {
   const mainSelector = '.realestate .inquire';
-  page.waitForSelector(mainSelector, {timeout: 60000});
+  await page.waitForSelector(mainSelector, {timeout: 60000});
 
   const dirtyResult = await page.$eval(
     mainSelector,

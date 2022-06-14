@@ -4,13 +4,19 @@ import {logger} from '../../../utils/logger';
 
 import {URLs, selectors} from './config';
 
+
 export const login = async (page: Page ) => {
   logger.info(`Started login to doNetwork. ${process.env.DO_NETWORK_USER}`);
 
-  await page.goto(URLs['login'], {waitUntil: 'networkidle2'});
-  await page.waitForNetworkIdle();
+  if (!await page.$(selectors.user)) {
+    await page.goto(URLs['login'], {waitUntil: 'networkidle2'});
+  }
+
   await page.waitForSelector(selectors.user);
-  await page.select(selectors.store, '157');
+  // await page.select(selectors.store, '157');
+  await page.$eval(selectors.store, (el)=>{
+    (el as HTMLInputElement).value = '157';
+  });
 
   await clearField(page, selectors.user);
   await page.type(selectors.user, process.env.DO_NETWORK_USER);

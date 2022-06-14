@@ -6,8 +6,7 @@ import {Page} from 'puppeteer';
 
 import {scrapeContactNew} from './scrapeContactNew';
 
-import {blockImages} from '../../../../../common/browser';
-import {logErrorScreenshot} from '../../helpers/logErrorScreenshot';
+import {logErrorScreenshot} from '../../../helpers/logErrorScreenshot';
 
 export const getContactByLink = async (page: Page, url: string) => {
   const initialVal = {
@@ -37,14 +36,17 @@ export const getContactByLink = async (page: Page, url: string) => {
           {visible: true, timeout: 30000})
         .then(()=>2),
       page
-        .waitForSelector('.mod-notFoundMsg',
+        .waitForSelector(
+          '.mod-notFoundMsg, .mod-bukkenNotFound, .mod-expiredInformation',
           {visible: true, timeout: 20000})
         .then(()=> 3),
+
     ]);
+
     switch (task) {
-      case 0: return scrapeSingleContact(page);
-      case 1: return scrapeSingleContactLot(page);
-      case 2: return scrapeContactNew(page);
+      case 0: return await scrapeSingleContact(page);
+      case 1: return await scrapeSingleContactLot(page);
+      case 2: return await scrapeContactNew(page);
       case 3: return {
         掲載企業: '取得失敗 3',
         掲載企業TEL: '取得失敗 3',
@@ -53,7 +55,7 @@ export const getContactByLink = async (page: Page, url: string) => {
     }
   } catch (err :any) {
     await logErrorScreenshot(
-      page, `Failed to get contact ${page.url()} ${err.message}`);
+      page, `Failed to get contact ${url} ${err.message}`);
     return {
       掲載企業: '取得失敗',
       掲載企業TEL: '取得失敗',

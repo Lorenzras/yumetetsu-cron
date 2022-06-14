@@ -10,7 +10,7 @@ import {
   setPropertyTypes,
   TPropTypes} from '../../../common/doNet/pages/properties';
 import {cityLists} from '../config';
-import {logErrorScreenshot} from '../scrapers/helpers/logErrorScreenshot';
+import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
 import {IHouse, ILot, IMansion, IProperty, TProperty, TPropertyConvert} from '../types';
 import {compareData, TSearchResult} from './compareData';
 import {setLocation} from './setLocation';
@@ -34,15 +34,20 @@ export const selectByText = async (
   text: string,
 ) => {
   await page.waitForSelector(`${selector} option`);
+  // await page.waitForTimeout(2000);
+  logger.info(`${selector} appeared.`);
   const prefId = await page.$eval(selector, (el, text) => {
     const prefId = $(el)
       .children(`option:contains(${text})`).val() as string;
+    (el as HTMLInputElement).value = prefId;
     // $(el).val(prefId);
-    // $(el).trigger('change');
+    $(el).trigger('change');
     return prefId;
   }, text);
 
-  await page.select(selector, prefId);
+
+  // await page.select(selector, prefId);
+  logger.info(`Selected  ${prefId} at ${selector}.`);
 };
 
 const setLotArea = async (page: Page, area: string) => {
@@ -54,10 +59,11 @@ const setLotArea = async (page: Page, area: string) => {
 
 
 export const searchDoProperty = async ({
-  page, inputData,
+  page, inputData, logSuffix,
 }:{
   page: Page,
   inputData: IProperty | IHouse | IMansion | ILot,
+  logSuffix: string
 }) => {
   const {
     所在地: address,
@@ -66,6 +72,7 @@ export const searchDoProperty = async ({
   let area = '';
 
   let result: TSearchResult[] = [];
+  page.setDefaultTimeout(40000);
 
   try {
     if ('比較用土地面積' in inputData) {
@@ -80,9 +87,20 @@ export const searchDoProperty = async ({
 
 
     result = await retry(async () => {
-      logger.info('Starting search ' + JSON.stringify(inputData));
-      await login(page);
-      await navigateToPropertyPage(page);
+      logger.info('Checking donet page type.');
+      await Promise.race([
+        page.waitForSelector('.btn_login'),
+        page.waitForSelector('#m_estate_filters_fc_shop_id option'),
+        page.waitForSelector('body div', {hidden: true}),
+        page.waitForSelector('.error_navi td#error_area'),
+      ]);
+
+      logger.info(`${logSuffix} is starting donet compare.`);
+      if (!await page.$('#m_estate_filters_fc_shop_id option')) {
+        await login(page);
+        await navigateToPropertyPage(page);
+      }
+
       await page.waitForSelector('#m_estate_filters_fc_shop_id option');
 
       /* Select store */
@@ -95,26 +113,33 @@ export const searchDoProperty = async ({
         page,
         data: {
           pref, city, town,
-        }},
-      );
+        },
+        logSuffix,
+      });
 
 
       await setLotArea(page, area);
 
+      logger.info(`${logSuffix} clicked search.`);
       await Promise.all([
         page.waitForNavigation(),
         page.click('#btn_search'),
       ]);
 
-      return await compareData(page, inputData);
+      logger.info(`${logSuffix} is comparing data.`);
+      const comparedData = await compareData(page, inputData);
+      logger.info(`${logSuffix} is done comparing against ${comparedData.length} properties`);
+
+      return comparedData;
     }, {
       retries: 3,
+
       onRetry: async (e, attempt) => {
-        logger.warn(`Failed to compare data with ${attempt} attempt/s.  ${e.message} Retrying...`);
+        logger.warn(`${logSuffix} retried ${attempt} times to compare data.  ${e.message}`);
       },
     });
   } catch (err: any) {
-    await logErrorScreenshot(page, `I did my best but still failed to compare data.  ${err.message} `);
+    await logErrorScreenshot(page, `${logSuffix} did its best but still failed to compare data.  ${err.message} `);
   }
 
   return result;

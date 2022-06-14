@@ -1,19 +1,38 @@
+import {
+  templatesPath,
+  excelPath,
+  jsonPath,
+  csvPath,
+} from './../../../utils/paths';
 import path from 'path';
 import {ILocations} from './types';
+import {format} from 'date-fns';
 
-export const dirPortalCheck = __dirname;
-export const dlPortalCheck = path.join(dirPortalCheck, 'data');
-export const dlJSON = path.join(dlPortalCheck, 'json');
 
-export const dlExcelResult = process.env.ENVIRONMENT === 'prod' ?
+export const appName = 'portalCheck';
+export const resultJSONPath = path.join(jsonPath, appName);
+export const resultCSVPath = path.join(csvPath, appName);
+
+/**
+ * @deprecated Relying on environment affects other cron process.
+ */
+export const excelResultPath = process.env.ENVIRONMENT === 'prod' ?
   path.join('\\\\192.168.11.150', 'Data01', '★サポート共有', '【ポータル新着物件】') :
-  path.join(dlPortalCheck, 'excel');
+  path.join(excelPath, appName);
+
+export const resolveResultDir = (
+  saveToNetWorkDrive = true,
+) => path.join(
+  saveToNetWorkDrive ?
+    path.join('\\\\192.168.11.150', 'Data01', '★サポート共有', '【ポータル新着物件】') :
+    path.join(excelPath, appName),
+  `【JS】${format(new Date(), 'yyyy.MM.dd')}新着物件情報`);
 
 export const resultFileTemplate = path.join(
-  dirPortalCheck, 'excelTask', 'template.xlsx',
+  templatesPath, 'portalCheckTemplate.xlsx',
 );
 
-export const dlImg = path.join(dirPortalCheck, 'errImg');
+// export const dlImg = path.join(imagesPath, 'errImg');
 
 export const kintoneAppId = 199;
 

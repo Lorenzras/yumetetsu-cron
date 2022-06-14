@@ -3,11 +3,16 @@ import {extractNumber, extractPrice, extractTel, spreadAddress} from './text';
 describe(('stringManipulation'), ()=>{
   test('extractNumber', ()=>{
     const testVals = [
+      '376m²',
       '222.22m2',
       '600.00m² (181.49坪)',
       '284.00m² (85.90坪)',
       '1,035.00m² (313.08坪)',
       '2、335.00m²',
+      '3LDK/73.18m2',
+      '125.38m2',
+      '350.98㎡（106.17坪）（登記）、路地状部分：39㎡含、傾斜部分：72...',
+
     ];
     const result =testVals.map((i)=>{
       const res = extractNumber(i);
@@ -20,6 +25,7 @@ describe(('stringManipulation'), ()=>{
 
   test('extractPrice', ()=>{
     const testVals = [
+
       '2万',
       '２万',
       '1億3万',
@@ -35,6 +41,7 @@ describe(('stringManipulation'), ()=>{
       '28,000万円',
       '未定',
       'なんとか',
+      '1,879万円、1,899万円',
     ];
 
     const testResult = testVals.map((i) => {
@@ -61,6 +68,10 @@ describe(('stringManipulation'), ()=>{
 
   test('extractTel', ()=>{
     const testVals = [
+      '0532-31-8777／0532-31-3911無料電話（クリックで表示される番号にかけてください）',
+      '052-361-0034クリックで表示される番号にかけてください）053-131-3911無料電話（クリックで表示される番号にかけてください）',
+      '0532-31-8777クリックで表示される番号にかけてください）0532-31-3911無料電話（クリックで表示される番号にかけてください）',
+      '／0532-31-3911無料電話（クリックで表示される番号にかけてください）',
       '※光IP電話、及びIP電話をご利用のお客様はTEL:052-361-0034へご連絡ください',
       '※携帯電話からお問合せいただいた方には、ショートメッセージ（SMS）またはLINE通知メッセージによるお問合せ内容に',
       'なんとかテクスト052-361-0034なんとかテクスト07014529707',

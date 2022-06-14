@@ -5,13 +5,14 @@ import {logger} from '../../../../../utils';
 import {downloadLimit} from '../../config';
 import {getOptionsStore} from './content';
 import {clickSearch} from './clickSearch';
-import {handleDownload} from './handleDownload';
+// import {handleDownload} from './handleDownload';
 import {downloadPerAgent} from './downloadPerAgent';
 import {selectors} from './selectors';
 
 import {navigateToCustPage} from '../navigate';
 import {login} from '../../login';
 import {setCustForm} from './setCustForm';
+import {handleDownloadCust} from '../../../../syncs';
 
 export const selectStoreThenSearch = async (page: Page, store: string) => {
   /* Select store */
@@ -47,7 +48,8 @@ export const downloadStore = async (browser: Browser, store: string) => {
 
   if (resultCount > 0 ) {
     if (resultCount <= downloadLimit) {
-      await handleDownload(newPage);
+      await handleDownloadCust(newPage);
+      // await handleDownload(newPage);
     } else {
       await downloadPerAgent(newPage);
     }

@@ -23,6 +23,7 @@ export const getCSVFiles = (dir: string, appId: string) => {
  *
  * @param filePath
  * @param data comma delimited csv. See conventions.
+ * @returns {string} path of saved file.
  */
 export const saveCSV = (filePath: string, data: string) => {
   fs.writeFileSync(filePath, '');
@@ -35,16 +36,30 @@ export const saveCSV = (filePath: string, data: string) => {
 
   fs.writeSync( fd, buff);
   fs.close(fd);
+
+  return filePath;
 };
 
+/**
+ * Save json to csv
+ * @param filePath
+ * @param json
+ * @returns {string} file path
+ */
 export const saveJSONToCSV = async (
   filePath: string,
   json: {[k: string]: any}[],
 ) =>{
   if (!json.length) return;
-  saveCSV(filePath + '.csv', await json2csvAsync(json));
+  return saveCSV(filePath + '.csv', await json2csvAsync(json));
 };
 
+/**
+ * Save Serializable object into JSON file.
+ *
+ * @param filePath
+ * @param data
+ */
 export const saveJSON = async (
   filePath: string,
   data: {[k: string]: any}[],
@@ -55,6 +70,26 @@ export const saveJSON = async (
     logger.error('Failed to save json file.');
   }
 };
+
+/**
+ * Save any type of file.
+ *
+ * @param filePath
+ * @param data
+ */
+export const saveFile = async (
+  filePath: string,
+  data: string,
+) => {
+  try {
+    const dir = path.dirname(filePath);
+    fs.existsSync(dir) || fs.mkdirSync(dir, {recursive: true});
+    fs.writeFileSync(filePath, data);
+  } catch (err: any) {
+    logger.error('Failed to save file ' + err.message);
+  }
+};
+
 
 export const deleteFile = async (file: string) => {
   try {
@@ -96,7 +131,7 @@ export const getFileName = (
     suffix?: string,
     ext?: string
   }) => {
-  fs.existsSync(dir) || fs.mkdirSync(dir);
+  fs.existsSync(dir) || fs.mkdirSync(dir, {recursive: true});
 
   const randomize = format(new Date(), `yyyyMMdd-HHmmss`) + `-${nanoid(5)}`;
 

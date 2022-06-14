@@ -1,11 +1,13 @@
 
 import {cityLists, propertyTypes} from '../../config';
 import {IAction, TProperty} from '../../types';
-import {scrapeDtHouse} from './scrapeDtHouse';
-import {scrapeDtLot} from './scrapeDtLot';
-import {scrapeDtMansion} from './scrapeDtMansion';
-import {handleContactScraper} from './handleContactScraper';
-import {handlePrepareForm} from './handlePrepareform';
+import {
+  scrapeDtHouse,
+  scrapeDtLot,
+  scrapeDtMansion,
+  handleContactScraper,
+  handlePrepareForm,
+} from './';
 
 export const getScraperByPropType = (propType: TProperty) => {
   switch (propType) {

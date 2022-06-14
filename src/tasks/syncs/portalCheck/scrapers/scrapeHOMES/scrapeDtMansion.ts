@@ -1,12 +1,11 @@
 import {IMansion} from '../../types';
 import {Page} from 'puppeteer';
-import {extractNumber, extractPrice, logger} from '../../../../../utils';
+import {logger} from '../../../../../utils';
+import {webScraper} from '../../helpers/webScraper';
+import {handleNextPage} from './handleNextPage';
 
-export const scrapeDtMansion = async (
-  page: Page,
-  result?: IMansion[],
-): Promise<IMansion[]> => {
-  const data = await page.$$eval('.mod-mergeBuilding--sale', (els) => {
+export const scrapeDtMansionPage = async (page: Page) => {
+  return await page.$$eval('.mod-mergeBuilding--sale', (els) => {
     return els.reduce((curr, el)=>{
       const address = $(el)
         .find('.bukkenSpec .verticalTable td')
@@ -39,24 +38,18 @@ export const scrapeDtMansion = async (
       return [...curr, ...mansions];
     }, [] as IMansion[]);
   });
+};
 
-  const populateNumbers = data
-    .map(((item)=>({
-      ...item,
-      比較用価格: extractPrice(item.販売価格),
-      比較用専有面積: extractNumber(item.専有面積),
-    })));
 
-  const cummulativeResult = [...(result ?? []), ...populateNumbers];
+export const scrapeDtMansion = async (
+  page: Page,
 
-  if (await page.$('.nextPage')) {
-    await Promise.all([
-      page.click('.nextPage'),
-      page.waitForNavigation(),
-    ]);
-    return await scrapeDtMansion(page, cummulativeResult);
-  }
+): Promise<IMansion[]> => {
+  logger.info(`Scraping ${page.url()}. `);
 
-  logger.info('Done scraping mansion');
-  return cummulativeResult;
+  return await webScraper<IMansion>({
+    page,
+    handleScraper: scrapeDtMansionPage,
+    handleNextPage: handleNextPage,
+  });
 };

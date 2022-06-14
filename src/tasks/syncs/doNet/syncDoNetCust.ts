@@ -4,26 +4,34 @@ import {navigateToCustPage} from '../../common/doNet/pages/navigate';
 import {
   downloadPerStore, selectStoreThenSearch,
 } from '../../common/doNet/pages/customer/downloadPerStore';
-import {uploadSingleCSV} from '../../common/kintone/uploadCSV';
+import {
+  uploadSingleCSVSmart,
+} from '../../common/kintone/uploadCSV';
 import {APP_IDS} from '../../../api/kintone';
 import chokidar from 'chokidar';
-import {deleteFile, dumpPath, logger, notifyDev} from '../../../utils';
+import {deleteFile, logger, notifyDev} from '../../../utils';
 import {setCustForm} from '../../common/doNet/pages/customer/setCustForm';
 
 import {format, subDays} from 'date-fns';
-import {handleDownload} from '../../common/doNet/pages/customer/handleDownload';
-import {Browser} from 'puppeteer';
+import {Browser, Page} from 'puppeteer';
+import {handleDownload} from '../../common/doNet/helpers/handleDownload';
+import {donetCSVEndpoint, donetDownloadPath} from './config';
+import path from 'path';
 
 
-export const handleFileWatcher = async (path: string, browser: Browser) => {
+export const handleFileWatcher = async (filePath: string, browser: Browser) => {
   try {
     const context = await browser.createIncognitoBrowserContext();
     const newPage = await context.newPage();
     newPage.setDefaultNavigationTimeout(0);
-    logger.info(`File ${path} has been added.`);
-    await uploadSingleCSV(newPage, APP_IDS.customers, 'custId', path);
+    logger.info(`Adding to upload que: ${path.basename(filePath)}`);
+    await uploadSingleCSVSmart({
+      page: newPage,
+      fileWithAppId: filePath,
+      keyField: 'custId',
+    });
     await Promise.all([
-      deleteFile(path),
+      deleteFile(filePath),
       newPage.close(),
     ]);
   } catch (e) {
@@ -32,25 +40,43 @@ export const handleFileWatcher = async (path: string, browser: Browser) => {
   }
 };
 
+export const handleDownloadCust = async (page: Page) => {
+  const filePath = await handleDownload({
+    page,
+    appId: APP_IDS.customers,
+    downloadDir: donetDownloadPath,
+    requestURL: donetCSVEndpoint,
+  });
+
+  if (filePath) {
+    await uploadSingleCSVSmart({
+      page,
+      fileWithAppId: filePath,
+      keyField: 'custId',
+    });
+    await deleteFile(filePath);
+  }
+};
+
 export const syncDoNetCust = async (isFullSync = false) => {
-  const watcher = chokidar.watch(dumpPath, {
+/*   const watcher = chokidar.watch(donetDownloadPath, {
     ignored: /(^|[/\\])\../, // ignore dotfiles
     persistent: true,
     depth: 0,
-  });
+  }); */
   try {
     /** File watcher */
 
 
     process.setMaxListeners(20);
     const page = await openBrowserPage();
-    const kintoneBrowser = page.browser();
+    // const kintoneBrowser = page.browser();
 
-    const uploadTasks : Promise<void>[] = [];
+    // const uploadTasks : Promise<void>[] = [];
 
-    watcher.on('add', (path)=>{
-      uploadTasks.push(handleFileWatcher(path, kintoneBrowser));
-    });
+    /*   watcher.on('add', (filePath)=>{
+      uploadTasks.push(handleFileWatcher(filePath, kintoneBrowser));
+    }); */
 
     await login(page);
     await navigateToCustPage(page);
@@ -68,20 +94,35 @@ export const syncDoNetCust = async (isFullSync = false) => {
           dateStr: format(subDays(new Date(), 1), 'yyyy-MM-dd')},
       );
       await selectStoreThenSearch(page, '');
-      await handleDownload(page);
+      await handleDownloadCust(page);
+      // await handleDownload(page);
+      /* const filePath = await handleDownload({
+        page,
+        appId: APP_IDS.customers,
+        downloadDir: donetDownloadPath,
+        requestURL: donetCSVEndpoint,
+      });
+
+      if (filePath) {
+        await uploadSingleCSVSmart({
+          page,
+          fileWithAppId: filePath,
+          keyField: 'custId',
+        });
+      } */
     }
 
     // Wait a second to register all promises upload promises to stack.
-    await page.waitForTimeout(1000);
-
-    console.log('prmise', uploadTasks.length);
-    await Promise.all(uploadTasks);
+    await page.waitForTimeout(2000);
 
 
-    await kintoneBrowser.close();
-    await watcher.close();
+    // await Promise.all(uploadTasks);
+
+    await page.browser().close();
+    // await kintoneBrowser.close();
+    // await watcher.close();
   } catch (error: any) {
-    await watcher.close();
-    notifyDev(`Error with syncDoNetCust. ${error.message}`);
+    // await watcher.close();
+    await notifyDev(`Error with syncDoNetCust. ${error.message}`);
   }
 };

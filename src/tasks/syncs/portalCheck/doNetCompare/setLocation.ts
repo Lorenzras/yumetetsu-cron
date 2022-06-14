@@ -5,58 +5,86 @@ import {logger} from '../../../../utils';
 import {selectByText} from './searchDoProperty';
 
 export const setLocation = async (
-  {page, data}:
+  {page, data, logSuffix}:
   {
     page: Page,
     data: {
       pref: string,
       city: string,
       town: string,
-    }
+    },
+    logSuffix: string
+
   }) => {
   const {pref, city, town} = data;
   await retry(async ()=>{
-    logger.info(`Setting location. ${pref} ${city} ${town}`);
+    // Test reset in case of retrying
+    await page.click('#modal_clear_button').catch(()=>true);
+
+    logger.info(`${logSuffix} is opening location modal.`);
+
+
     /* Open modal */
     await page.waitForSelector('#select_button_city1');
-    await page.click('#select_button_city1');
+    await page.click('#select_button_city1'),
 
-    // await selectByText(page, '#select_pref_id', '愛媛県' );
-    await selectByText(page, '#select_pref_id', pref );
 
-    await page.click('#modal_city_name_autocomplete_list_button');
+    logger.info(`${logSuffix} is setting prefecture.`);
+    await selectByText(page, '#select_pref_id', pref ),
+    await page.waitForNetworkIdle({idleTime: 500}),
+
+    logger.info(`${logSuffix} is setting city`);
+    await page.click('#modal_city_name_autocomplete', {clickCount: 3});
     await page.type('#modal_city_name_autocomplete', city);
 
-
-    /* Town field is disabled until triggering blur event on city field */
-    await page.$eval(
-      '#modal_city_name_autocomplete', (e) => {
-        (e as HTMLInputElement).blur();
-      });
-
+    // throw new Error('test');
     if (town) {
+      // On slow or laggy computers, donet's town API takes a very long time to respond so
+      // I addressing it with the following lines
+
+      logger.info(`${logSuffix} is waiting for town list reponse. `);
+      await Promise.all([
+        page.$eval(
+          '#modal_city_name_autocomplete', (e) => {
+            (e as HTMLInputElement).blur();
+          }),
+        page.waitForResponse((resp) => {
+          return resp.url().includes('https://manage.do-network.com/m_town/list') &&
+           resp.status() === 200;
+        }).catch(()=>logger.warn(`${logSuffix} failed to retrieve m_town.`)),
+      ]);
+
+      // Click/Focus to trigger populate when trigger blur event failed due to network lag.
+      await page.click('#modal_town_name_autocomplete');
+
       await page.waitForSelector(
         '#modal_town_name_autocomplete:not(:disabled)',
         {timeout: 10000},
       )
         .then(async ()=>{
-          // There are times when blur doesn't fire to populate autocomplete.
-          // So click the button.
-          await page.click('#modal_town_name_autocomplete_list_button');
-          return page.type('#modal_town_name_autocomplete', town);
+          // Setting the value directly does not reliably trigger autocomplete so
+          // 3x click the field to simulate a person overwriting town field.
+          logger.info(`${logSuffix} is typing town`);
+          await page.click('#modal_town_name_autocomplete', {clickCount: 3});
+          await page.type('#modal_town_name_autocomplete', town);
+          logger.info(`${logSuffix} succesfully typed town.`);
         })
-        .catch((err: any)=>{
-          throw new Error(`Failed to type town ${err.message}`);
+        .catch(async (err: any)=>{
+          throw new Error(`${logSuffix} failed to type town, clicking clear. ${err.message}`);
         });
     }
 
     await page.click('#modal_ok_button');
-    await page.waitForSelector('#select_pref_id', {hidden: true});
+    await page.waitForSelector('#select_pref_id', {hidden: true, timeout: 10000})
+      .catch(()=>{
+        throw new Error(`${logSuffix} Failed to click ok.`);
+      });
   }, {
     retries: 3,
     onRetry: async (e, tries) => {
-      logger.error(`Failed. Retrying to populate location form. ${e.message} Attempt: ${tries}`);
-      await page.click('#modal_clear_button');
+      logger.warn(`${logSuffix} retried ${tries} time/s in retrying to populate location form. ${e.message}`);
     },
+    maxTimeout: 1000,
+    minTimeout: 500,
   });
 };

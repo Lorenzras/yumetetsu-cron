@@ -22,11 +22,11 @@ export const decodeToSJIS = (buffer: Buffer) => {
   const decoder = new TextDecoder('shift_jis');
   return decoder.decode(buffer);
 };
-
+// /^\d*\.?\d+/g
 export const extractNumber = (str: string): number => {
   const matchResult = str
     .replace(/[,、]/, '')
-    .match(/(\d+)(?:\.(\d+))?/g);
+    .match(/(\d*\.?\d+(?![A-Z]))/g);
   const result = matchResult?.[0] || 0;
   return isNaN(+result) ? 0 : +result;
 };
@@ -37,7 +37,9 @@ const getCleanJaPrice = (
   cleanStr: string,
   computedDecimal: number
 } => {
-  let cleanStr = dirtyStr.replace(/[円,]/g, '');
+  // const firstPrice = dirtyStr.split('円', 1)[0]; // 値段が複数ある場合
+  let cleanStr = dirtyStr.split('円', 1)[0].replace(',', '');
+
   const splitByDecimal = cleanStr.split('.');
   let computedDecimal = 0;
 
@@ -108,14 +110,21 @@ export const spreadAddress = (
 };
 
 export const extractTel = (dirtySource: string) => {
+  const cleanerSource = dirtySource
+    .replace(/[\s-]/g, '')
+    // fails to capture at " ／ " so replace it with any word
+    .replace('／', '電話');
+
   const result = findPhoneNumbersInText(
-    dirtySource,
+    cleanerSource,
     {
       defaultCountry: 'JP',
     },
   );
+
+
   return result
     .map((i) => parsePhoneNumber(i.number.number)
       .formatNational(),
-    ).join(' または ');
+    ).join(' / ');
 };

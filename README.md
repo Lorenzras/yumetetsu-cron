@@ -1,27 +1,94 @@
-# yumetetsu-cron
- Cron jobs for yumetetsu
+# Yumecoco CronJobs
 
-Commands:
+[日本語版](README.ja.md)
 
-- npm run start:dev
-Starts the application in development using nodemon and ts-node to do cold reloading.
+This project is a collection of automation projects
+for Yumetetsu and Cocosumo written in Typescript.
 
-- npm run build
-Builds the app at build, cleaning the folder first.
+- [Yumecoco CronJobs](#yumecoco-cronjobs)
+  - [Usage](#usage)
+  - [Settings](#settings)
+  - [Jobs](#jobs)
+  - [Testing](#testing)
+  - [Paths](#paths)
+  - [Definition of Terms](#definition-of-terms)
 
-- npm run start
-Starts the app in production by first building the project with npm run build, and then executing the compiled JavaScript at build/index.js.
+## Usage
+
+1. Run the following commands in order on the root folder.
+
+   ```bash
+   git fetch
+   npm i
+   npm run build
+   ```
+
+2. Execute **start.bat** at the root folder.
+
+3. Done. Jobs will now be automatically executed according to
 
 
-Mac
+## Settings
 
-- /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222 --no-first-run --no-default-browser-check --user-data-dir=$(mktemp -d -t 'chrome-remote_data_dir')
-Run a dev version of chrome where puppeteer can connect.
+- [Cron Jobs](src/main.ts)
+Configure task schedule here.
+Refer to [Cron Generator](https://crontab.guru/)
 
-- https://github.com/kintone-labs/cli-kintone/blob/master/docs/BuildForMacLinux.md
-Build for Mac/linux
+## Jobs
+
+- [Portal Check](src/tasks/syncs/portalCheck/readme.md)
+- [Sync Donetwork Customer to Kintone](src/tasks/syncs/doNet/syncDoNetCust.ts)
+- [Sync Donetwork Properties to Kintone](src/tasks/syncs/doNet/syncDonetProperties.ts)
+  (inactive)
+
+- [Sync Reins to Kintone](src/tasks/syncs/reins/syncProperties.ts)
+(inactive)
 
 
-I added xserver path
-- GOBIN
-Path to GO
+
+## Testing
+
+This project use [jest](https://jestjs.io/).
+
+Files with accompanying *.test.ts may be tested.
+
+```bash
+jest [relative file path] -t [testName]
+```
+
+Example to test run portalCheck run the following:
+
+```bash
+jest portalCheckMainTask -t main
+```
+
+There maybe conditions before running the test,
+please check the code or contact the programmer.
+
+Refer to [jest](https://jestjs.io/) for more information.
+
+## Paths
+
+- Logs
+   Located at the root's **logs** folder.
+
+- Downloads
+   Located at the root's **downloads** folder.
+
+- [Other Paths](./src/utils/paths.ts).
+
+## Definition of Terms
+
+- **Root**
+The project's base folder.
+
+- **Cron**
+A Linux command used for scheduling tasks to be executed sometime in the future.
+This is normally used to schedule a job that is executed periodically.
+
+- **Job**
+Refers to tasks run by cron.
+
+- **Typescript**
+A superset of Javascript used as the programming language for this project.
+Used officially by large companies like Google.

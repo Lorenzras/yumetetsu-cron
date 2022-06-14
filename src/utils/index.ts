@@ -1,4 +1,5 @@
 export * from './dates';
+export * from './dom';
 export * from './field';
 export * from './file';
 export * from './logger';
