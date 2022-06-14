@@ -47,7 +47,6 @@ export const saveMeta = (
     }, {
       doNet無: 0,
       doNet有: 0,
-
       siteAtHome全: {
         件数: 0,
       },
@@ -60,6 +59,7 @@ export const saveMeta = (
       siteYahoo全: {
         件数: 0,
       },
+
     } as Record<string, any>);
 
 
@@ -93,7 +93,12 @@ export const saveMeta = (
     };
 
     if (isFail) accu.企業取得失敗件数 += 1;
-    if (isGone) accu.無くなった件数 += 1;
+    if (isGone) {
+      accu.無くなった.件数 += 1;
+      accu.無くなった.詳細.push([
+        市区, propType,
+      ].join(' - '));
+    }
 
     if (link.includes('athome')) {
       resolveCounter('siteAtHome');
@@ -115,12 +120,8 @@ export const saveMeta = (
 
     return accu;
   }, {
-    企業取得失敗件数: 0,
-    無くなった件数: 0,
-    doNetエラー: {
-      件数: 0,
-      詳細: [],
-    },
+
+
     siteAtHome済: {
       件数: 0,
     },
@@ -133,6 +134,10 @@ export const saveMeta = (
     siteYahoo済: {
       件数: 0,
     },
+    無くなった: {
+      件数: 0,
+      詳細: [],
+    },
     siteAtHome失敗: {
       件数: 0,
     },
@@ -144,6 +149,11 @@ export const saveMeta = (
     },
     siteYahoo失敗: {
       件数: 0,
+    },
+    企業取得失敗件数: 0,
+    doNetエラー: {
+      件数: 0,
+      詳細: [],
     },
   } as Record<string, any>);
 
