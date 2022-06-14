@@ -18,13 +18,18 @@ export const saveMeta = (
       DO管理有無: doNetExist,
       リンク: link,
       物件種別: propType = '無',
+      DO価格差: priceDiff,
     })=>{
       switch (doNetExist) {
         case '無':
           accu.doNet無 += 1;
           break;
         case '有':
-          accu.doNet有 += 1;
+          if (+(priceDiff ?? 0) !== 0) {
+            accu.doNet有_非同額 += 1;
+          } else {
+            accu.doNet有_同額 += 1;
+          }
           break;
       }
 
@@ -46,7 +51,8 @@ export const saveMeta = (
       return accu;
     }, {
       doNet無: 0,
-      doNet有: 0,
+      doNet有_非同額: 0,
+      doNet有_同額: 0,
       siteAtHome全: {
         件数: 0,
       },
