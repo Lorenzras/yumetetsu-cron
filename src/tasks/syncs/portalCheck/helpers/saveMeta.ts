@@ -80,7 +80,7 @@ export const saveMeta = (
     DO管理有無,
   }) => {
     const isFail = !company || company.includes('失敗');
-    const isGone = !company || company.includes('無くなった');
+    const isGone = company?.includes('無くなった');
     const {市区} = spreadAddress(address);
 
     const resolveCounter = (fieldPart: string) => {
