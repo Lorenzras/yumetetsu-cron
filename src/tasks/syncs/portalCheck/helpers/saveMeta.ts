@@ -101,9 +101,9 @@ export const saveMeta = (
     if (isFail) accu.企業取得失敗件数 += 1;
     if (isGone) {
       accu.無くなった.件数 += 1;
-      accu.無くなった.詳細.push([
-        市区, propType,
-      ].join(' - '));
+      const currGoneValue = accu.無くなった[市区]?.[propType] || 0;
+      accu.無くなった[市区] = accu.無くなった[市区] ?? Object.create(null);
+      accu.無くなった[市区][propType] = currGoneValue + 1;
     }
 
     if (link.includes('athome')) {
@@ -118,10 +118,15 @@ export const saveMeta = (
 
     if (!DO管理有無?.trim()) {
       accu.doNetエラー.件数 += 1;
+      const currDonetErrVal = accu.doNetエラー[市区]?.[propType] || 0;
+      accu.doNetエラー[市区] = accu.doNetエラー[市区] ?? Object.create(null);
+      accu.doNetエラー[市区][propType] = currDonetErrVal + 1;
+
+      /*       accu.doNetエラー.件数 += 1;
       accu.doNetエラー.詳細.push([
         市区,
         propType,
-      ].join(' - '));
+      ].join(' - ')); */
     }
 
     return accu;
@@ -142,7 +147,9 @@ export const saveMeta = (
     },
     無くなった: {
       件数: 0,
-      詳細: [],
+    },
+    doNetエラー: {
+      件数: 0,
     },
     siteAtHome失敗: {
       件数: 0,
@@ -157,10 +164,7 @@ export const saveMeta = (
       件数: 0,
     },
     企業取得失敗件数: 0,
-    doNetエラー: {
-      件数: 0,
-      詳細: [],
-    },
+
   } as Record<string, any>);
 
   const prettyResult = beautify({
