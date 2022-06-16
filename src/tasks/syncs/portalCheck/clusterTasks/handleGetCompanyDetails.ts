@@ -22,11 +22,18 @@ THandleContactScraper = async (page, data) => {
     } else if (url.includes('yahoo')) {
       return await yahoo(page, data);
     } else {
-      return data;
+      return {
+        ...data,
+        掲載企業: '取得失敗：不明なリンク',
+      };
     }
   } catch (err: any) {
     logger
       .error(`Fatal: failed to get contact details. ${JSON.stringify(data)} ${err.message}`);
-    return data;
+    return {
+      ...data,
+      掲載企業TEL: '取得大失敗',
+      掲載企業: '取得大失敗',
+    };
   }
 };

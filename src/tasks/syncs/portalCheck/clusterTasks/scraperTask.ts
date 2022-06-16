@@ -130,7 +130,10 @@ export const scraperTask: TScraperTask = async (actions, cluster, saveToNetWorkD
           }) as IProperty;
         } catch (err: any) {
           logger.error(`Unhandled error at fetchingContact ${data.リンク} ${err.message}`);
-          return data;
+          return {
+            ...data,
+            掲載企業: '処理失敗',
+          };
         }
       }),
   );

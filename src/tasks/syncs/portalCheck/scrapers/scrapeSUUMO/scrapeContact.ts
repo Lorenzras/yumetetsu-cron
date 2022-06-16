@@ -108,14 +108,14 @@ export const getContactLink = async (
       });
     }, {
       retries: 3,
+      minTimeout: 5000,
+      maxTimeout: 15000,
       onRetry: (e, attempts)=>{
         logger.error(
           `getContactLink retries: ${attempts} ${e.message} ${url}`);
       },
     });
 
-
-    console.log(pageType);
     switch (pageType) {
       case 'error':
       case 'errWithSorry':
