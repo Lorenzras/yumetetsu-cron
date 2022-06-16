@@ -87,8 +87,7 @@ export const getContactLink = async (
             bail(new Error(`Network error`));
             return 'netError';
           }
-          bail(new Error(`goto error. ${err.message}`));
-          return 'otherError';
+          throw new Error('Network error.');
         });
 
       if (status!=='ok') return status;

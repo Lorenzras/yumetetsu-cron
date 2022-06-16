@@ -28,8 +28,8 @@ export const initCluster = () => Cluster.launch({
     headless: process.env.BROWSER_TYPE === 'HEADLESS',
     // args: minimalArgs,
   },
-  retryLimit: 1,
-  retryDelay: 5000,
+  retryLimit: 2,
+  retryDelay: 20000,
   timeout: 1000 * 60 * 8,
 });
 

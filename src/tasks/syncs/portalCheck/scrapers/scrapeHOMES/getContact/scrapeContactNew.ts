@@ -8,8 +8,8 @@ import {scrapeContactCompanyPage} from './scrapeContactCompanyPage';
 */
 export const scrapeContactNew = async (page: Page ) => {
   let result : TCompanyContact = {
-    掲載企業: '---',
-    掲載企業TEL: '---',
+    掲載企業: '',
+    掲載企業TEL: '',
   };
   let realtorPage: string;
 
@@ -36,6 +36,9 @@ export const scrapeContactNew = async (page: Page ) => {
     return result;
   } catch (err: any) {
     logger.error(`scrapeSingleContact ${page.url()} ${err.message}`);
-    return result;
+    return {
+      ...result,
+      掲載企業: '取得失敗',
+    };
   }
 };
