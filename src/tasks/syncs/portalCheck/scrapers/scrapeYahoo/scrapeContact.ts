@@ -53,7 +53,7 @@ const getMultipleLink = async (
   // const htmlBody = await page.content();
   const htmlBody = await axios(
     url,
-    {headers: {'User-Agent': userAgent}},
+    {headers: {'User-Agent': await page.browser().userAgent()}},
   ).then((resp) => resp.data);
   const $ = load(htmlBody);
 
@@ -132,10 +132,9 @@ const getSingleLink = async (
   page: Page,
   url: string,
 ) => {
-  const userAgent = await page.browser().userAgent();
   const htmlBody = await axios(
     url,
-    {headers: {'User-Agent': userAgent}},
+    {headers: {'User-Agent': await page.browser().userAgent()}},
   ).then((resp) => resp.data);
   const $ = load(htmlBody);
 
