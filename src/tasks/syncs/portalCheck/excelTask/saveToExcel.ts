@@ -110,11 +110,8 @@ export const saveFile = async (
     const props = groupedByPropType[wsName];
     if (!props) return; // Short circuit when it doesn't exist
 
-    const rows = extractRows(props)
-      .sort((a, b) => {
-        if (a[4] < b[4]) return -1;
-        return 0;
-      });
+    const rows = extractRows(props);
+
 
     ws.addRows(rows);
 

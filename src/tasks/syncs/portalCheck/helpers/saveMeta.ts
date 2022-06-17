@@ -118,7 +118,7 @@ export const saveMeta = ({
 
     if (link.includes('athome')) {
       resolveCounter('siteAtHome');
-    } else if (link.includes('homes')) {
+    } else if (link.includes('homes.co.jp')) {
       resolveCounter('siteHomes');
     } else if (link.includes('suumo')) {
       resolveCounter('siteSuumo');
@@ -131,12 +131,6 @@ export const saveMeta = ({
       const currDonetErrVal = accu.doNetエラー[市区]?.[propType] || 0;
       accu.doNetエラー[市区] = accu.doNetエラー[市区] ?? Object.create(null);
       accu.doNetエラー[市区][propType] = currDonetErrVal + 1;
-
-      /*       accu.doNetエラー.件数 += 1;
-      accu.doNetエラー.詳細.push([
-        市区,
-        propType,
-      ].join(' - ')); */
     }
 
     return accu;
