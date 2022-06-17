@@ -6,7 +6,7 @@ const {combine, timestamp, json, prettyPrint} = format;
 import {format as dateFormat} from 'date-fns';
 import DailyRotateFile from 'winston-daily-rotate-file';
 
-const hourlyTransport: DailyRotateFile = new DailyRotateFile({
+const combinedTransport: DailyRotateFile = new DailyRotateFile({
   filename: 'combined-%DATE%.log',
   dirname: logsPath,
   datePattern: 'YYYY-MM-DD',
@@ -15,7 +15,7 @@ const hourlyTransport: DailyRotateFile = new DailyRotateFile({
   maxFiles: '14d',
 });
 
-const hourlyErrTransport: DailyRotateFile = new DailyRotateFile({
+const errTransport : DailyRotateFile = new DailyRotateFile({
   filename: 'error-%DATE%.log',
   dirname: logsPath,
   datePattern: 'YYYY-MM-DD',
@@ -39,8 +39,8 @@ export const logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.Console(),
-    hourlyErrTransport,
-    hourlyTransport,
+    combinedTransport,
+    errTransport,
   ],
   exceptionHandlers: [
     new winston.transports.File({filename: 'exceptions.log'}),
