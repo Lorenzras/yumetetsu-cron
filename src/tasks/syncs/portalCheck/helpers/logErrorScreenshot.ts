@@ -2,7 +2,8 @@ import {logsDatedPath} from './../../../../utils/logger';
 
 import path from 'path';
 import {Page} from 'puppeteer';
-import {getFileName, logger, saveFile} from '../../../../utils';
+import {getFileName, logger, logsPath, saveFile} from '../../../../utils';
+import {format} from 'date-fns';
 
 
 /**
@@ -14,7 +15,7 @@ import {getFileName, logger, saveFile} from '../../../../utils';
  */
 export const logErrorScreenshot = async (page: Page, message: string) => {
   const filePath = getFileName({
-    dir: logsDatedPath,
+    dir: path.join(logsPath, format(new Date(), 'yyyy.MM.dd')),
   });
   const fileName = path.basename(filePath);
 

@@ -4,6 +4,26 @@ import winston, {format} from 'winston';
 import {logsPath} from './paths';
 const {combine, timestamp, json, prettyPrint} = format;
 import {format as dateFormat} from 'date-fns';
+import DailyRotateFile from 'winston-daily-rotate-file';
+
+const hourlyTransport: DailyRotateFile = new DailyRotateFile({
+  filename: 'combined-%DATE%.log',
+  dirname: logsPath,
+  datePattern: 'YYYY-MM-DD',
+  zippedArchive: true,
+  maxSize: '20m',
+  maxFiles: '14d',
+});
+
+const hourlyErrTransport: DailyRotateFile = new DailyRotateFile({
+  filename: 'error-%DATE%.log',
+  dirname: logsPath,
+  datePattern: 'YYYY-MM-DD',
+  zippedArchive: true,
+  maxSize: '20m',
+  maxFiles: '14d',
+  level: 'warn',
+});
 
 export const logsDatedPath = path.join(
   logsPath,
@@ -19,16 +39,8 @@ export const logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({
-      filename: path.join(
-        logsDatedPath, `error.log`,
-      ),
-      level: 'error'}),
-    new winston.transports.File({
-      filename: path.join(
-        logsDatedPath, `combined.log`,
-      ),
-    }),
+    hourlyErrTransport,
+    hourlyTransport,
   ],
   exceptionHandlers: [
     new winston.transports.File({filename: 'exceptions.log'}),
