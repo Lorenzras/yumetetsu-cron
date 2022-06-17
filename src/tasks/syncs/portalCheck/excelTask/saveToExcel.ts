@@ -9,7 +9,6 @@ import {spreadAddress} from '../../../../utils';
 import fs from 'fs';
 import {format} from 'date-fns';
 import {formatResult} from './formatResult';
-import {saveMeta} from '../helpers/saveMeta';
 
 type UProperty = IProperty[] | IHouse[] | ILot[] | IMansion[]
 
@@ -111,7 +110,11 @@ export const saveFile = async (
     const props = groupedByPropType[wsName];
     if (!props) return; // Short circuit when it doesn't exist
 
-    const rows = extractRows(props);
+    const rows = extractRows(props)
+      .sort((a, b) => {
+        if (a[4] < b[4]) return -1;
+        return 0;
+      });
 
     ws.addRows(rows);
 

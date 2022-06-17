@@ -1,17 +1,16 @@
 import {browserTimeOut} from '../../../common/browser/config';
 import {getGroupByCity, saveToExcel} from './saveToExcel';
-import jsonData from './../../../../../downloads/json/portalCheck/199-20220608-235456-N5T8V--finalResults-2426.json';
+// eslint-disable-next-line max-len
+import jsonData from './../../../../../downloads/json/portalCheck/199-20220617-134740-POJjq--finalResults-65.json';
 import {IProperty} from './../types';
 import path from 'path';
-import { resultJSONPath } from '../config';
-
-
+import {resultJSONPath} from '../config';
 
 
 describe('SaveToExcel', ()=>{
   test('main', async ()=>{
     console.log('Test data length ', jsonData.length);
-    await saveToExcel(jsonData as IProperty[]);
+    await saveToExcel(jsonData as IProperty[], false);
   }, browserTimeOut);
 
   test('byCity', ()=>{

@@ -20,19 +20,30 @@ const setHyperlinks = (
   },
 ) => {
   const propNameCell = ws.getCell('M' + (rowIdx + 2) );
-  propNameCell.font = {
-    color: {argb: '004e47cc'},
-    bold: true,
-    underline: true,
-  };
 
   const portalLink = props[rowIdx].リンク;
   const site = getSite(portalLink);
+  const companyName = row.at(-2);
 
   propNameCell.value = {
-    formula: `=HYPERLINK("${portalLink}", "(${site}) ${row.at(-2)}")`,
+    formula: `=HYPERLINK("${portalLink}", "(${site}) ${companyName}")`,
     date1904: false,
   };
+
+
+  const isFail = !companyName || companyName.includes('失敗');
+  if (isFail) {
+    propNameCell.font = {
+      color: {argb: 'FF0000'},
+      underline: true,
+    };
+  } else {
+    propNameCell.font = {
+      color: {argb: '004e47cc'},
+      bold: true,
+      underline: true,
+    };
+  }
 };
 
 export const formatResult = (
@@ -69,7 +80,7 @@ export const formatResult = (
       };
     });
 
-    // Link
+    // Link and color
     setHyperlinks({
       ws, row, rowIdx, props,
     });
