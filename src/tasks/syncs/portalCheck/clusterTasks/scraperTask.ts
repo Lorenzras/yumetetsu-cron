@@ -106,7 +106,6 @@ export const scraperTask: TScraperTask = async (actions, cluster, saveToNetWorkD
 
 
   const scrapedProps = actionResults.reduce((accu, curr) => {
-    console.log('CURR', curr.result);
     if (curr.result?.length) {
       accu.push(...curr.result);
     }

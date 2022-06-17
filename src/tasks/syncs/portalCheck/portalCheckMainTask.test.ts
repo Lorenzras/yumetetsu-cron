@@ -81,7 +81,12 @@ describe('portalCheckMainProcess', () => {
       }));
 
     await saveToExcel(newData);
-    saveMeta(data, newData);
+    saveMeta({
+      beforeGetContact: data,
+      afterGetContact: newData,
+      saveToNetWorkDrive: false,
+      startTime: new Date(),
+    });
 
     // await sleep(10000);
     // saveToExcel(data)
@@ -115,7 +120,12 @@ describe('portalCheckMainProcess', () => {
       }));
 
     await saveToExcel(newDataWithContacts, false);
-    saveMeta(getJSONData(beforeGetContacts), newDataWithContacts, false);
+    saveMeta({
+      beforeGetContact: getJSONData(beforeGetContacts),
+      afterGetContact: newDataWithContacts,
+      startTime: new Date(),
+      saveToNetWorkDrive: false,
+    });
 
     // await sleep(10000);
     // saveToExcel(data)
