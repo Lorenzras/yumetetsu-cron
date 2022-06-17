@@ -22,6 +22,7 @@ type TScraperTask = (
 ) => Promise<IProperty[]>
 
 export const scraperTask: TScraperTask = async (actions, cluster, saveToNetWorkDrive = true) => {
+  const startTime = new Date();
   // Shuffle actions to spread network traffic between sites.
   const shuffledActions = _.shuffle(actions);
 
@@ -188,7 +189,12 @@ export const scraperTask: TScraperTask = async (actions, cluster, saveToNetWorkD
     suffix: `${finalResults.length.toString()}`,
   }), finalResults);
 
-  saveMeta(doComparedDt, finalResults, saveToNetWorkDrive);
+  saveMeta({
+    beforeGetContact: doComparedDt,
+    afterGetContact: finalResults,
+    saveToNetWorkDrive,
+    startTime,
+  });
   saveScrapeMeta(actionResults, saveToNetWorkDrive);
 
   logger.info(`Done saving to CSV. Starting to save to upload to kintone.`);

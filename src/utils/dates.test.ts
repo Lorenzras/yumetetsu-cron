@@ -1,4 +1,4 @@
-import {format} from 'date-fns';
+import {format, intervalToDuration} from 'date-fns';
 import {APP_IDS, kintoneClient} from '../api/kintone';
 import {getYearDiffFromToday, isSameMonthDay, getDateYesterday} from './dates';
 
@@ -13,7 +13,7 @@ describe('Date', <
           .record
           .getRecords({
             app: APP_IDS.longTermCustomers,
-            query: `${'追客可能時期' as T} = ""`,
+            query: `${String('追客可能時期' as T)} = ""`,
           })
       )
         .records
@@ -35,7 +35,7 @@ describe('Date', <
         .record
         .getRecords({
           app: APP_IDS.longTermCustomers,
-          query: `${'追客可能時期' as T} = ""`,
+          query: `${String('追客可能時期' as T)} = ""`,
         })
     )
       .records
@@ -53,5 +53,12 @@ describe('Date', <
 
   it('yesterday', ()=>{
     expect(getDateYesterday()).toMatchSnapshot();
+  });
+
+  it('intervalDuration', ()=>{
+    expect(intervalToDuration({
+      start: new Date(1929, 0, 15, 12, 0, 0),
+      end: new Date(),
+    })).toMatchSnapshot();
   });
 });

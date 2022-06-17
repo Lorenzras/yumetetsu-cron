@@ -1,5 +1,5 @@
 import {resolveResultDir} from './../config';
-import {format} from 'date-fns';
+import {format, intervalToDuration} from 'date-fns';
 import {saveFile, spreadAddress} from '../../../../utils';
 import {IProperty} from './../types';
 import path from 'path';
@@ -7,10 +7,17 @@ import beautify from 'json-beautify';
 import {hostname} from 'os';
 
 
-export const saveMeta = (
+export const saveMeta = ({
+  beforeGetContact,
+  afterGetContact,
+  startTime,
+  saveToNetWorkDrive = true,
+}: {
   beforeGetContact: IProperty[],
   afterGetContact: IProperty[],
-  saveToNetWorkDrive = true,
+  startTime: Date,
+  saveToNetWorkDrive : boolean,
+},
 ) => {
   const totalLength = beforeGetContact.length;
   const resultLength = afterGetContact.length;
@@ -169,8 +176,15 @@ export const saveMeta = (
 
   } as Record<string, any>);
 
+  const {hours, minutes, seconds} = intervalToDuration({
+    start: startTime,
+    end: new Date(),
+  });
+
   const prettyResult = beautify({
-    日時: format(new Date(), 'yyyy.MM.dd HH:mm:ss'),
+    処理時間: `${hours}時間${minutes}分${seconds}秒`,
+    開始日時: format(startTime, 'yyyy.MM.dd HH:mm:ss'),
+    終了日時: format(new Date(), 'yyyy.MM.dd HH:mm:ss'),
     パソコン名: hostname(),
     取得件数: totalLength,
     結果件数: resultLength,

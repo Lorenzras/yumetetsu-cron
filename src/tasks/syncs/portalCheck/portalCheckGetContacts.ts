@@ -22,6 +22,7 @@ const getJSONData = (fName: string) => {
 };
 
 export const portalCheckGetContacts = async ()=>{
+  const startTime = new Date();
   const jsonFName = '199-20220611-163407-mT7s9--doComparedDt-5288.json';
   const cluster: Cluster<{ page: Page }> = await initCluster();
   const data: IProperty[] = getJSONData(jsonFName);
@@ -52,8 +53,13 @@ export const portalCheckGetContacts = async ()=>{
   logger.info('DONE fetching contacts. Starting to save!');
 
   await saveToExcel(newData, false);
-  saveMeta(data, newData, false);
-
+  saveMeta({
+    beforeGetContact: data,
+    afterGetContact: newData,
+    saveToNetWorkDrive: false,
+    startTime,
+  });
+  // data, newData, false
   // await sleep(10000);
   // saveToExcel(data)
   await cluster.idle();
