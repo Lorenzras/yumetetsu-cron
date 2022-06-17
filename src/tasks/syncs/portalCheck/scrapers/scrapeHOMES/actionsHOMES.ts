@@ -28,6 +28,7 @@ export const actionsHOMES = () => {
     const actions = propertyTypes
       .map<IAction>((type) => {
       return {
+        site: 'homes',
         pref,
         type,
         handlePrepareForm,

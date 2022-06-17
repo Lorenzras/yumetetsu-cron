@@ -26,6 +26,7 @@ export const actionsAtHome = () => {
     const actions = propertyTypes
       .map<IAction>((type) => {
       return {
+        site: 'athome',
         pref,
         type,
         handlePrepareForm,

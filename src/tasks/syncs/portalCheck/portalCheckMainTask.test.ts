@@ -41,14 +41,14 @@ describe('portalCheckMainProcess', () => {
 
     const actions = [
       // ...actionsHOMES(),
-      ...actionsHOMES(),
+      ...(actionsHOMES().slice(2)),
       // ...actionsAtHome(),
       // ...actionsSUUMO(),
       // ...actionsYahoo(),
       // actionsSUUMO()[2],
     ];
 
-    await scraperTask(actions, cluster);
+    await scraperTask(actions, cluster, false);
     await sleep(5000);
 
     await cluster.idle();

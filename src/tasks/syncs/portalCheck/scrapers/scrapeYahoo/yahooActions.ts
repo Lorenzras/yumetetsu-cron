@@ -1,6 +1,6 @@
-import {Page} from 'puppeteer';
-import {cityLists} from '../../config';
-import {IAction, TProperty} from '../../types';
+
+
+import {IAction} from '../../types';
 import {prepareForm} from './prepareForm';
 import {scrapeContact} from './scrapeContact';
 import {scrapeDtMansion} from './scrapeDtMansion';
@@ -8,8 +8,9 @@ import {scrapeDtHouse} from './scrapeDtHouse';
 import {scrapeDtLot} from './scrapeDtLot';
 
 export const yahooActions = (): IAction[] => {
-  return [
+  const actions: IAction[] = [
     {
+      site: 'yahoo',
       pref: '愛知県',
       type: '中古マンション',
       handlePrepareForm: prepareForm,
@@ -17,6 +18,7 @@ export const yahooActions = (): IAction[] => {
       handleContactScraper: scrapeContact,
     },
     {
+      site: 'yahoo',
       pref: '岐阜県',
       type: '中古マンション',
       handlePrepareForm: prepareForm,
@@ -24,6 +26,7 @@ export const yahooActions = (): IAction[] => {
       handleContactScraper: scrapeContact,
     },
     {
+      site: 'yahoo',
       pref: '愛知県',
       type: '中古戸建',
       handlePrepareForm: prepareForm,
@@ -31,6 +34,7 @@ export const yahooActions = (): IAction[] => {
       handleContactScraper: scrapeContact,
     },
     {
+      site: 'yahoo',
       pref: '岐阜県',
       type: '中古戸建',
       handlePrepareForm: prepareForm,
@@ -38,6 +42,7 @@ export const yahooActions = (): IAction[] => {
       handleContactScraper: scrapeContact,
     },
     {
+      site: 'yahoo',
       pref: '愛知県',
       type: '土地',
       handlePrepareForm: prepareForm,
@@ -45,6 +50,7 @@ export const yahooActions = (): IAction[] => {
       handleContactScraper: scrapeContact,
     },
     {
+      site: 'yahoo',
       pref: '岐阜県',
       type: '土地',
       handlePrepareForm: prepareForm,
@@ -52,4 +58,5 @@ export const yahooActions = (): IAction[] => {
       handleContactScraper: scrapeContact,
     },
   ];
+  return actions;
 };

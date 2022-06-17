@@ -3,7 +3,7 @@ import {resultJSONPath, kintoneAppId, resultCSVPath} from './../config';
 import {saveJSONToCSV, saveJSON, getFileName} from './../../../../utils/file';
 import {Page} from 'puppeteer';
 import {Cluster} from 'puppeteer-cluster';
-import {IAction, IProperty} from '../types';
+import {IAction, IActionResult, IProperty} from '../types';
 import {logger} from '../../../../utils';
 import _ from 'lodash';
 import {saveToExcel} from '../excelTask/saveToExcel';
@@ -11,6 +11,7 @@ import {handleGetCompanyDetails} from './handleGetCompanyDetails';
 import {uploadTask} from './uploadTask';
 import {handleDonetCompare} from './handleDonetCompare';
 import {saveMeta} from '../helpers/saveMeta';
+import {saveScrapeMeta} from '../helpers/saveScrapeMeta';
 
 
 type TScraperTask = (
@@ -33,7 +34,9 @@ export const scraperTask: TScraperTask = async (actions, cluster, saveToNetWorkD
   };
 
 
-  const handleAction = async (action: IAction) => {
+  const handleAction = async (
+    action: IAction,
+  ): Promise<IActionResult> => {
     const {
       pref, type, handleScraper, handlePrepareForm,
     } = action;
@@ -51,6 +54,9 @@ export const scraperTask: TScraperTask = async (actions, cluster, saveToNetWorkD
               (typeof formState !== 'boolean' && formState.success)
             ) {
               res.push(...await handleScraper(page));
+            } else {
+              // 失敗した場合
+              throw new Error('失敗しました。');
             }
 
             if (typeof formState !== 'boolean' ) {
@@ -67,10 +73,23 @@ export const scraperTask: TScraperTask = async (actions, cluster, saveToNetWorkD
 
       const dataWithType = handleAddPropertyType(action, initialResult);
 
-      return dataWithType;
+      return {
+        site: action.site,
+        prefecture: action.pref,
+        propertyType: action.type,
+        isSuccess: true,
+        length: dataWithType.length,
+        result: dataWithType,
+      };
     } catch (err: any) {
       logger.error(`Unhandled error at scraperTask.handleAction ${pref} ${type} $ ${err.message}`);
-      return res;
+      return {
+        site: action.site,
+        prefecture: action.pref,
+        propertyType: action.type,
+        isSuccess: false,
+        error: err.message,
+      };
     }
   };
 
@@ -78,11 +97,20 @@ export const scraperTask: TScraperTask = async (actions, cluster, saveToNetWorkD
   /**
    * Stores all scraped properties from designated actions.
    */
-  const scrapedProps = (await Promise.all(
+  const actionResults = (await Promise.all(
     shuffledActions.map(async (action) => {
       return await handleAction(action);
     }),
-  )).flat();
+  ));
+
+
+  const scrapedProps = actionResults.reduce((accu, curr) => {
+    console.log('CURR', curr.result);
+    if (curr.result?.length) {
+      accu.push(...curr.result);
+    }
+    return accu;
+  }, [] as IProperty[]);
 
   const totalScrapeLength = scrapedProps.length;
   logger.info(`Scraped results ${totalScrapeLength}. Starting to compare to doNet.`);
@@ -159,8 +187,9 @@ export const scraperTask: TScraperTask = async (actions, cluster, saveToNetWorkD
     dir: resultCSVPath,
     suffix: `${finalResults.length.toString()}`,
   }), finalResults);
-  saveMeta(doComparedDt, finalResults, saveToNetWorkDrive);
 
+  saveMeta(doComparedDt, finalResults, saveToNetWorkDrive);
+  saveScrapeMeta(actionResults, saveToNetWorkDrive);
 
   logger.info(`Done saving to CSV. Starting to save to upload to kintone.`);
   if (csvFile) {

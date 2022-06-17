@@ -32,8 +32,9 @@ export type THandlePrepareForm = (
   nextIdx: number,
 } | boolean>
 export type THandleContactScraper = (page: Page, data: IProperty) => Promise<IProperty>
-
+export type TSites = 'yahoo' | 'suumo' | 'homes' | 'athome'
 export interface IAction {
+  site: TSites,
   pref: string,
   type: TProperty,
   handleScraper: THandleScraper,
@@ -41,6 +42,15 @@ export interface IAction {
   handleContactScraper: THandleContactScraper
 }
 
+export interface IActionResult {
+  site: TSites,
+  prefecture: string,
+  propertyType: TProperty,
+  isSuccess: boolean,
+  result?: IProperty[]
+  length?: number,
+  error?: string
+}
 
 export interface IProperty {
   物件番号?: string,

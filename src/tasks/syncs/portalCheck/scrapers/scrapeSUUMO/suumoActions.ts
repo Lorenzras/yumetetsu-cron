@@ -22,6 +22,7 @@ const getScrapeFunc = (type: TProperty) => {
 export const suumoActions = (): IAction[] => {
   return [
     {
+      site: 'suumo',
       pref: '愛知県',
       type: '中古マンション',
       handlePrepareForm: prepareForm,
@@ -29,6 +30,7 @@ export const suumoActions = (): IAction[] => {
       handleContactScraper: scrapeContact,
     },
     {
+      site: 'suumo',
       pref: '岐阜県',
       type: '中古マンション',
       handlePrepareForm: prepareForm,
@@ -36,6 +38,7 @@ export const suumoActions = (): IAction[] => {
       handleContactScraper: scrapeContact,
     },
     {
+      site: 'suumo',
       pref: '愛知県',
       type: '中古戸建',
       handlePrepareForm: prepareForm,
@@ -43,6 +46,7 @@ export const suumoActions = (): IAction[] => {
       handleContactScraper: scrapeContact,
     },
     {
+      site: 'suumo',
       pref: '岐阜県',
       type: '中古戸建',
       handlePrepareForm: prepareForm,
@@ -50,6 +54,7 @@ export const suumoActions = (): IAction[] => {
       handleContactScraper: scrapeContact,
     },
     {
+      site: 'suumo',
       pref: '愛知県',
       type: '土地',
       handlePrepareForm: prepareForm,
@@ -57,6 +62,7 @@ export const suumoActions = (): IAction[] => {
       handleContactScraper: scrapeContact,
     },
     {
+      site: 'suumo',
       pref: '岐阜県',
       type: '土地',
       handlePrepareForm: prepareForm,

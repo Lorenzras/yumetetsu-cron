@@ -1,4 +1,4 @@
-import {resolveResultDir, cityLists} from './../config';
+import {resolveResultDir} from './../config';
 import {format} from 'date-fns';
 import {saveFile, spreadAddress} from '../../../../utils';
 import {IProperty} from './../types';
