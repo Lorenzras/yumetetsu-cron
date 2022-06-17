@@ -1,3 +1,4 @@
+import axios from 'axios';
 import {load} from 'cheerio';
 import {Page} from 'puppeteer';
 import {IProperty, THandleContactScraper} from '../../types';
@@ -26,14 +27,14 @@ export const getContactLink = async (
   url: string,
 ) => {
   // 物件詳細ページを表示する
-  await page.goto(url, {waitUntil: 'domcontentloaded'});
- /*  await Promise.all([
+
+  /*  await Promise.all([
     page.goto(url, {waitUntil: 'domcontentloaded'}),
     page.waitForNavigation(),
   ]); */
 
-  const info = url.indexOf('_corp') !== -1 ? getSingleLink(page) :
-    url.indexOf('_ag') !== -1 ? getMultipleLink(page) :
+  const info = url.indexOf('_corp') !== -1 ? getSingleLink(page, url) :
+    url.indexOf('_ag') !== -1 ? getMultipleLink(page, url) :
       {掲載企業: '取得失敗', 掲載企業TEL: '取得失敗'};
 
   return info;
@@ -42,10 +43,18 @@ export const getContactLink = async (
 /**
  * 掲載企業情報が複数社の場合の処理
  * @param page
+ * @param url
  * @returns {IProperty | IMansion | IHouse | ILot} 物件情報
  */
-const getMultipleLink = async (page: Page) => {
-  const htmlBody = await page.content();
+const getMultipleLink = async (
+  page: Page, // 未使用
+  url: string) => {
+  const userAgent = await page.browser().userAgent();
+  // const htmlBody = await page.content();
+  const htmlBody = await axios(
+    url,
+    {headers: {'User-Agent': userAgent}},
+  ).then((resp) => resp.data);
   const $ = load(htmlBody);
 
   // 掲載企業数を取得する
@@ -57,19 +66,19 @@ const getMultipleLink = async (page: Page) => {
     .eq(0).text().trim();
   // 掲載企業名(複数)を取得する
   // puppeteerでの記述方法
-  const kigyoumei = await page
+  /* const kigyoumei = await page
     .$$eval('.DetailCompanyInfo2__companyName', (els) => {
       return els.map((el) => {
         return (el as HTMLElement).innerText;
       });
-    });
+    }); */
   // jQueryでの記述方法
-  /* const kigyoumei = $('.DetailCompanyInfo2__companyName')
+  const kigyoumei = $('.DetailCompanyInfo2__companyName')
     .map(
       (idx, el) => {
         return $(el).text(); // el=ELEMENTを
       },
-    ).toArray(); */
+    ).toArray();
 
   // 夢てつが含まれる場合、店舗名のみ取り出し、含まれない場合は''
   const shopName = kigyoumei.filter((item) => {
@@ -116,15 +125,23 @@ const getMultipleLink = async (page: Page) => {
 /**
  * 掲載企業情報が1社のみの場合の処理
  * @param page
+ * @param url
  * @returns {IProperty | IMansion | IHouse | ILot} 物件情報
  */
-const getSingleLink = async (page: Page) => {
-  const htmlBody = await page.content();
+const getSingleLink = async (
+  page: Page,
+  url: string,
+) => {
+  const userAgent = await page.browser().userAgent();
+  const htmlBody = await axios(
+    url,
+    {headers: {'User-Agent': userAgent}},
+  ).then((resp) => resp.data);
   const $ = load(htmlBody);
 
   // 掲載企業名を取得する
   const kigyoumei = $('.DetailCompanyInfo2__companyName')
-    .eq(0).children('a').eq(0).text().trim();
+    .eq(0).text().trim();
   // kigyoumei = kigyoumei.split('（')[1].split('）')[0];
 
   // 掲載企業の連絡先を取得する

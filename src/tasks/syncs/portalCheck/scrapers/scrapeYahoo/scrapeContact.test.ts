@@ -1,4 +1,4 @@
-import {openMockBrowserPage} from '../../../../common/browser';
+import {openBrowserPage, openMockBrowserPage} from '../../../../common/browser';
 import {browserTimeOut} from '../../../../common/browser/config';
 import {IProperty} from '../../types';
 import {getContactLink, scrapeContact} from './scrapeContact';
@@ -47,22 +47,29 @@ describe('scrapecontact', () => {
       'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018596691/',
       'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018762695/#tab', */
   test(('link'), async () => {
-    const page = await openMockBrowserPage();
+    const page = await openBrowserPage();
     const testLinks = [
-      'https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0018766861/',
-      'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018760118/',
-      'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018596691/',
-      'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018762695/#tab',
-      'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018775216/',
-      'https://realestate.yahoo.co.jp/land/detail_corp/b0018783353/',
+      // 'https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0018766861/',
+      // 'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018760118/',
+      // 'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018596691/',
+      // 'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018762695/#tab',
+      // 'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018775216/',
+      // 'https://realestate.yahoo.co.jp/land/detail_corp/b0018783353/',
+      'https://realestate.yahoo.co.jp/land/detail_corp/b0018812010/',
+      'https://realestate.yahoo.co.jp/land/detail_corp/b0018815000/',
+      'https://realestate.yahoo.co.jp/used/house/detail_ag/A3jZbRxc46o5uSbr8vaxY/#company',
+      'https://realestate.yahoo.co.jp/used/house/detail_ag/15QfyySHRGLvhhtCQ829Xt/#company',
     ];
 
+    console.log(new Date());
     const result = [];
     for (const link of testLinks) {
       result.push(await getContactLink(page, link));
     }
 
+    console.log(new Date());
+    await page.close();
     expect(result).toMatchSnapshot();
-    page.browser().disconnect();
+    // page.browser().disconnect();
   }, browserTimeOut);
 });
