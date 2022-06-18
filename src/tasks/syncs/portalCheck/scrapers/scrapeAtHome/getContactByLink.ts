@@ -120,7 +120,7 @@ const fetchCompanyPage = async (urlPart: string) =>{
 
 export const getContactByLinkFast = async (url: string) =>{
   logger.info(`Trying to fetch html ${url}`);
-  const html = await getHTML({url});
+  const html = await getHTML({url, method: 'post'});
 
 
   const $ = load(html);

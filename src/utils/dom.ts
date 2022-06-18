@@ -42,16 +42,23 @@ export const select = (
 );
 
 export const getHTML = async (
-  {url, page}:
-  {url: string, page?: Page}) => {
+  {
+    url,
+    page,
+    method = 'get',
+  }:
+  {
+    url: string,
+    page?: Page,
+    method?: 'get' | 'post'
+  }) => {
   const ua = page ? await page.browser().userAgent() : userAgent.data.userAgent;
 
   const getHTMLBody = async () => await axios(
     url,
     {
+      method,
       headers: {'User-Agent': ua},
-      timeout: 1000 * 2500,
-      httpsAgent: new https.Agent({keepAlive: true}),
       validateStatus: (status) => {
         return status < 500; // Resolve only if the status code is less than 500
       },
