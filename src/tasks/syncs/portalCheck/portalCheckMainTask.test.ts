@@ -24,6 +24,7 @@ import {resultJSONPath} from './config';
 import {saveMeta} from './helpers/saveMeta';
 import {logger, sleep} from '../../../utils';
 import {handleDonetCompare} from './clusterTasks/handleDonetCompare';
+import {saveScrapeMeta} from './helpers/saveScrapeMeta';
 
 const getJSONData = (fName: string) => {
   const res = fs.readFileSync(path.join(resultJSONPath, fName), 'utf8');
@@ -57,7 +58,7 @@ describe('portalCheckMainProcess', () => {
 
   it('contacts', async () => {
     // donet結果を絞って、企業情報を取得する
-    const jsonFName = '199-20220610-074022-QkBts--doComparedDt-5198.json';
+    const jsonFName = '199-20220619-000823-_Tot3--doComparedDt-5383.json';
     const cluster: Cluster<{ page: Page }> = await initCluster();
     const data: IProperty[] = getJSONData(jsonFName);
     const filteredData = data
@@ -72,8 +73,9 @@ describe('portalCheckMainProcess', () => {
     const filterDataLength = filteredData.length;
     const newData = await Promise.all(_.shuffle(filteredData)
       .map(async (data, idx) => {
-        logger.info(`Fetching contact: ${idx + 1} of ${filterDataLength} rows.`);
-        return await handleGetCompanyDetails(cluster, data);
+        const res = await handleGetCompanyDetails(cluster, data);
+        logger.info(`Done fetch contact: ${idx + 1} of ${filterDataLength} rows.`);
+        return res;
       }));
 
     await saveToExcel(newData);
@@ -81,8 +83,9 @@ describe('portalCheckMainProcess', () => {
       beforeGetContact: data,
       afterGetContact: newData,
       saveToNetWorkDrive: false,
-      startTime: new Date(),
+      startTime: new Date(2022, 5, 18, 11),
     });
+
 
     // await sleep(10000);
     // saveToExcel(data)
