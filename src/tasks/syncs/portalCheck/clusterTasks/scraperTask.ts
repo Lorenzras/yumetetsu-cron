@@ -103,6 +103,7 @@ export const scraperTask: TScraperTask = async (actions, cluster, saveToNetWorkD
       return await handleAction(action);
     }),
   ));
+  saveScrapeMeta(actionResults, saveToNetWorkDrive);
 
 
   const scrapedProps = actionResults.reduce((accu, curr) => {
@@ -192,7 +193,7 @@ export const scraperTask: TScraperTask = async (actions, cluster, saveToNetWorkD
     saveToNetWorkDrive,
     startTime,
   });
-  saveScrapeMeta(actionResults, saveToNetWorkDrive);
+
 
   logger.info(`Done saving to CSV. Starting to save to upload to kintone.`);
   if (csvFile) {
