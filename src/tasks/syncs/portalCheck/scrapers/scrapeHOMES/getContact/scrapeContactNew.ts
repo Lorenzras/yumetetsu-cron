@@ -7,6 +7,7 @@ import {
   scrapeContactCompanyPage,
   scrapeContactCompanyPageFast,
 } from './scrapeContactCompanyPage';
+import {saveHTML} from '../../../helpers/logErrorScreenshot';
 
 /* A new property page that doesn't use JQuery,
   but the contact link still leads to legacy page.
@@ -55,6 +56,7 @@ export const scrapeContactNewFast = async ($: CheerioAPI ) => {
       ?.attr('href');
 
     if (!realtorPage) {
+      await saveHTML($.html());
       throw new Error(`Failed to scrape new page ${realtorPage}`);
     }
 
@@ -62,10 +64,7 @@ export const scrapeContactNewFast = async ($: CheerioAPI ) => {
       load(await getHTML({url: realtorPage})),
     );
   } catch (err: any) {
-    logger.error(`HOMES scrapeSingleContactFast ${err.message}`);
-    return {
-      掲載企業: '取得失敗',
-      掲載企業TEL: '',
-    };
+    logger.error(`HOMES.scrapeContactNewFast ${err.message}`);
+    throw new Error(`HOMES.scrapeContactNewFast ${err.message}`);
   }
 };

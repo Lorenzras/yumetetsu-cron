@@ -151,10 +151,8 @@ export const getContactByLinkFast = async (url: string) =>{
     };
   }
 
-  return {
-    掲載企業: '取得失敗',
-    掲載企業TEL: '取得失敗',
-  };
+  // Unknown page, so throw error
+  throw new Error(`Unknown page ${url}`);
 };
 
 export const getContactByLink = async (

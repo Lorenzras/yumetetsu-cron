@@ -6,6 +6,14 @@ import {getFileName, logger, logsPath, saveFile} from '../../../../utils';
 import {format} from 'date-fns';
 
 
+export const saveHTML = async (
+  html: string,
+  filePath = getFileName({
+    dir: path.join(logsPath, format(new Date(), 'yyyy.MM.dd')),
+  })) => {
+  await saveFile(filePath + '.html', html);
+};
+
 /**
  * Saves the screenshot, message, and the page content.
  * Directory may be set at portalCheck/config/dlImage
@@ -27,7 +35,7 @@ export const logErrorScreenshot = async (page: Page, message: string) => {
       path: filePath + '.png',
     });
     const body = await page.content();
-    await saveFile(filePath + '.html', body);
+    await saveHTML(body, filePath);
   } catch (err: any) {
     logger.error(`Failed to save screenshot. ${fileName} ${err.message}` );
   }

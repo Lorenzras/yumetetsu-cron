@@ -12,6 +12,8 @@ import {scrapeContactNew, scrapeContactNewFast} from './scrapeContactNew';
 import {logErrorScreenshot} from '../../../helpers/logErrorScreenshot';
 import {load} from 'cheerio';
 
+const errorMatch = /終了しました|物件が見つかりません/;
+
 export const getContactByLink = async (page: Page, url: string) => {
   try {
     // page.removeAllListeners();
@@ -67,29 +69,37 @@ export const getContactByLink = async (page: Page, url: string) => {
 export const getContactByLinkFast = async (url: string) => {
   try {
     logger.info(`Getting it fast ${url}`);
-    const htmlBody = await getHTML({url});
+
+    // HOMES return 404 when page no longer exist,
+    // Rather than let axios throw error, handle it here
+    // to avoid retries from the calling process
+    const htmlBody = await getHTML({url})
+      .catch((err) => {
+        console.log('Error', err.response.status, url);
+        return err.response.status as string;
+      });
+
     const $ = load(htmlBody);
-    if ($('p.attention a').length) {
-      return await scrapeSingleContactFast($);
-    } else if ($('.realestate .inquire').length) {
-      return await scrapeSingleContactLotFast($);
-    } else if ($('a span:contains(詳細を見る)').length) {
-      return await scrapeContactNewFast($);
-    } else if ($(
+
+    if ($(
       '.mod-notFoundMsg, .mod-bukkenNotFound, .mod-expiredInformation',
     ).length) {
       return {
         掲載企業: 'ページ無くなった',
         掲載企業TEL: 'ぺージ無くなった',
       };
+    }
+
+    if ($('p.attention a').length) {
+      return await scrapeSingleContactFast($);
+    } else if ($('.realestate .inquire').length) {
+      return await scrapeSingleContactLotFast($);
+    } else if ($('a span:contains(詳細を見る)').length) {
+      return await scrapeContactNewFast($);
     } else {
       throw new Error(`Unknown page ${url}`);
     }
   } catch (err: any) {
-    logger.error('HOMES Failed to get contact.');
-    return {
-      掲載企業: '取得失敗',
-      掲載企業TEL: '取得失敗',
-    };
+    throw new Error(`HOMES.getContactByLinkFast ${err.message} ${url}`);
   }
 };

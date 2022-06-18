@@ -7,17 +7,15 @@ import {initCluster} from '../portalCheckMainTask';
 import {IProperty} from '../types';
 import {handleDonetCompare, saveCookie, setCookie} from './handleDonetCompare';
 import {handleGetCompanyDetails} from './handleGetCompanyDetails';
-import dtArr from './test/199-20220531-063130-XVAu1.json';
+import dtArr from './test/homes.json';
 
-describe('handleDonetCompare', ()=>{
+describe('handleGetCompanyDetails', ()=>{
   test('main', async ()=>{
     const cluster: Cluster<{page: Page}> = await initCluster();
 
     const result = await Promise.all(dtArr
       .map((item)=>{
-        return cluster.execute(({page})=>{
-          return handleGetCompanyDetails(page, item as IProperty);
-        });
+        return handleGetCompanyDetails(cluster, item as IProperty);
       }));
 
 

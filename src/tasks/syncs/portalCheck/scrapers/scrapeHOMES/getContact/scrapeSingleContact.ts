@@ -53,9 +53,6 @@ export const scrapeSingleContactFast = async ($: CheerioAPI) => {
     return await scrapeContactCompanyPageFast(load(htmlBody));
   } catch (err: any) {
     logger.error(`scrapeSingleContactFast ${err.message}`);
-    return {
-      掲載企業: '取得失敗',
-      掲載企業TEL: '取得失敗',
-    };
+    throw new Error(`scrapeSingleContactFast ${err.message}`);
   }
 };

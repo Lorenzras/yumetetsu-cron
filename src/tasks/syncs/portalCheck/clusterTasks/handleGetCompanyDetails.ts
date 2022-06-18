@@ -5,7 +5,10 @@ import {
   handleContactScraper as homes,
   getContactByLinkFast as homesFast,
 } from '../scrapers/scrapeHOMES';
-import {scrapeContact as suumo} from '../scrapers/scrapeSUUMO/scrapeContact';
+import {
+  scrapeContact as suumo,
+  scrapeContactFast as suumoFast,
+} from '../scrapers/scrapeSUUMO';
 import {
   handleContactScraper as atHome,
   getContactByLinkFast as atHomeFast,
@@ -45,12 +48,15 @@ THandleContactScraper = async (page, data) => {
 };
 
 export const getCompanyDetailsFast = async (
-  url: string,
+  data: IProperty,
 ) => {
+  const url = data.リンク;
   if (url.includes('homes.co.jp')) {
     return await homesFast(url);
   } else if (url.includes('athome.co.jp')) {
     return await atHomeFast(url);
+  } else if (url.includes('suumo.jp')) {
+    return await suumoFast(data);
   }
 };
 
@@ -80,12 +86,12 @@ export const handleGetCompanyDetails = async (
     In case of error or if the site does not allow it,
     queue it to the cluster.
     */
-    const fastResult = await getCompanyDetailsFast(url);
+    const fastResult = await getCompanyDetailsFast(data);
     if (fastResult) {
       return {...data, ...fastResult};
     }
-  } catch (err) {
-    logger.warn(`Fast fetch error at ${url}. Queing it to cluster.`);
+  } catch (err: any) {
+    logger.warn(`Fast fetch error at ${err.message}. Queing it to cluster.`);
   }
 
 

@@ -21,3 +21,5 @@ export const minimalArgs = [
   '--no-sandbox', // meh but better resource comsuption
   '--disable-setuid-sandbox', // same
 ];
+
+

@@ -3,6 +3,7 @@ import puppeteer from 'puppeteer-extra';
 import {openMockBrowserPage} from '../tasks/common/browser';
 import {browserTimeOut} from '../tasks/common/browser/config';
 import {getTextByXPath, select, getHTML} from './dom';
+import {load} from 'cheerio';
 
 describe('dom', ()=>{
   test('getTextByXPath', async ()=>{
@@ -47,8 +48,14 @@ describe('dom', ()=>{
 
   test('html', async ()=>{
     const result = await getHTML({
-      url: 'https://www.homes.co.jp/realtor/mid-129577hic7rcPdQlAI/',
-    });
+      url: 'https://www.homes.co.jp/tochi/b-1294040002843/',
+    }).catch((err) => err.response.data.toString() as string);
+
+    const $ = load(result);
+    const errorMatch = /終了しました|物件が見つかりません/;
+    console.log('result', errorMatch.test(result) );
+    console.log($('.count.history_count').text());
+
 
     expect(result).toMatchSnapshot();
   });

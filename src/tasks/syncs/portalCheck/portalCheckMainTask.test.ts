@@ -42,10 +42,10 @@ describe('portalCheckMainProcess', () => {
     const actions = [
       // ...actionsHOMES(),
       // ...(actionsHOMES().slice(2)),
-      ...actionsAtHome(),
+      // ...actionsAtHome(),
       // ...actionsSUUMO(),
       // ...actionsYahoo(),
-      // actionsSUUMO()[2],
+      actionsSUUMO()[2],
     ];
 
     await scraperTask(actions, cluster, false);

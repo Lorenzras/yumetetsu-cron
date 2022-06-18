@@ -147,6 +147,7 @@ export const getContactLink = async (
   }
 };
 
+
 export const scrapeContact: THandleContactScraper = async (
   page: Page,
   data: IProperty,

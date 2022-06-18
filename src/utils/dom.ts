@@ -44,12 +44,15 @@ export const getHTML = async (
   const ua = page ? await page.browser().userAgent() : userAgent.data.userAgent;
   const htmlBody = await axios(
     url,
-    {headers: {'User-Agent': ua}},
+    {
+      headers: {'User-Agent': ua},
+      validateStatus: (status) => {
+        return status < 500; // Resolve only if the status code is less than 500
+      },
+    },
   )
-    .then((resp) => resp.data)
-    .catch((err: any) => {
-      throw new Error(`Failed to retrieve DOM ${url} ${err.message}}`);
-    });
+    .then((resp) => resp.data);
+
 
   return htmlBody;
 };

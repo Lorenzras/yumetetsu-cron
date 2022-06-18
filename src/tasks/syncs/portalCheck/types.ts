@@ -16,7 +16,7 @@ export interface IPropertyAction {
 }
 
 /**
- * @deprecated
+ * @deprecated in favor of IAction
  */
 export type PropertyActions = Array<IPropertyAction>
 
