@@ -8,7 +8,8 @@ import {
 import {scrapeContact as suumo} from '../scrapers/scrapeSUUMO/scrapeContact';
 import {
   handleContactScraper as atHome,
-} from '../scrapers/scrapeAtHome/handleContactScraper';
+  getContactByLinkFast as atHomeFast,
+} from '../scrapers/scrapeAtHome';
 import {scrapeContact as yahoo} from '../scrapers/scrapeYahoo/scrapeContact';
 import {Cluster} from 'puppeteer-cluster';
 import {Page} from 'puppeteer';
@@ -43,6 +44,16 @@ THandleContactScraper = async (page, data) => {
   }
 };
 
+export const getCompanyDetailsFast = async (
+  url: string,
+) => {
+  if (url.includes('homes.co.jp')) {
+    return await homesFast(url);
+  } else if (url.includes('athome.co.jp')) {
+    return await atHomeFast(url);
+  }
+};
+
 const queGetCompanyDetails = async (
   cluster: Cluster<{page: Page}>,
   data: IProperty,
@@ -64,19 +75,19 @@ export const handleGetCompanyDetails = async (
   data: IProperty,
 ) => {
   const url = data.リンク;
-  const getCompanyDetailsFn = async () => await queGetCompanyDetails(cluster, data);
   try {
     /*  Prioritize fast processing if available for the site.
     In case of error or if the site does not allow it,
     queue it to the cluster.
     */
-    if (url.includes('homes.co.jp')) {
-      return {...data, ...await homesFast(url)};
+    const fastResult = await getCompanyDetailsFast(url);
+    if (fastResult) {
+      return {...data, ...fastResult};
     }
   } catch (err) {
-    logger.warn(`Fast fetch error at ${url}. Switching to normal.`);
+    logger.warn(`Fast fetch error at ${url}. Queing it to cluster.`);
   }
 
 
-  return await getCompanyDetailsFn();
+  return await queGetCompanyDetails(cluster, data);
 };

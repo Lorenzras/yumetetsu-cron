@@ -40,9 +40,9 @@ describe('portalCheckMainProcess', () => {
     const cluster: Cluster<{ page: Page }> = await initCluster();
 
     const actions = [
-      ...actionsHOMES(),
+      // ...actionsHOMES(),
       // ...(actionsHOMES().slice(2)),
-      // ...actionsAtHome(),
+      ...actionsAtHome(),
       // ...actionsSUUMO(),
       // ...actionsYahoo(),
       // actionsSUUMO()[2],

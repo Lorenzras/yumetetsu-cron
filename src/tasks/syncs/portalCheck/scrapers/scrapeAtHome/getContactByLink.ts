@@ -118,7 +118,7 @@ const fetchCompanyPage = async (urlPart: string) =>{
   return $('#item-est_outline li div:contains(電話)').next().text().trim();
 };
 
-export const fetchCompanyDetails = async (url: string) =>{
+export const getContactByLinkFast = async (url: string) =>{
   logger.info(`Trying to fetch html ${url}`);
   const html = await axios.post(url).then((resp)=> resp.data);
   const $ = load(html);
@@ -151,7 +151,10 @@ export const fetchCompanyDetails = async (url: string) =>{
     };
   }
 
-  return null;
+  return {
+    掲載企業: '取得失敗',
+    掲載企業TEL: '取得失敗',
+  };
 };
 
 export const getContactByLink = async (
@@ -159,7 +162,7 @@ export const getContactByLink = async (
 ) => {
   try {
     const companyDetails = await retry(
-      async ()=> fetchCompanyDetails(url),
+      async () => getContactByLinkFast(url),
       {
         retries: 2,
         minTimeout: 2000,

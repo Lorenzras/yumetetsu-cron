@@ -30,7 +30,7 @@ export const scrapeDtHousePage = async (page: Page) => {
   });
 };
 
-export const handleNextPage = async (page: Page) => {
+const handleNextPage = async (page: Page) => {
   const nextPageBtn = (await page.$x('//a[contains(text(), "次へ")]'))?.[0];
   if (nextPageBtn) {
     logger.info('Clicking next page.');

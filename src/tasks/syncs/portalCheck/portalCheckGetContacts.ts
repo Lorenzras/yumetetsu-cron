@@ -39,12 +39,8 @@ export const portalCheckGetContacts = async ()=>{
   const newData = await Promise.all(_.shuffle(filteredData)
     .map(async (item, idx) => {
       try {
-        return await cluster.execute(async ({page, worker}) => {
-          logger.info(`Worker ${worker.id} at ${idx} of ${filterDataLength} is fetching contact from ${item.リンク}`);
-          const res = await handleGetCompanyDetails(page, item);
-          logger.info(`Worker ${worker.id} at ${idx} of ${filterDataLength} is DONE fetching contact from ${item.リンク}`);
-          return res;
-        }) as IProperty;
+        logger.info(`Fetching contact: ${idx + 1} of ${filterDataLength} rows.`);
+        return await handleGetCompanyDetails(cluster, item);
       } catch {
         return item;
       }
