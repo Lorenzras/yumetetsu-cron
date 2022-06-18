@@ -40,8 +40,8 @@ describe('portalCheckMainProcess', () => {
     const cluster: Cluster<{ page: Page }> = await initCluster();
 
     const actions = [
-      // ...actionsHOMES(),
-      ...(actionsHOMES().slice(2)),
+      ...actionsHOMES(),
+      // ...(actionsHOMES().slice(2)),
       // ...actionsAtHome(),
       // ...actionsSUUMO(),
       // ...actionsYahoo(),
@@ -71,13 +71,9 @@ describe('portalCheckMainProcess', () => {
 
     const filterDataLength = filteredData.length;
     const newData = await Promise.all(_.shuffle(filteredData)
-      .map(async (item, idx) => {
-        return await cluster.execute(async ({page, worker}) => {
-          logger.info(`Worker ${worker.id} at ${idx} of ${filterDataLength} is fetching contact from ${item.リンク}`);
-          const res = await handleGetCompanyDetails(page, item);
-          logger.info(`Worker ${worker.id} at ${idx} of ${filterDataLength} is DONE fetching contact from ${item.リンク}`);
-          return res;
-        }) as IProperty;
+      .map(async (data, idx) => {
+        logger.info(`Fetching contact: ${idx + 1} of ${filterDataLength} rows.`);
+        return await handleGetCompanyDetails(cluster, data);
       }));
 
     await saveToExcel(newData);
@@ -106,17 +102,13 @@ describe('portalCheckMainProcess', () => {
 
     const filterDataLength = afterData.length;
     const newDataWithContacts = await Promise.all(_.shuffle(afterData)
-      .map(async (item, idx) => {
-        if (item.掲載企業?.includes('失敗') || item.掲載企業?.includes('無くなった')) {
-          return await cluster.execute(async ({page, worker}) => {
-            logger.info(`Worker ${worker.id} at ${idx} of ${filterDataLength} is fetching contact from ${item.リンク}`);
-            const res = await handleGetCompanyDetails(page, item);
-            logger.info(`Worker ${worker.id} at ${idx} of ${filterDataLength} is DONE fetching contact from ${item.リンク}`);
-            return res;
-          }) as IProperty;
+      .map(async (data, idx) => {
+        if (data.掲載企業?.includes('失敗') || data.掲載企業?.includes('無くなった')) {
+          logger.info(`Fetching contact: ${idx + 1} of ${filterDataLength} rows.`);
+          return await handleGetCompanyDetails(cluster, data);
         }
 
-        return item;
+        return data;
       }));
 
     await saveToExcel(newDataWithContacts, false);

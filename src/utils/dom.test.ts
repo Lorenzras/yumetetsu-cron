@@ -2,7 +2,7 @@ import {launchBrowser} from './../tasks/common/browser/openBrowser';
 import puppeteer from 'puppeteer-extra';
 import {openMockBrowserPage} from '../tasks/common/browser';
 import {browserTimeOut} from '../tasks/common/browser/config';
-import {getTextByXPath, select} from './dom';
+import {getTextByXPath, select, getHTML} from './dom';
 
 describe('dom', ()=>{
   test('getTextByXPath', async ()=>{
@@ -44,5 +44,13 @@ describe('dom', ()=>{
 
     await page.browser().close();
   }, browserTimeOut);
+
+  test('html', async ()=>{
+    const result = await getHTML({
+      url: 'https://www.homes.co.jp/realtor/mid-129577hic7rcPdQlAI/',
+    });
+
+    expect(result).toMatchSnapshot();
+  });
 });
 

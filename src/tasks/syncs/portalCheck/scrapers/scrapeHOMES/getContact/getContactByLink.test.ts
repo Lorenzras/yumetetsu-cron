@@ -3,22 +3,38 @@ import {
   openBrowserPage,
 } from './../../../../../common/browser/openBrowser';
 import {browserTimeOut} from './../../../../../common/browser/config';
-import {getContactByLink} from './getContactByLink';
-test('Contact', async ()=>{
-  const page = await openBrowserPage();
-  const links = [
-    'https://www.homes.co.jp/mansion/b-1093100000760/',
-    'https://www.homes.co.jp/mansion/b-1436460000425/',
-    'https://www.homes.co.jp/mansion/b-1453580001292/',
+import {getContactByLink, getContactByLinkFast} from './getContactByLink';
 
-  ];
 
-  const results = [];
+const testLinks = [
+  'https://www.homes.co.jp/mansion/b-1093100000760/',
+  'https://www.homes.co.jp/mansion/b-1436460000425/',
+  'https://www.homes.co.jp/mansion/b-1453580001292/',
 
-  for (const link of links) {
-    results.push(await getContactByLink(page, link ));
-  }
+];
 
-  await page.close();
-  expect(results).toMatchSnapshot();
-}, browserTimeOut);
+describe('getContactByLink', ()=>{
+  test('normal', async ()=>{
+    const page = await openBrowserPage();
+
+
+    const results = [];
+
+    for (const link of testLinks) {
+      results.push(await getContactByLink(page, link ));
+    }
+
+    await page.close();
+    expect(results).toMatchSnapshot();
+  }, browserTimeOut);
+
+  test('fast', async ()=> {
+    const results = testLinks.map(async (item)=>{
+      return await getContactByLinkFast(item);
+    });
+
+    expect(await Promise.all(results)).toMatchSnapshot();
+  }, browserTimeOut);
+});
+
+

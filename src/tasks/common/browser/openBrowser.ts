@@ -18,13 +18,13 @@ interface OpenBrowserParam {
 }
 
 export const getExtraPuppeteer = ()=> puppeteer;
+export const userAgent = new UserAgent({deviceCategory: 'desktop'});
 
 const getPage = async (browser: Browser) => {
   const pages = await browser.pages();
   return pages.length > 0 ? pages[0] : browser.newPage();
 };
 
-logger.info(`Running in ${process.env.NODE_ENV}`);
 
 export const launchBrowser = ({
   slowMo = 0,
@@ -63,9 +63,7 @@ export const openBrowserPage = async (opt?: OpenBrowserParam) => {
   });
   const page = await getPage(browser);
 
-  const newUserAgent = new UserAgent({
-    deviceCategory: 'desktop',
-  }).data.userAgent;
+  const newUserAgent = userAgent.data.userAgent;
 
   // eslint-disable-next-line max-len
   await page.setUserAgent(newUserAgent);

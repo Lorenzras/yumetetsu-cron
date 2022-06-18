@@ -31,7 +31,7 @@ export type THandlePrepareForm = (
   chunkLength: number,
   nextIdx: number,
 } | boolean>
-export type THandleContactScraper = (page: Page, data: IProperty) => Promise<IProperty>
+export type THandleContactScraper = (page: Page, data: IProperty, isFetch?: boolean) => Promise<IProperty>
 export type TSites = 'yahoo' | 'suumo' | 'homes' | 'athome'
 export interface IAction {
   site: TSites,

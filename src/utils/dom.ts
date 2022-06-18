@@ -1,4 +1,6 @@
+import {userAgent} from './../tasks/common/browser/openBrowser';
 import {Page, ElementHandle} from 'puppeteer';
+import axios from 'axios';
 
 /**
  * Get text by xpath.
@@ -35,3 +37,19 @@ export const select = (
   (el, value) => (<HTMLSelectElement>el).value = <string>value,
   value,
 );
+
+export const getHTML = async (
+  {url, page}:
+  {url: string, page?: Page}) => {
+  const ua = page ? await page.browser().userAgent() : userAgent.data.userAgent;
+  const htmlBody = await axios(
+    url,
+    {headers: {'User-Agent': ua}},
+  )
+    .then((resp) => resp.data)
+    .catch((err: any) => {
+      throw new Error(`Failed to retrieve DOM ${url} ${err.message}}`);
+    });
+
+  return htmlBody;
+};

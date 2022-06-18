@@ -1,7 +1,12 @@
+import {getHTML} from './../../../../../../utils/dom';
+import {CheerioAPI, load} from 'cheerio';
 import {logger} from '../../../../../../utils/logger';
 import {Page} from 'puppeteer';
 import {TCompanyContact} from '../../../types';
-import {scrapeContactCompanyPage} from './scrapeContactCompanyPage';
+import {
+  scrapeContactCompanyPage,
+  scrapeContactCompanyPageFast,
+} from './scrapeContactCompanyPage';
 
 /* A new property page that doesn't use JQuery,
   but the contact link still leads to legacy page.
@@ -39,6 +44,28 @@ export const scrapeContactNew = async (page: Page ) => {
     return {
       ...result,
       掲載企業: '取得失敗',
+    };
+  }
+};
+
+export const scrapeContactNewFast = async ($: CheerioAPI ) => {
+  try {
+    const realtorPage = $('a span:contains(詳細を見る)')
+      ?.parent('a')
+      ?.attr('href');
+
+    if (!realtorPage) {
+      throw new Error(`Failed to scrape new page ${realtorPage}`);
+    }
+
+    return await scrapeContactCompanyPageFast(
+      load(await getHTML({url: realtorPage})),
+    );
+  } catch (err: any) {
+    logger.error(`HOMES scrapeSingleContactFast ${err.message}`);
+    return {
+      掲載企業: '取得失敗',
+      掲載企業TEL: '',
     };
   }
 };

@@ -1,13 +1,13 @@
+import {getHTML} from './../../../../../../utils/dom';
 import {logger} from '../../../../../../utils/logger';
 import {Page} from 'puppeteer';
-import {TCompanyContact} from '../../../types';
-import {scrapeContactCompanyPage} from './scrapeContactCompanyPage';
+
+import {
+  scrapeContactCompanyPage,
+  scrapeContactCompanyPageFast} from './scrapeContactCompanyPage';
+import {CheerioAPI, load} from 'cheerio';
 
 export const scrapeSingleContact = async (page: Page ) => {
-  let result : TCompanyContact = {
-    掲載企業: '---',
-    掲載企業TEL: '---',
-  };
   let getKochiraLink: string;
 
   try {
@@ -27,14 +27,35 @@ export const scrapeSingleContact = async (page: Page ) => {
 
     logger.info('Kochiralink ' + getKochiraLink);
 
-    if (getKochiraLink) {
-      await page.goto(getKochiraLink);
-      const scrapedResult = await scrapeContactCompanyPage(page);
-      result = {...result, ...scrapedResult};
+    if (!getKochiraLink) {
+      throw new Error('Failed to find kochira link');
     }
-    return result;
+
+    await page.goto(getKochiraLink);
+    return await scrapeContactCompanyPage(page);
   } catch (err: any) {
     logger.error(`scrapeSingleContact ${page.url()} ${err.message}`);
-    return result;
+    return {
+      掲載企業: '取得失敗',
+      掲載企業TEL: '取得失敗',
+    };
+  }
+};
+
+
+export const scrapeSingleContactFast = async ($: CheerioAPI) => {
+  const kochiraLink = $('p.attention a').attr('href') || '';
+  try {
+    if (!kochiraLink) {
+      throw new Error(`Failed to find kochira link ${kochiraLink}`);
+    }
+    const htmlBody = await getHTML({url: kochiraLink});
+    return await scrapeContactCompanyPageFast(load(htmlBody));
+  } catch (err: any) {
+    logger.error(`scrapeSingleContactFast ${err.message}`);
+    return {
+      掲載企業: '取得失敗',
+      掲載企業TEL: '取得失敗',
+    };
   }
 };

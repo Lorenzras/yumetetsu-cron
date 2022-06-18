@@ -49,7 +49,6 @@ export const getContactLink = async (
 const getMultipleLink = async (
   page: Page, // 未使用
   url: string) => {
-  const userAgent = await page.browser().userAgent();
   // const htmlBody = await page.content();
   const htmlBody = await axios(
     url,

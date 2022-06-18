@@ -1,18 +1,18 @@
+import {getHTML} from './../../../../../../utils/dom';
 
 import {logger} from './../../../../../../utils/logger';
-import {scrapeSingleContact} from './scrapeSingleContact';
-import {scrapeSingleContactLot} from './scrapeSingleContactLot';
+import {scrapeSingleContact,
+  scrapeSingleContactFast} from './scrapeSingleContact';
+import {scrapeSingleContactLot,
+  scrapeSingleContactLotFast} from './scrapeSingleContactLot';
 import {Page} from 'puppeteer';
 
-import {scrapeContactNew} from './scrapeContactNew';
+import {scrapeContactNew, scrapeContactNewFast} from './scrapeContactNew';
 
 import {logErrorScreenshot} from '../../../helpers/logErrorScreenshot';
+import {load} from 'cheerio';
 
 export const getContactByLink = async (page: Page, url: string) => {
-  const initialVal = {
-    掲載企業: '---',
-    掲載企業TEL: '---',
-  };
   try {
     // page.removeAllListeners();
     // await blockImages(page);
@@ -48,14 +48,45 @@ export const getContactByLink = async (page: Page, url: string) => {
       case 1: return await scrapeSingleContactLot(page);
       case 2: return await scrapeContactNew(page);
       case 3: return {
-        掲載企業: '取得失敗 3',
-        掲載企業TEL: '取得失敗 3',
+        掲載企業: 'ページ無くなった',
+        掲載企業TEL: 'ぺージ無くなった',
       };
-      default: return initialVal;
+      default: throw new Error(`Unknown page ${url}`);
     }
   } catch (err :any) {
     await logErrorScreenshot(
       page, `Failed to get contact ${url} ${err.message}`);
+    return {
+      掲載企業: '取得失敗',
+      掲載企業TEL: '取得失敗',
+    };
+  }
+};
+
+
+export const getContactByLinkFast = async (url: string) => {
+  try {
+    logger.info(`Getting it fast ${url}`);
+    const htmlBody = await getHTML({url});
+    const $ = load(htmlBody);
+    if ($('p.attention a').length) {
+      return await scrapeSingleContactFast($);
+    } else if ($('.realestate .inquire').length) {
+      return await scrapeSingleContactLotFast($);
+    } else if ($('a span:contains(詳細を見る)').length) {
+      return await scrapeContactNewFast($);
+    } else if ($(
+      '.mod-notFoundMsg, .mod-bukkenNotFound, .mod-expiredInformation',
+    ).length) {
+      return {
+        掲載企業: 'ページ無くなった',
+        掲載企業TEL: 'ぺージ無くなった',
+      };
+    } else {
+      throw new Error(`Unknown page ${url}`);
+    }
+  } catch (err: any) {
+    logger.error('HOMES Failed to get contact.');
     return {
       掲載企業: '取得失敗',
       掲載企業TEL: '取得失敗',
