@@ -47,19 +47,40 @@ THandleContactScraper = async (page, data) => {
   }
 };
 
+/**
+ * Scraping by fetching just the HTML.
+ * This could process hundreds of request per second,
+ * but sites largely vary on how they respond to large volume of request.
+ * So I am using cluster, to consistently apply throttling regardless of method.
+ *
+ * @param cluster
+ * @param data
+ * @returns {IProperty} Property
+ */
 export const getCompanyDetailsFast = async (
+  cluster: Cluster<{page: Page}>,
   data: IProperty,
 ) => {
   const url = data.リンク;
-  if (url.includes('homes.co.jp')) {
-    return await homesFast(url);
-  } else if (url.includes('athome.co.jp')) {
-    return await atHomeFast(url);
-  } else if (url.includes('suumo.jp')) {
-    return await suumoFast(data);
-  }
+  return cluster.execute(async ({page})=>{
+    await page.setContent(`<h1 style="font-size: 120px;">${url}</h1>`);
+    if (url.includes('homes.co.jp')) {
+      return await homesFast(url);
+    } else if (url.includes('athome.co.jp')) {
+      return await atHomeFast(url);
+    } else if (url.includes('suumo.jp')) {
+      return await suumoFast(data);
+    }
+  });
 };
 
+/**
+ * Scraping by page manipulation.
+ *
+ * @param cluster
+ * @param data
+ * @returns {IProperty} Property
+ */
 const queGetCompanyDetails = async (
   cluster: Cluster<{page: Page}>,
   data: IProperty,
@@ -86,12 +107,14 @@ export const handleGetCompanyDetails = async (
     In case of error or if the site does not allow it,
     queue it to the cluster.
     */
-    const fastResult = await getCompanyDetailsFast(data);
+    logger.info(`Started fast scrape for ${url}`);
+    const fastResult = await getCompanyDetailsFast(cluster, data);
     if (fastResult) {
+      logger.info(`Done fast scrape for ${url}`);
       return {...data, ...fastResult};
     }
   } catch (err: any) {
-    logger.warn(`Fast fetch error at ${err.message}. Queing it to cluster.`);
+    logger.warn(`Fast Scrape error at ${err.message} ${url}. Queing it to cluster.`);
   }
 
 

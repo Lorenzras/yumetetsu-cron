@@ -100,6 +100,6 @@ export const getContactByLinkFast = async (url: string) => {
       throw new Error(`Unknown page ${url}`);
     }
   } catch (err: any) {
-    throw new Error(`HOMES.getContactByLinkFast ${err.message} ${url}`);
+    throw new Error(`HOMES.getContactByLinkFast ${err.message}`);
   }
 };

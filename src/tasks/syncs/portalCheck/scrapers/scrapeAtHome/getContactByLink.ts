@@ -1,6 +1,6 @@
 import {TCompanyContact} from '../../types';
 import {Page} from 'puppeteer';
-import {extractTel, logger} from '../../../../../utils';
+import {extractTel, getHTML, logger} from '../../../../../utils';
 import {logErrorScreenshot} from '../../helpers/logErrorScreenshot';
 import axios from 'axios';
 import {load} from 'cheerio';
@@ -120,7 +120,9 @@ const fetchCompanyPage = async (urlPart: string) =>{
 
 export const getContactByLinkFast = async (url: string) =>{
   logger.info(`Trying to fetch html ${url}`);
-  const html = await axios.post(url).then((resp)=> resp.data);
+  const html = await getHTML({url});
+
+
   const $ = load(html);
 
   // Shortcircuit if page have errors
@@ -160,7 +162,7 @@ export const getContactByLink = async (
 ) => {
   try {
     const companyDetails = await retry(
-      async () => getContactByLinkFast(url),
+      async () => await getContactByLinkFast(url),
       {
         retries: 2,
         minTimeout: 2000,

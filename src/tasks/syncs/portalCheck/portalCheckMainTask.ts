@@ -22,7 +22,8 @@ export const initCluster = () => Cluster.launch({
   concurrency: Cluster.CONCURRENCY_CONTEXT,
   maxConcurrency: +process.env.CLUSTER_MAXCONCURRENCY || 5,
   // monitor: true,
-  workerCreationDelay: 300,
+  workerCreationDelay: 100,
+
   puppeteerOptions: {
     // slowMo: 100,
     headless: process.env.BROWSER_TYPE === 'HEADLESS',

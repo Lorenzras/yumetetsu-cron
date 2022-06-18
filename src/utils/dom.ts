@@ -1,6 +1,9 @@
+import {logger} from './logger';
 import {userAgent} from './../tasks/common/browser/openBrowser';
 import {Page, ElementHandle} from 'puppeteer';
 import axios from 'axios';
+import retry from 'async-retry';
+import https from 'https';
 
 /**
  * Get text by xpath.
@@ -42,10 +45,13 @@ export const getHTML = async (
   {url, page}:
   {url: string, page?: Page}) => {
   const ua = page ? await page.browser().userAgent() : userAgent.data.userAgent;
-  const htmlBody = await axios(
+
+  const getHTMLBody = async () => await axios(
     url,
     {
       headers: {'User-Agent': ua},
+      timeout: 1000 * 2500,
+      httpsAgent: new https.Agent({keepAlive: true}),
       validateStatus: (status) => {
         return status < 500; // Resolve only if the status code is less than 500
       },
@@ -53,6 +59,18 @@ export const getHTML = async (
   )
     .then((resp) => resp.data);
 
+
+  const htmlBody = retry(async () => {
+    return await getHTMLBody();
+  }, {
+    retries: 3,
+    minTimeout: 500,
+    maxTimeout: 3000,
+    onRetry: (e, attempt) => {
+      logger.warn(
+        `Failed fast fetching ${url} with ${attempt} attempt/s. ${e.message}`);
+    },
+  });
 
   return htmlBody;
 };

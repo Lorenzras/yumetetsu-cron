@@ -1,5 +1,8 @@
+/* eslint-disable max-len */
+import {logger} from './../../../../utils/logger';
 import {Page} from 'puppeteer';
 import {Cluster} from 'puppeteer-cluster';
+import {sleep} from '../../../../utils';
 import {openBrowserPage} from '../../../common/browser';
 import {browserTimeOut} from '../../../common/browser/config';
 import {login} from '../../../common/doNet';
@@ -7,21 +10,32 @@ import {initCluster} from '../portalCheckMainTask';
 import {IProperty} from '../types';
 import {handleDonetCompare, saveCookie, setCookie} from './handleDonetCompare';
 import {handleGetCompanyDetails} from './handleGetCompanyDetails';
-import dtArr from './test/homes.json';
+import dtArr from './test/all.json';
 
 describe('handleGetCompanyDetails', ()=>{
   test('main', async ()=>{
     const cluster: Cluster<{page: Page}> = await initCluster();
+    const dataLength = dtArr.length;
 
-    const result = await Promise.all(dtArr
-      .map((item)=>{
-        return handleGetCompanyDetails(cluster, item as IProperty);
-      }));
+    let doneCount = 0;
 
+    const jobs = dtArr
+      .map(async (item)=>{
+        const res = await handleGetCompanyDetails(cluster, item as IProperty);
+        doneCount += 1;
+
+        logger.info(`Progress ${doneCount} / ${dataLength}`);
+        return res;
+      });
+
+    const result = await Promise.all(jobs as Promise<IProperty>[]);
 
     console.log(result.length);
 
     expect(result).toMatchSnapshot();
+
+    await sleep(3000);
+    logger.info('Closing');
     await cluster.idle();
     await cluster.close();
   }, browserTimeOut);

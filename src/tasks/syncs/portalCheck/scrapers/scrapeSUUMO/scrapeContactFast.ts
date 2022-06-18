@@ -54,7 +54,11 @@ export const getContactByLinkFast = async (
   data: IProperty,
 ) => {
   const url = data.リンク;
-  const $ = load(await getHTML({url}));
+
+  const $ = load(await getHTML({url})
+    .catch((err) => {
+      throw new Error(`Error getting main page ${err.message}`);
+    }));
 
   if ($('#header div[title*="ライブラリー"]').length) {
     return {
