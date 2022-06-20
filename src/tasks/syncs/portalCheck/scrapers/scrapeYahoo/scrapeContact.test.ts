@@ -9,7 +9,8 @@ const data: IProperty = {
   物件名: '安城市古井町宮前',
   物件番号: 'yahoo-15QfyySHRGLvhhtCQ829Xt',
   所在地: '愛知県安城市古井町宮前 ',
-  リンク: 'https://realestate.yahoo.co.jp/used/house/detail_ag/15QfyySHRGLvhhtCQ829Xt/#company',
+  リンク: 'https://realestate.yahoo.co.jp/used/mansion/detail_ag/2mudhkDwjT4UI61QYJiUjY/',
+  /* リンク: 'https://realestate.yahoo.co.jp/used/house/detail_ag/15QfyySHRGLvhhtCQ829Xt/#company', */
   販売価格: '4,490万円',
   比較用価格: 4490,
 };
@@ -47,7 +48,7 @@ describe('scrapecontact', () => {
       'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018596691/',
       'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018762695/#tab', */
   test(('link'), async () => {
-    const page = await openBrowserPage();
+    const page = await openMockBrowserPage();
     const testLinks = [
       // 'https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0018766861/',
       // 'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018760118/',
@@ -55,10 +56,13 @@ describe('scrapecontact', () => {
       // 'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018762695/#tab',
       // 'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018775216/',
       // 'https://realestate.yahoo.co.jp/land/detail_corp/b0018783353/',
-      'https://realestate.yahoo.co.jp/land/detail_corp/b0018812010/',
-      'https://realestate.yahoo.co.jp/land/detail_corp/b0018815000/',
-      'https://realestate.yahoo.co.jp/used/house/detail_ag/A3jZbRxc46o5uSbr8vaxY/#company',
-      'https://realestate.yahoo.co.jp/used/house/detail_ag/15QfyySHRGLvhhtCQ829Xt/#company',
+      // 'https://realestate.yahoo.co.jp/land/detail_corp/b0018812010/',
+      // 'https://realestate.yahoo.co.jp/land/detail_corp/b0018815000/',
+      // 'https://realestate.yahoo.co.jp/used/house/detail_ag/A3jZbRxc46o5uSbr8vaxY/#company',
+      // 'https://realestate.yahoo.co.jp/used/house/detail_ag/15QfyySHRGLvhhtCQ829Xt/#company',
+      'https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0018830208/',
+      'https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0018492250/',
+      'https://realestate.yahoo.co.jp/used/mansion/detail_ag/2mudhkDwjT4UI61QYJiUjY/',
     ];
 
     console.log(new Date());
@@ -68,8 +72,8 @@ describe('scrapecontact', () => {
     }
 
     console.log(new Date());
-    await page.close();
+    // await page.close();
+    page.browser().disconnect();
     expect(result).toMatchSnapshot();
-    // page.browser().disconnect();
   }, browserTimeOut);
 });
