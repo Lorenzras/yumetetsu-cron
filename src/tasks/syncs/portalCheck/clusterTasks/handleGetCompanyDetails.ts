@@ -62,7 +62,7 @@ export const getCompanyDetailsFast = async (
   data: IProperty,
 ) => {
   const url = data.リンク;
-  return cluster.execute(async ({page})=>{
+  return await cluster.execute(async ({page})=>{
     await page.setContent(`<h1 style="font-size: 120px;">${url}</h1>`);
     if (url.includes('homes.co.jp')) {
       return await homesFast(url);
