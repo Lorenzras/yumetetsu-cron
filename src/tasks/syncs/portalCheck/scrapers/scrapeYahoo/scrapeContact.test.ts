@@ -48,7 +48,7 @@ describe('scrapecontact', () => {
       'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018596691/',
       'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018762695/#tab', */
   test(('link'), async () => {
-    const page = await openMockBrowserPage();
+    // const page = await openMockBrowserPage();
     const testLinks = [
       // 'https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0018766861/',
       // 'https://realestate.yahoo.co.jp/used/house/detail_corp/b0018760118/',
@@ -68,12 +68,12 @@ describe('scrapecontact', () => {
     console.log(new Date());
     const result = [];
     for (const link of testLinks) {
-      result.push(await getContactLink(page, link));
+      result.push(await getContactLink(link));
     }
 
     console.log(new Date());
     // await page.close();
-    page.browser().disconnect();
+    // page.browser().disconnect();
     expect(result).toMatchSnapshot();
   }, browserTimeOut);
 });
