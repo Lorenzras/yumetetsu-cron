@@ -101,6 +101,6 @@ export const handleDonetCompare = async (
     dir: resultJSONPath,
     suffix: '-doComparedDt-' + newDtArr.length.toString(),
   }), newDtArr);
-  logger.info(`Done comparing to donet. Starting to filter.`);
+  logger.info(`Done comparing to donet.`);
   return newDtArr;
 };
