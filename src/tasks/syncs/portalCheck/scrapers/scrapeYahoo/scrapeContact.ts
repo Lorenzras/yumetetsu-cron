@@ -1,13 +1,14 @@
-import axios from 'axios';
-import {load} from 'cheerio';
+// import axios from 'axios';
+import {CheerioAPI, load} from 'cheerio';
 import {Page} from 'puppeteer';
+import {getHTML} from '../../../../../utils';
 import {IProperty, THandleContactScraper} from '../../types';
 
 export const scrapeContact: THandleContactScraper = async (
   page: Page,
   data: IProperty,
 ) => {
-  const info = await getContactLink(page, data.リンク);
+  const info = await getContactLink(data.リンク);
 
   return {
     ...data,
@@ -18,12 +19,11 @@ export const scrapeContact: THandleContactScraper = async (
 
 /**
  *
- * @param page
  * @param url
  * @returns {IProperty | IMansion | IHouse | ILot} 物件情報
  */
 export const getContactLink = async (
-  page: Page,
+  // page: Page,
   url: string,
 ) => {
   // 物件詳細ページを表示する
@@ -33,8 +33,8 @@ export const getContactLink = async (
     page.waitForNavigation(),
   ]); */
 
-  const info = url.indexOf('_corp') !== -1 ? getSingleLink(page, url) :
-    url.indexOf('_ag') !== -1 ? getMultipleLink(page, url) :
+  const info = url.indexOf('_corp') !== -1 ? getSingleLink(url) :
+    url.indexOf('_ag') !== -1 ? getMultipleLink(url) :
       {掲載企業: '取得失敗', 掲載企業TEL: '取得失敗'};
 
   return info;
@@ -42,20 +42,49 @@ export const getContactLink = async (
 
 /**
  * 掲載企業情報が複数社の場合の処理
- * @param page
  * @param url
  * @returns {IProperty | IMansion | IHouse | ILot} 物件情報
  */
 const getMultipleLink = async (
-  page: Page, // 未使用
+  // page: Page, // 未使用
   url: string) => {
   // const htmlBody = await page.content();
-  const htmlBody = await axios(
-    url,
-    {headers: {'User-Agent': await page.browser().userAgent()}},
-  ).then((resp) => resp.data);
-  const $ = load(htmlBody);
+  const htmlBody = await getHTML({url});
+  let pageType;
+  const pageNone = htmlBody.includes('お探しのページが見つかりません');
+  if (pageNone) {
+    pageType = 'errWithSorry';
+  } else {
+    const $ = load(htmlBody);
+    if ($('.DetailCompanyInfo2--ag').length) {
+      pageType = 'success';
+    } else {
+      throw new Error('Failed to find any of the selectors.');
+    }
+    /* await page.goto(url);
+    pageType =
+      await Promise.race([
+        page.waitForSelector('.DetailCompanyInfo2--ag')
+          .then(() => 'success'), // 正常
+      ]).catch(async () => {
+        throw new Error('Failed to find any of the selectors.');
+      }); */
+  }
 
+  switch (pageType) {
+    case 'errWithSorry':
+      return {
+        掲載企業: 'ページが無くなった',
+        掲載企業TEL: 'ページが無くなった',
+      };
+    case 'success':
+      return await getContactMultipul(load(htmlBody));
+    default:
+      throw new Error('Unknown pageType. Contact Administrator');
+  }
+};
+
+const getContactMultipul = ($: CheerioAPI) => {
   // 掲載企業数を取得する
   const kigyouNum = Number($('.DetailSummaryMain__tips__text')
     .eq(0).text().trim().replace(/[^0-9]/g, ''));
@@ -123,20 +152,41 @@ const getMultipleLink = async (
 
 /**
  * 掲載企業情報が1社のみの場合の処理
- * @param page
  * @param url
  * @returns {IProperty | IMansion | IHouse | ILot} 物件情報
  */
 const getSingleLink = async (
-  page: Page,
+  // page: Page,
   url: string,
 ) => {
-  const htmlBody = await axios(
-    url,
-    {headers: {'User-Agent': await page.browser().userAgent()}},
-  ).then((resp) => resp.data);
-  const $ = load(htmlBody);
+  const htmlBody = await getHTML({url}) as string;
+  let pageType;
+  const pageNone = htmlBody.includes('お探しのページが見つかりません');
+  if (pageNone) {
+    pageType = 'errWithSorry';
+  } else {
+    const $ = load(htmlBody);
+    if ($('.DetailCompanyInfo2').length) {
+      pageType = 'success';
+    } else {
+      throw new Error('Failed to find any of the selectors.');
+    }
+  }
 
+  switch (pageType) {
+    case 'errWithSorry':
+      return {
+        掲載企業: 'ページが無くなった',
+        掲載企業TEL: 'ページが無くなった',
+      };
+    case 'success':
+      return await getContactSingle(load(htmlBody));
+    default:
+      throw new Error('Unknown pageType. Contact Administrator');
+  }
+};
+
+const getContactSingle = ($: CheerioAPI) => {
   // 掲載企業名を取得する
   const kigyoumei = $('.DetailCompanyInfo2__companyName')
     .eq(0).text().trim();
