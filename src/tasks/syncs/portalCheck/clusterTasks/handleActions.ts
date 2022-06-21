@@ -26,11 +26,6 @@ export const handleAction = async (
               (typeof formState !== 'boolean' && formState.success)
           ) {
             res.push(...await handleScraper(page));
-          } else {
-            // アクションがFalseを返った場合、
-            throw new Error(
-              'Action returned boolean: false or {success: false}',
-            );
           }
 
           if (typeof formState !== 'boolean' ) {
