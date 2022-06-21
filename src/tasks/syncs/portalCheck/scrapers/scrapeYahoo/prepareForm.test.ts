@@ -1,4 +1,4 @@
-import {openMockBrowserPage} from '../../../../common/browser';
+import {openBrowserPage, openMockBrowserPage} from '../../../../common/browser';
 import {browserTimeOut} from '../../../../common/browser/config';
 import {prepareForm} from './prepareForm';
 
@@ -7,9 +7,11 @@ import {prepareForm} from './prepareForm';
 // describe('prepareForm', () => {
 /* test comand:: jest scrapeYahoo/prepareForm -t check -u */
 test(('test1'), async () => {
+  // const page = await openBrowserPage({slowMo: 200});
   const page = await openMockBrowserPage();
-  const result = await prepareForm(page, '愛知県', '中古マンション', 0);
+  const result = await prepareForm(page, '愛知県', '中古戸建', 0);
 
+  // await page.close();
   page.browser().disconnect();
   expect(result).toMatchSnapshot();
 }, browserTimeOut);

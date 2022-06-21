@@ -3,6 +3,7 @@ import {logger} from '../../../../../utils';
 import {THandlePrepareForm, TProperty} from '../../types';
 import {logErrorScreenshot} from '../../helpers/logErrorScreenshot';
 import {chunkLengs, splitCities} from './splitHelper';
+import retry from 'async-retry';
 
 // 物件種別によって、開くサイトアドレスを設定する
 const getUrl = (type: TProperty) => {
@@ -57,22 +58,27 @@ export const prepareForm: THandlePrepareForm = async (
       }, cityChkBox);
     }
 
+    // await retry(async () => {
     // 3日以内をクリックする(css)
     await page.click('label[for="_info_open3"]');
     /* await page.$eval('#_info_open3', (el) => {
-      (el as HTMLInputElement).click();
-    }); */
+        (el as HTMLInputElement).click();
+      }); */
 
+    await page.waitForResponse((res) => {
+      console.log(res.url(), res.status());
+      return res.url().includes('https://realestate.yahoo.co.jp/used/apj/api/');
+    });
     await page.waitForNetworkIdle();
     // 3日以内をクリックする(XPath)
     /*   const [spanBtn] = await page.$x('//input[@id="_info_open3"]');
-    // サイトの構成上、puppeteerのクリックが使えないため、evaluateを使用する
-    await page.evaluate((spanBtn: HTMLInputElement)=>{
-      spanBtn.click();
-    }, spanBtn); */
+      // サイトの構成上、puppeteerのクリックが使えないため、evaluateを使用する
+      await page.evaluate((spanBtn: HTMLInputElement)=>{
+        spanBtn.click();
+      }, spanBtn); */
     // 3日以内をクリックする(js?)
     /*     const radio = document.querySelector('#_info_open3');
-        (radio as HTMLInputElement)?.click(); */
+          (radio as HTMLInputElement)?.click(); */
 
     await page.waitForSelector('.FixedBtnBox__inner', {visible: true});
 
@@ -96,27 +102,43 @@ export const prepareForm: THandlePrepareForm = async (
     }
 
     // 検索をクリックする
-    await page.waitForNetworkIdle();
+    // await page.waitForNetworkIdle();
+    /* await page.evaluate(() =>{
+      (document?.querySelector('#_FixedSearchButton') as HTMLElement)?.click();
+    }); */
     await Promise.all([
       page.waitForNavigation(),
-      page.click('#_FixedSearchButton'),
+      // page.click('#_FixedSearchButton'),
+      page.evaluate(() =>{
+        (document?.querySelector('#_FixedSearchButton') as HTMLElement)
+          ?.click();
+      }),
     ]);
     /*     await page.$eval('#_FixedSearchButton', (el) => {
-      (el as HTMLAnchorElement).click();
-    }); */
+        (el as HTMLAnchorElement).click();
+      }); */
 
     /* エラーページなら、待たずに次の処理に行く。
-    わざとスローもさせるか様子見る */
+      わざとスローもさせるか様子見る */
     await Promise.race([
       page.waitForSelector('#_ResultCountDisplay'),
       page.waitForSelector('#usedListBox .error'),
     ]);
 
     /* logger.info('検索をクリックする');
-    await Promise.all([
-      page.click('#_FixedSearchButton'),
-      page.waitForNavigation(),
-    ]); */
+      await Promise.all([
+        page.click('#_FixedSearchButton'),
+        page.waitForNavigation(),
+      ]); */
+    /* }, {
+      retries: 3,
+      minTimeout: 5000,
+      maxTimeout: 15000,
+      onRetry: (e, attempts)=>{
+        logger.error(
+          `prepareForm retries: ${attempts} ${e.message} ${url}`);
+      },
+    }); */
   } catch (error: any) {
     await logErrorScreenshot(page,
       `Yahoo検索ページの設定に失敗しました。${page.url()} ${error.message}`);
