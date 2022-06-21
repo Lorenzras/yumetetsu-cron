@@ -3,9 +3,10 @@ import {Page} from 'puppeteer';
 import {Cluster} from 'puppeteer-cluster';
 import {IProperty} from '../types';
 import {searchDoProperty} from '../doNetCompare/searchDoProperty';
-import {cookiesPath, logger} from '../../../../utils';
+import {cookiesPath, getFileName, logger, saveJSON} from '../../../../utils';
 import fs from 'fs';
 import path from 'path';
+import {kintoneAppId, resultJSONPath} from '../config';
 
 
 export const cookieFile = (workerId: number) => {
@@ -95,5 +96,11 @@ export const handleDonetCompare = async (
   }));
 
 
+  await saveJSON(getFileName({
+    appId: kintoneAppId,
+    dir: resultJSONPath,
+    suffix: '-doComparedDt-' + newDtArr.length.toString(),
+  }), newDtArr);
+  logger.info(`Done comparing to donet. Starting to filter.`);
   return newDtArr;
 };

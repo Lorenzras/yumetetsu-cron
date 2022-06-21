@@ -16,6 +16,9 @@ import {
 import {scrapeContact as yahoo} from '../scrapers/scrapeYahoo/scrapeContact';
 import {Cluster} from 'puppeteer-cluster';
 import {Page} from 'puppeteer';
+import _ from 'lodash';
+import {getFileName, saveJSON} from '../../../../utils';
+import {kintoneAppId, resultJSONPath} from '../config';
 
 export const getCompanyDetails:
 THandleContactScraper = async (page, data) => {
@@ -97,7 +100,7 @@ const queGetCompanyDetails = async (
  * @param data
  * @returns {IProperty} Object with company details
  */
-export const handleGetCompanyDetails = async (
+export const scrapeSingleCompany = async (
   cluster: Cluster<{page: Page}>,
   data: IProperty,
 ) => {
@@ -119,4 +122,49 @@ export const handleGetCompanyDetails = async (
 
 
   return await queGetCompanyDetails(cluster, data);
+};
+
+
+export const handleGetCompanyDetails = async (
+  cluster: Cluster<{page: Page}>,
+  dtArr: IProperty[],
+) => {
+  const filteredData = dtArr.filter((dt)=>{
+    return (
+      !dt.DO管理有無?.trim() ||
+      dt.DO管理有無 === '無' ||
+      (dt.DO管理有無 === '有' && +(dt.DO価格差 ?? 0) !== 0)
+    );
+  });
+  const filteredDataLength = filteredData.length;
+
+  logger.info(`Filtered results ${filteredDataLength}. Starting to scrape contact. `);
+
+  const finalResults = await Promise.all(
+    _.shuffle(filteredData)
+      .map(async (data, idx) => {
+        try {
+          logger.info(`Fetching contact: ${idx + 1} of ${filteredDataLength} rows.`);
+          return await scrapeSingleCompany(cluster, data);
+        } catch (err: any) {
+          logger.error(`Unhandled error at fetchingContact ${data.リンク} ${err.message}`);
+          return {
+            ...data,
+            掲載企業: '処理失敗',
+          };
+        }
+      }),
+  );
+
+  const filteredJSONFname = `-finalResults-${finalResults.length.toString()}`;
+  logger.info(`Done scraping contact. Saving progress to ${filteredJSONFname}`);
+
+  // Save final result to JSON
+  await saveJSON(getFileName({
+    appId: kintoneAppId,
+    dir: resultJSONPath,
+    suffix: filteredJSONFname,
+  }), finalResults);
+
+  return finalResults;
 };

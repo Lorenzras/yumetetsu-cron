@@ -55,12 +55,12 @@ export const handlePrepareForm : THandlePrepareForm = async (
       page.waitForNavigation(),
     ]);
 
-    return await Promise.race([
-      page.waitForSelector('#item-list', {visible: true, timeout: 30000})
-        .then(()=>true),
-      page.waitForSelector('.noContents', {visible: true, timeout: 30000})
-        .then(()=>false),
+    await Promise.race([
+      page.waitForSelector('#item-list', {visible: true, timeout: 30000}),
+      page.waitForSelector('.noContents', {visible: true, timeout: 30000}),
     ]);
+
+    return true;
   } catch (err: any) {
     await logErrorScreenshot(
       page, `Failed to navigate ${page.url()} ${err.message}`,

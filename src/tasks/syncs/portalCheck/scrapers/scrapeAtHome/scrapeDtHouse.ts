@@ -35,6 +35,7 @@ const handleNextPage = async (page: Page) => {
   if (nextPageBtn) {
     logger.info('Clicking next page.');
 
+    // Wait for loading animation appear
     await Promise.allSettled([
       nextPageBtn.click(),
       page.waitForSelector('#loading', {visible: true, timeout: 1500}),
@@ -42,7 +43,7 @@ const handleNextPage = async (page: Page) => {
 
     await page.waitForSelector('#loading', {hidden: true});
 
-    logger.info('Succesfully clicked next page.');
+    logger.info(`Succesfully clicked next page. ${page.url()}`);
 
     return true;
   }

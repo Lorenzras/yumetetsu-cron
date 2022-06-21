@@ -3,11 +3,10 @@ import {Page} from 'puppeteer';
 import {scraperTask} from './clusterTasks/scraperTask';
 import {getExtraPuppeteer} from '../../common/browser';
 import {Cluster} from 'puppeteer-cluster';
-import {browserTimeOut, minimalArgs} from '../../common/browser/config';
-// import chokidar from 'chokidar';
-// import {dlPortalCheck} from './config';
+
 import {logger, sleep} from '../../../utils';
-import {uploadTask} from './clusterTasks/uploadTask';
+
+
 import {actionsHOMES} from './scrapers/scrapeHOMES';
 import {actionsAtHome} from './scrapers/scrapeAtHome/actionsAtHome';
 import {
@@ -33,15 +32,6 @@ export const initCluster = () => Cluster.launch({
   retryDelay: 20000,
   timeout: 1000 * 60 * 8,
 });
-
-/* const initFileWatcher = () => {
-  return chokidar.watch(dlPortalCheck, {
-    ignored: /(^|[/\\])\../, // ignore dotfiles
-    ignoreInitial: true,
-    persistent: false,
-    depth: 0,
-  });
-}; */
 
 
 /**
