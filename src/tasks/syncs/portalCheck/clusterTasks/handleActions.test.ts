@@ -15,9 +15,9 @@ import _ from 'lodash';
 test('actions', async () => {
   const cluster = await initCluster();
   const actions = [
-    ...actionsHOMES(),
-    ...actionsAtHome(),
-    ...actionsSUUMO(),
+    // ...actionsHOMES(),
+    // ...actionsAtHome(),
+    // ...actionsSUUMO(),
     ...actionsYahoo(),
   ];
 
