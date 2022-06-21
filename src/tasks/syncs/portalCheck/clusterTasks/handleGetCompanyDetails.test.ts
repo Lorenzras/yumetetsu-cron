@@ -15,20 +15,12 @@ import dtArr from './test/all.json';
 describe('handleGetCompanyDetails', ()=>{
   test('main', async ()=>{
     const cluster: Cluster<{page: Page}> = await initCluster();
-    const dataLength = dtArr.length;
 
-    let doneCount = 0;
+    const result = await handleGetCompanyDetails(
+      cluster,
+      dtArr as IProperty[],
+    );
 
-    const jobs = dtArr
-      .map(async (item)=>{
-        const res = await handleGetCompanyDetails(cluster, item as IProperty);
-        doneCount += 1;
-
-        logger.info(`Progress ${doneCount} / ${dataLength}`);
-        return res;
-      });
-
-    const result = await Promise.all(jobs as Promise<IProperty>[]);
 
     console.log(result.length);
 
