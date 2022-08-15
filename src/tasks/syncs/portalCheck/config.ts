@@ -25,9 +25,7 @@ export const resolveResultDir = (
       '★サポート共有',
       '【ポータル新着物件】') :
     path.join(excelPath, appName),
-
-  `${format(new Date(), 'yyyy.MM.dd')}新着物件情報`,
-);
+  `${format(new Date(), 'yyyy.MM.dd')}新着物件情報`);
 
 export const resultFileTemplate = path.join(
   templatesPath, 'portalCheckTemplate.xlsx',
