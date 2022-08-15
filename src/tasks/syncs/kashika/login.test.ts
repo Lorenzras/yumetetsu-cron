@@ -1,5 +1,7 @@
 
+import path from 'path';
 import {openBrowserPage, openMockBrowserPage} from '../../common/browser';
+import {kasikaAccounts, ocrWorker} from './config';
 
 import {login} from './login';
 
@@ -8,9 +10,23 @@ describe('kashika', ()=>{
     // const page = await openMockBrowserPage();
     const page = await openBrowserPage({
       slowMo: 40,
-
+      headless: false,
+      loadImages: true,
     });
-    await login(page);
+
+    const worker = await ocrWorker;
+
+    for (const [store, auth] of Object.entries(kasikaAccounts)) {
+      await login(
+        await (await page.browser().createIncognitoBrowserContext())
+          .newPage(),
+        worker,
+        auth,
+      );
+      console.log('Success', store);
+    }
+    // await login(page, kasikaAccounts['豊川中央']);
+
     // await page.click('button[type=submit]');
     // await page.waitForNavigation();
     // const el = await page.$('div[role=alert]');
@@ -18,5 +34,6 @@ describe('kashika', ()=>{
 
     // page.browser().disconnect();
     await page.close();
-  }, 300000);
+    await worker.terminate();
+  }, 3000000);
 });
