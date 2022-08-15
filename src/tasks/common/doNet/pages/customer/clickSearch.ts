@@ -19,12 +19,12 @@ export const clickSearch = async (page: Page) => {
 
   await Promise.race([
     page.waitForSelector(
-      selectors.resultCount, {timeout: 4000, visible: true}).catch(),
+      selectors.resultCount, {timeout: 8000, visible: true}),
     page.waitForSelector(
-      selectors.resultNothing, {timeout: 4000, visible: true}).catch(),
+      selectors.resultNothing, {timeout: 8000, visible: true}),
   ]);
 
-  const count = getResultCount(page);
+  const count = await getResultCount(page);
 
 
   return count;

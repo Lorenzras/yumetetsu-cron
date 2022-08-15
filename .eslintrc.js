@@ -22,6 +22,7 @@ module.exports = {
   ],
   'rules': {
     'no-unused-vars': 'off',
+    'import/no-unresolved': 'error',
     '@typescript-eslint/no-unused-vars': 'warn',
     'indent': 'off',
     '@typescript-eslint/indent': [

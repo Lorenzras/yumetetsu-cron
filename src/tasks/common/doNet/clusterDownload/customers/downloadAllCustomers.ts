@@ -1,5 +1,9 @@
+import {Page} from 'puppeteer';
 import {Cluster} from 'puppeteer-cluster';
+import {logger, sleep} from '../../../../../utils';
 import {getExtraPuppeteer} from '../../../browser';
+import {getDonetStores} from '../../pages/customer';
+import {downloadAllStores} from './downloadStores/downloadAllStores';
 
 export const initCluster = () => Cluster.launch({
   puppeteer: getExtraPuppeteer(),
@@ -20,5 +24,22 @@ export const initCluster = () => Cluster.launch({
 
 
 export const downloadAllCustomers = async () => {
-  const cluster = await initCluster();
+  const cluster : Cluster<{page: Page}> = await initCluster();
+
+  cluster.on('taskerror', (err, data) => {
+    logger.error(`Error crawling : ${err.message} ${data}`);
+  });
+
+  const stores = await getDonetStores();
+
+  const result = await downloadAllStores(cluster, stores);
+  console.log('Result', result);
+
+  await sleep(5000);
+
+  await cluster.idle();
+  logger.info('Cluster is now idle.');
+  await cluster.close();
+  logger.info('Cluster is closed.');
 };
+

@@ -1,15 +1,15 @@
 {
 
-  "ts-node": {
+/*   "ts-node": {
     "files": true //added this to force ts-node to use files
-  },
+  }, */
   "compilerOptions": {
 
     /* Language and Environment */
     "target": "ESNext",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
     "lib": ["ES5", "ES6", "DOM", "DOM.Iterable", "ES2021"],                                        /* Specify a set of bundled library declaration files that describe the target runtime environment. */
     /* Modules */
-    "module": "commonjs",                                /* Specify what module code is generated. */
+    "module": "NodeNext",                                /* Specify what module code is generated. */
     "resolveJsonModule": true,                        /* Enable importing .json files */
     "allowJs": true,                                  /* Allow JavaScript files to be a part of your program. Use the `checkJS` option to get errors from these files. */
     "outDir": "./build",                                   /* Specify an output folder for all emitted files. */
@@ -22,15 +22,13 @@
     "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
     "importHelpers": true
   },
-   "files": [
-    "./node_modules/@kintone/dts-gen/kintone.d.ts",
-    "./src/types/longtermCust.d.ts",
-    "./src/types/kintone.d.ts",
-    "./src/types/environment.d.ts"
-  ],
+
   "include": [
     "src/**/*",
+    "./node_modules/@kintone/dts-gen/kintone.d.ts",
+    "./node_modules/puppeteer/lib/types.d.ts",
     //"/src/types/longtermCust.d.ts",
     // /"./node_modules/@kintone/dts-gen/kintone.d.ts"
   ],
 }
+// node_modules\puppeteer\lib\types.d.ts

@@ -76,6 +76,7 @@ export const handleActions = async (
       return await handleAction(cluster, action);
     }),
   ));
+
   saveScrapeMeta(actionResults, saveToNetWorkDrive);
 
   const scrapedProps = actionResults.reduce((accu, curr) => {
