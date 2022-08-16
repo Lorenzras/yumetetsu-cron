@@ -66,8 +66,8 @@ export const saveJSON = async (
 ) => {
   try {
     fs.writeFileSync(filePath + '.json', JSON.stringify(data));
-  } catch (err) {
-    logger.error('Failed to save json file.');
+  } catch (err: any) {
+    logger.error(`Failed to save json file. ${err.message}`);
   }
 };
 

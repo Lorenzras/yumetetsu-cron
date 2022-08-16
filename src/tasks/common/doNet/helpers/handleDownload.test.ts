@@ -12,7 +12,8 @@ describe('Download', ()=> {
         page,
         appId: '111',
         downloadDir: dlPathDonetProperty,
-        requestURL: 'https://manage.do-network.com/estate/ListCsvDownload',
+        // requestURL: 'https://manage.do-network.com/estate/ListCsvDownload',
+        requestURL: 'https://manage.do-network.com/customer/ListCsvDownload',
       },
     );
 

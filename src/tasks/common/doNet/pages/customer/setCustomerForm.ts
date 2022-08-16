@@ -13,6 +13,7 @@ export const setCustomerForm = async (
 ) => {
   const {
     storeId,
+    agentId,
     status = [],
   } = options;
 
@@ -20,9 +21,16 @@ export const setCustomerForm = async (
   await page.waitForSelector(selectors.ddStores);
   await page.select(selectors.ddStores, storeId);
 
-  /* Select agent */
 
-  /* Select status */
+  /* Select agent */
+  if (agentId) {
+    // wait until there are multiple options
+    await page.waitForSelector(selectors.ddAgents + ' > option + option');
+    await page.select(selectors.ddAgents, agentId);
+  }
+
+
+  /* Set status */
   await page.evaluate((status: TCustStatus[])=>{
     const elStatuses = $('th:contains(状態) ~ td div div');
     elStatuses.each((_, statusDiv) => {

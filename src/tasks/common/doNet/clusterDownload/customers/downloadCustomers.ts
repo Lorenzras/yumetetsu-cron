@@ -1,8 +1,7 @@
 /* eslint-disable max-len */
-import {Cluster} from 'puppeteer-cluster';
 import {logger} from '../../../../../utils/logger';
 import {TClusterPage} from '../../../browser/config';
-import {getExtraPuppeteer, initCluster} from '../../../browser/openBrowser';
+import {initCluster} from '../../../browser/openBrowser';
 import {downloadAllCustomers} from './downloadAllCustomers';
 import {downloadProcess} from './downloadProcess';
 
@@ -25,8 +24,8 @@ export const downloadCustomers = async (options?: IFormOptions,
    * Download all based on following condition
    */
   if (options && (updatedFrom || updateUntil)) {
-    const count = await cluster.execute(async ({page}) => {
-      return await downloadProcess(page, options);
+    const count = await cluster.execute(async ({page, worker: {id}}) => {
+      return await downloadProcess(page, {...options, workerId: id});
     });
     logger.info(`Filtered by dates ${updatedFrom} ~ ${updateUntil} : ${count}件`);
   } else {

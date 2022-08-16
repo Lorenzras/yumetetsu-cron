@@ -1,18 +1,21 @@
 
 import {Page} from 'puppeteer';
 import fs from 'fs';
-import {csvPath, dumpPath, logger, notifyDev} from '../../../../../utils';
+import {logger, notifyDev} from '../../../../../utils';
 import {custDlDir} from '../../config';
 import path from 'path';
 import {format} from 'date-fns';
 import {APP_IDS} from '../../../../../api/kintone';
 import iconv from 'iconv-lite';
+// @ts-expect-error TS is looking for a workaround
 import {nanoid} from 'nanoid/non-secure';
 import {donetDownloadPath} from '../../../../syncs/doNet/config';
 
 
 /**
  * Programatically download csv data into stream.
+ * This was patterned to kintone upload,
+ * use handleDownloadCustomer for more generic customer download.
  *
  * @param page
  * @return {string} data

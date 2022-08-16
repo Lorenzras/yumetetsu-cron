@@ -5,14 +5,18 @@ import {logger} from '../../../../../utils';
 
 
 export const getOptionsStore = async ( page: Page) => {
-  const result = await getSelectOptions(page, selectors.ddStores);
+  // await page.waitForNetworkIdle();
+  const result = await getSelectOptions(
+    page, selectors.ddStores,
+  );
   logger.info(`Found ${result.length} stores`);
 
   return result;
 };
 
 export const getOptionsEmployee = async (page: Page) => {
-  const result = await getSelectOptions(page, selectors.ddAgents);
+  const result = (await getSelectOptions(page, selectors.ddAgents))
+    .filter(Boolean);
   logger.info(`Found ${result.length} employees`);
   return result;
 };

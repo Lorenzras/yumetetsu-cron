@@ -12,12 +12,16 @@ import {nanoid} from 'nanoid/non-secure';
 export const handleDownload = async (
   {
     page, requestURL, downloadDir, appId,
+    prefix = '',
+    suffix = '',
   }:
   {
     page: Page,
-    requestURL: string,
+    requestURL: string, // https://manage.do-network.com/customer/ListCsvDownload
     downloadDir: string,
     appId: string,
+    prefix?: string,
+    suffix?: string
   },
 ) => {
   logger.info(`Executing fetch.`);
@@ -50,10 +54,16 @@ export const handleDownload = async (
 
     fs.existsSync(downloadDir) || fs.mkdirSync(downloadDir, {recursive: true});
 
-    const filePath = path.join(
-      downloadDir,
-      format(new Date(), `${appId}-yyyyMMdd-HHmmss`),
-    ) + `-${nanoid(5)}.csv`;
+    const filePath = [
+      path.join(
+        downloadDir,
+        format(new Date(), `${appId}-${prefix}-yyyyMMdd-HHmmss`),
+      ),
+      suffix,
+      `${nanoid(5)}.csv`]
+      .join('-');
+
+    logger.info(`Saving to ${filePath}`);
 
     fs.writeFileSync(
       filePath,
