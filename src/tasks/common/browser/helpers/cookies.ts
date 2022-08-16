@@ -26,6 +26,7 @@ export const setBrowserCookie = async (page: Page, workerId: number) => {
   try {
     const cookiePath = cookieFilePath(workerId);
     const cookiesString = await fs.readFile(cookiePath, 'utf8');
+
     const cookies = JSON.parse(cookiesString);
     await page.setCookie(...cookies);
 
