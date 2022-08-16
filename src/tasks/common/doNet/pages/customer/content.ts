@@ -3,6 +3,7 @@ import {getSelectOptions} from '../../../browser/helpers/content';
 import {selectors} from './selectors';
 import {logger} from '../../../../../utils';
 
+
 export const getOptionsStore = async ( page: Page) => {
   const result = await getSelectOptions(page, selectors.ddStores);
   logger.info(`Found ${result.length} stores`);

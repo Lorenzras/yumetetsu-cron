@@ -5,6 +5,7 @@ import UserAgent from 'user-agents';
 import puppeteer from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
 import adblockerPlugin from 'puppeteer-extra-plugin-adblocker';
+import {Cluster} from 'puppeteer-cluster';
 
 
 puppeteer.use(stealthPlugin());
@@ -95,4 +96,28 @@ export const openMockBrowserPage = async () => {
     browserURL,
     defaultViewport: null});
   return getPage(browser);
+};
+
+
+export const initCluster = (options: {
+  maxConcurrency: number
+}) => {
+  const {maxConcurrency} = options;
+
+  return Cluster.launch({
+    puppeteer: getExtraPuppeteer(),
+    concurrency: Cluster.CONCURRENCY_CONTEXT,
+    maxConcurrency: maxConcurrency || +process.env.CLUSTER_MAXCONCURRENCY || 5,
+    // monitor: true,
+    workerCreationDelay: 100,
+
+    puppeteerOptions: {
+    // slowMo: 100,
+      headless: process.env.BROWSER_TYPE === 'HEADLESS',
+    // args: minimalArgs,
+    },
+    retryLimit: 2,
+    retryDelay: 20000,
+    timeout: 1000 * 60 * 8,
+  });
 };

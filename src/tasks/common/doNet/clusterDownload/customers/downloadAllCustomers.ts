@@ -1,45 +1,26 @@
-import {Page} from 'puppeteer';
-import {Cluster} from 'puppeteer-cluster';
-import {logger, sleep} from '../../../../../utils';
-import {getExtraPuppeteer} from '../../../browser';
-import {getDonetStores} from '../../pages/customer';
-import {downloadAllStores} from './downloadStores/downloadAllStores';
+/* eslint-disable max-len */
+import {TClusterPage} from '../../../browser/config';
+import {getDonetStores} from '../../pages/customer/getDonetStores';
+import {downloadProcess} from './downloadProcess';
 
-export const initCluster = () => Cluster.launch({
-  puppeteer: getExtraPuppeteer(),
-  concurrency: Cluster.CONCURRENCY_CONTEXT,
-  maxConcurrency: +process.env.CLUSTER_MAXCONCURRENCY || 5,
-  // monitor: true,
-  workerCreationDelay: 100,
+/** I avoided nesting queues to prevent process deadlock. */
 
-  puppeteerOptions: {
-    // slowMo: 100,
-    headless: process.env.BROWSER_TYPE === 'HEADLESS',
-    // args: minimalArgs,
-  },
-  retryLimit: 2,
-  retryDelay: 20000,
-  timeout: 1000 * 60 * 8,
-});
+/**
+ * Download all customers
+ *
+ * @param cluster
+ */
+export const downloadAllCustomers = async (
+  cluster: TClusterPage,
+) => {
+  const stores: AsyncReturnType<typeof getDonetStores> = await cluster
+    .execute(({page}) => getDonetStores(page));
 
+  console.log(stores);
+  const dlPerStoreResult = await Promise.all(
+    stores.map<ReturnType<typeof downloadProcess>>(({value}) => cluster
+      .execute(({page}) => downloadProcess(page, {storeId: value}))),
+  );
 
-export const downloadAllCustomers = async () => {
-  const cluster : Cluster<{page: Page}> = await initCluster();
-
-  cluster.on('taskerror', (err, data) => {
-    logger.error(`Error crawling : ${err.message} ${data}`);
-  });
-
-  const stores = await getDonetStores();
-
-  const result = await downloadAllStores(cluster, stores);
-  console.log('Result', result);
-
-  await sleep(5000);
-
-  await cluster.idle();
-  logger.info('Cluster is now idle.');
-  await cluster.close();
-  logger.info('Cluster is closed.');
+  console.log(dlPerStoreResult);
 };
-
