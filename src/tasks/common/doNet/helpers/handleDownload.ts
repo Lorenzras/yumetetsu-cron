@@ -14,6 +14,7 @@ export const handleDownload = async (
     page, requestURL, downloadDir, appId,
     prefix = '',
     suffix = '',
+    encoding = 'shift_jis',
   }:
   {
     page: Page,
@@ -22,6 +23,7 @@ export const handleDownload = async (
     appId: string,
     prefix?: string,
     suffix?: string
+    encoding?: 'shift_jis' | 'utf8'
   },
 ) => {
   logger.info(`Executing fetch.`);
@@ -37,9 +39,9 @@ export const handleDownload = async (
         .then((buffer)=>{
           const decoder = new TextDecoder('shift-jis');
 
-          const text =
-            decoder.decode(buffer)
-              .replace(/([0-5]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9])/g, '$1:$2');
+          const text = decoder
+            .decode(buffer)
+            .replace(/([0-5]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9])/g, '$1:$2');
           return text;
         });
     }, requestURL);
@@ -67,7 +69,7 @@ export const handleDownload = async (
 
     fs.writeFileSync(
       filePath,
-      iconv.encode(result, 'shift_jis'),
+      iconv.encode(result, encoding),
     );
 
     return filePath;

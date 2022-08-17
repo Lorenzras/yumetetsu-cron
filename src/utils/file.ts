@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs, {createReadStream} from 'fs';
 import {logger} from './logger';
 import path from 'path';
 import {dumpPath} from './paths';
@@ -7,6 +7,7 @@ import rmfr from 'rmfr';
 import {json2csvAsync} from 'json-2-csv';
 import {nanoid} from 'nanoid';
 import format from 'date-fns/format';
+import {createInterface} from 'readline';
 
 export const getCSVFiles = (dir: string, appId: string) => {
   const result = fs.readdirSync(dir)
@@ -141,4 +142,14 @@ export const getFileName = (
       .filter(Boolean)
       .join('-')}`,
   );
+};
+
+export const readFirstLine = async (path: string) => {
+  const inputStream = createReadStream(path);
+  try {
+    for await (const line of createInterface(inputStream)) return line;
+    return ''; // If the file is empty.
+  } finally {
+    inputStream.destroy(); // Destroy file stream.
+  }
 };
