@@ -4,7 +4,7 @@ import {Page} from 'puppeteer';
 
 export const getSelectOptions = async (page : Page, selector: string) => {
   logger.info(`Retrieving options of ${selector}`);
-  await page.waitForNetworkIdle();
+  // await page.waitForNetworkIdle();
   await page.waitForSelector(selector);
 
   const allOptions = await page.$$eval(

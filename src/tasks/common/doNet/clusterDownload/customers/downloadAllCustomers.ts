@@ -1,9 +1,9 @@
 /* eslint-disable max-len */
 
 
+import {storeSettings} from '../../../../../config';
 import {logger} from '../../../../../utils';
 import {TClusterPage} from '../../../browser/config';
-import {getDonetStores} from '../../pages/customer/getDonetStores';
 import {dlLimit} from './config';
 import {downloadPerAgents} from './downloadPerAgents';
 import {downloadPerStatus} from './downloadPerStatus';
@@ -20,16 +20,24 @@ import {saveMeta} from './helper/saveMeta';
 export const downloadAllCustomers = async (
   cluster: TClusterPage,
 ) => {
-  const stores: AsyncReturnType<typeof getDonetStores> = await cluster
-    .execute(({page}) => getDonetStores(page));
+  // const stores: AsyncReturnType<typeof getDonetStores> = await cluster
+  //  .execute(({page}) => getDonetStores(page));
+  const stores = Object.entries(storeSettings)
+    .filter(([, setting]) => ('email' in setting))
+    .map(([key, {name}]) => {
+      return {
+        text: name,
+        storeId: key,
+      };
+    });
 
 
   // Download per store
   logger.info('Starting to download per store.');
   const dlPerStoreResult = await Promise.all(stores
     .map<ReturnType<typeof downloadProcess>>(
-    ({value}) => cluster
-      .execute(({page, worker: {id}}) => downloadProcess(page, {storeId: value, workerId: id})),
+    ({storeId}) => cluster
+      .execute(({page, worker: {id}}) => downloadProcess(page, {storeId: storeId, workerId: id})),
   ));
 
   await saveMeta('perStores', dlPerStoreResult.map(({count, options}) => ({count, options})));

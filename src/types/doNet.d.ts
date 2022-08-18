@@ -18,4 +18,5 @@ interface IFormOptions {
   updatedFrom?: Date,
   updateUntil?: Date
   workerId?: number,
+  dir?: string,
 }

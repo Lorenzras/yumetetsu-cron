@@ -1,4 +1,5 @@
 import fs, {createReadStream} from 'fs';
+import asyncFs from 'fs/promises';
 import {logger} from './logger';
 import path from 'path';
 import {dumpPath} from './paths';
@@ -24,15 +25,20 @@ export const getCSVFiles = (dir: string, appId: string) => {
  *
  * @param filePath
  * @param data comma delimited csv. See conventions.
+ * @param encoding
  * @returns {string} path of saved file.
  */
-export const saveCSV = (filePath: string, data: string) => {
+export const saveCSV = (
+  filePath: string,
+  data: string,
+  encoding: 'utf8' | 'Shift_JIS' = 'Shift_JIS',
+) => {
   fs.writeFileSync(filePath, '');
 
   const fd = fs.openSync( filePath, 'w');
   const buff = iconv.encode(
     data.replace(/²/g, '2'),
-    'Shift_JIS',
+    encoding,
   );
 
   fs.writeSync( fd, buff);
@@ -45,14 +51,20 @@ export const saveCSV = (filePath: string, data: string) => {
  * Save json to csv
  * @param filePath
  * @param json
+ * @param encoding
  * @returns {string} file path
  */
 export const saveJSONToCSV = async (
   filePath: string,
   json: {[k: string]: any}[],
+  encoding: 'utf8' | 'Shift_JIS' = 'Shift_JIS',
 ) =>{
   if (!json.length) return;
-  return saveCSV(filePath + '.csv', await json2csvAsync(json));
+  return saveCSV(
+    filePath + '.csv',
+    await json2csvAsync(json),
+    encoding,
+  );
 };
 
 /**
@@ -64,6 +76,7 @@ export const saveJSONToCSV = async (
 export const saveJSON = async (
   filePath: string,
   data: {[k: string]: any}[],
+
 ) => {
   try {
     fs.writeFileSync(filePath + '.json', JSON.stringify(data));
@@ -81,6 +94,7 @@ export const saveJSON = async (
 export const saveFile = async (
   filePath: string,
   data: string,
+
 ) => {
   try {
     const dir = path.dirname(filePath);
@@ -109,6 +123,16 @@ export const deleteFile = async (file: string) => {
  */
 export const deleteFilesInFolder = (dir: string) =>{
 // Still thinking if I will include this as it is damaging.
+
+  fs.readdir(dir, (err, files) => {
+    if (err) throw err;
+
+    for (const file of files) {
+      fs.unlink(path.join(dir, file), (err) => {
+        if (err) throw err;
+      });
+    }
+  });
 };
 
 /**
@@ -145,7 +169,7 @@ export const getFileName = (
 };
 
 export const readFirstLine = async (path: string) => {
-  const inputStream = createReadStream(path);
+  const inputStream = createReadStream(path, 'utf8');
   try {
     for await (const line of createInterface(inputStream)) return line;
     return ''; // If the file is empty.

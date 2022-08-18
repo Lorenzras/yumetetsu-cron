@@ -15,21 +15,23 @@ export const handleDownload = async (
     prefix = '',
     suffix = '',
     encoding = 'shift_jis',
+    removeTimeFromDate = true,
   }:
   {
     page: Page,
     requestURL: string, // https://manage.do-network.com/customer/ListCsvDownload
     downloadDir: string,
     appId: string,
+    removeTimeFromDate?: boolean,
     prefix?: string,
     suffix?: string
     encoding?: 'shift_jis' | 'utf8'
   },
 ) => {
   logger.info(`Executing fetch.`);
-
+  let filePath = '';
   try {
-    const result = await page.evaluate((requestURL)=>{
+    const result = await page.evaluate((requestURL, removeTimeFromDate)=>{
       return fetch(requestURL, {
         method: 'GET',
         credentials: 'include',
@@ -39,12 +41,17 @@ export const handleDownload = async (
         .then((buffer)=>{
           const decoder = new TextDecoder('shift-jis');
 
-          const text = decoder
-            .decode(buffer)
-            .replace(/([0-5]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9])/g, '$1:$2');
+          let text = decoder
+            .decode(buffer);
+
+          if (removeTimeFromDate) {
+            text = text
+              .replace(/([0-5]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9])/g, '$1:$2');
+          }
+
           return text;
         });
-    }, requestURL);
+    }, requestURL, removeTimeFromDate);
 
 
     logger.info(
@@ -56,7 +63,7 @@ export const handleDownload = async (
 
     fs.existsSync(downloadDir) || fs.mkdirSync(downloadDir, {recursive: true});
 
-    const filePath = [
+    filePath = [
       path.join(
         downloadDir,
         format(new Date(), `${appId}-${prefix}-yyyyMMdd-HHmmss`),
@@ -74,7 +81,7 @@ export const handleDownload = async (
 
     return filePath;
   } catch (err: any) {
-    logger.error('Failed saving file. ' + err.message);
-    await notifyDev('Error downloading files' + err.message);
+    logger.error(`Failed saving file. ${filePath} ${err.message}`);
+    // await notifyDev('Error downloading files' + err.message);
   }
 };

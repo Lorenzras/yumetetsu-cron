@@ -1,7 +1,6 @@
 
 import {Page} from 'puppeteer';
 import {logger} from '../../../../../utils/logger';
-import {login} from '../../login';
 import {clickSearch} from '../../pages/customer/clickSearch';
 import {
   setCustomerForm,
@@ -16,8 +15,15 @@ import {handleDownload} from '../../helpers/handleDownload';
 import {APP_IDS} from '../../../../../api/kintone';
 import {dlLimit, downloadDir} from './config';
 import {getOptionsEmployee} from '../../pages/customer';
+import {loginToCustomerPage} from '../../pages/customer/loginToCustomerPage';
 
-
+/**
+ * Central download process
+ *
+ * @param page
+ * @param options
+ * @returns {object} containing count, options used, and agents if applicable.
+ */
 export const downloadProcess = (
   page: Page,
   options: IFormOptions,
@@ -26,18 +32,18 @@ export const downloadProcess = (
     storeId,
     agentId,
     workerId = 404,
+    dir = downloadDir,
   } = options;
   return retry(async ()=>{
     const isWithCookie = await setBrowserCookie(page, workerId);
     logger.info(`processing: ${storeId} ${agentId}`);
 
-    if (!isWithCookie) {
-      await login(page);
-      await navigateToCustPage(page);
-      await saveBrowserCookie(page, workerId);
-    } else {
-      await page.goto('https://manage.do-network.com/customer');
+
+    if (!isWithCookie || !await navigateToCustPage(page)) {
+      logger.info('Logging in to customer page.');
+      await loginToCustomerPage(page);
     }
+    await saveBrowserCookie(page, workerId);
 
 
     await setCustomerForm(page, options);
@@ -56,9 +62,10 @@ export const downloadProcess = (
         page,
         requestURL: 'https://manage.do-network.com/customer/ListCsvDownload',
         appId: APP_IDS.customers,
-        downloadDir: downloadDir,
-        prefix: `${[storeId, agentId, count]
-          .filter((i) => i != undefined)
+        downloadDir: dir,
+        encoding: 'utf8',
+        removeTimeFromDate: false,
+        prefix: `${[storeId, agentId ?? '', count]
           .join('-')}`,
       });
       return {
