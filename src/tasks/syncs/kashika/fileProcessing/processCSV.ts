@@ -45,13 +45,13 @@ export const processCSV = async () => {
           if (!record[storeId]) record[storeId] = [];
 
           // Extract the store name from row[店舗名], then remove 店.
-          const cleanStoreName: string = row['店舗名'].replaceAll(/(ハウスドゥ[!！]?(\s+)?)|店/g, '');
+          // const cleanStoreName: string = row['店舗名'].replaceAll(/(ハウスドゥ[!！]?(\s+)?)|店/g, '');
 
           record[storeId].push({
             ...row,
             店舗営業担当者: email,
             メール禁止フラグ: +Boolean(row['メール禁止フラグ']),
-            タグ: `${cleanStoreName}_${row['顧客種別']}`,
+            タグ: `${row['店舗名']}_${row['顧客種別']}`,
           });
         })
         .on('end', (rowCount: number) => console.log(`Parsed ${rowCount} rows. ${csvFile}`));
