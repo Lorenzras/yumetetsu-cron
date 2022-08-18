@@ -1,3 +1,4 @@
+import {logger} from './../../../../../utils/logger';
 import {initCluster} from '../../../browser';
 import {browserTimeOut, TClusterPage} from '../../../browser/config';
 import {downloadCustomers} from './downloadCustomers';
@@ -7,7 +8,14 @@ describe('customers', ()=>{
     const cluster : TClusterPage = await initCluster({
       maxConcurrency: 5,
     });
+
     await downloadCustomers(cluster);
+
+
+    await cluster.idle();
+    logger.info('Cluster is now idle.');
+    await cluster.close();
+    logger.info('Cluster is closed.');
     expect(true);
   }, browserTimeOut);
 });

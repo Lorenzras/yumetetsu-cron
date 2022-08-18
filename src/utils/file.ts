@@ -60,6 +60,8 @@ export const saveJSONToCSV = async (
   encoding: 'utf8' | 'Shift_JIS' = 'Shift_JIS',
 ) =>{
   if (!json.length) return;
+  const dir = path.dirname(filePath);
+  fs.existsSync(dir) || fs.mkdirSync(dir, {recursive: true});
   return saveCSV(
     filePath + '.csv',
     await json2csvAsync(json),
