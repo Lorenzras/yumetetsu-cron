@@ -44,10 +44,8 @@ export const processCSV = async () => {
         .on('data', (row) => {
           if (!record[storeId]) record[storeId] = [];
 
-          // Extract the store name from row[店舗名].
-          let cleanStoreName: string = row['店舗名'].replaceAll(/ハウスドゥ[!！]?(\s+)?/g, '');
-          // Add 店 to store name without it.
-          cleanStoreName = cleanStoreName.includes('店') ? cleanStoreName : cleanStoreName + '店';
+          // Extract the store name from row[店舗名], then remove 店.
+          const cleanStoreName: string = row['店舗名'].replaceAll(/(ハウスドゥ[!！]?(\s+)?)|店/g, '');
 
           record[storeId].push({
             ...row,
