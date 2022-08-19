@@ -106,11 +106,12 @@ export const downloadError = async (
 
   const processedCSV = await cleanCSV(result);
 
-  const csvFilePath = await saveJSONToCSV(filePath, processedCSV, 'utf8');
+  const csvFilePath = await saveJSONToCSV(filePath, processedCSV, 'Shift_JIS');
 
   const errorSummary = summarizeErrors(processedCSV);
 
   if (!csvFilePath) throw new Error('Failed to retrive filepath after saving.');
+
   await sendFileToChatwork({
     filePath: csvFilePath,
     fileDetails: errorSummary,

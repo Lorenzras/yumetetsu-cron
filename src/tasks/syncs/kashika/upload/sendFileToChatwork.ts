@@ -8,14 +8,15 @@ import {logger} from '../../../../utils';
 // rpachat = 213232379
 // yumetetsu = 6732051
 
-const roomId = '6732051';
+const roomId = '225800073';
 
 export const sendFileToChatwork = async ({
-  filePath, fileDetails,
+  filePath, fileDetails, cwToken = process.env.CW_TOKEN,
 }:
 {
   fileDetails: Record<string, number>,
   filePath: string,
+  cwToken?: string
 },
 ) => {
   logger.info('sending to chatwork.');
@@ -39,7 +40,7 @@ export const sendFileToChatwork = async ({
 
   const headers = {
     'Accept': 'application/json',
-    'X-ChatWorkToken': process.env.CW_TOKEN,
+    'X-ChatWorkToken': cwToken,
   };
 
 
