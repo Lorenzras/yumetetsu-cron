@@ -81,3 +81,25 @@ export const getHTML = async (
 
   return htmlBody;
 };
+
+export const selectByText = async (
+  page: Page,
+  selector: string,
+  text: string,
+) => {
+  await page.waitForSelector(`${selector} option`);
+  // await page.waitForTimeout(2000);
+  logger.info(`${selector} appeared.`);
+  const prefId = await page.$eval(selector, (el, text) => {
+    const prefId = $(el)
+      .children(`option:contains(${text})`).val() as string;
+    (el as HTMLInputElement).value = prefId;
+    // $(el).val(prefId);
+    $(el).trigger('change');
+    return prefId;
+  }, text);
+
+
+  // await page.select(selector, prefId);
+  logger.info(`Selected  ${prefId} at ${selector}.`);
+};

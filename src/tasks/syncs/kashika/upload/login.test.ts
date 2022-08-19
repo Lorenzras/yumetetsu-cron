@@ -1,7 +1,7 @@
 
 import path from 'path';
-import {openBrowserPage, openMockBrowserPage} from '../../common/browser';
-import {kasikaAccounts, ocrWorker} from './config';
+import {openBrowserPage, openMockBrowserPage} from '../../../common/browser';
+import {kasikaAccounts, ocrWorker} from '../config';
 
 import {login} from './login';
 

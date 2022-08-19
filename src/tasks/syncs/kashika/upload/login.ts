@@ -2,7 +2,7 @@
 import path from 'path';
 import {Page} from 'puppeteer';
 import {Worker} from 'tesseract.js';
-import {TKasikaAccount} from './config';
+import {TKasikaAccount} from './../config';
 
 export const login = async (
   page: Page,

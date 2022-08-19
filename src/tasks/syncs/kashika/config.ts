@@ -56,8 +56,9 @@ export type KeyOfKasikaAccounts = keyof TKasikaAccounts
 export type TKasikaAccount = TKasikaAccounts[KeyOfKasikaAccounts]
 
 
-// OCR
-
+/**
+ * OCR Worker
+ */
 export const ocrWorker = (async () =>{
   const w = createWorker({
     logger: (m) => console.log(m),
