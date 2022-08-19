@@ -2,43 +2,44 @@
 import fs from 'fs';
 import FormData from 'form-data';
 import axios from 'axios';
+import {logger} from '../../../../utils';
+
+// test = 225800073
+// rpachat = 213232379
+// yumetetsu = 6732051
+
+const roomId = '6732051';
 
 export const sendFileToChatwork = async ({
-  filePath, roomId, cwToken, fileDetails,
+  filePath, fileDetails,
 }:
 {
-  fileDetails: Record<string, string>,
+  fileDetails: Record<string, number>,
   filePath: string,
-  roomId: string,
-  cwToken: string,
 },
 ) => {
+  logger.info('sending to chatwork.');
+
   const formData = new FormData();
   const strFileDetails = Object.entries(fileDetails).map(([key, val]) => {
-    return `${key}：${val}`;
-  });
+    return `${key}： ${val}件`;
+  }).join('\n\n');
   const message = `[info][title]KASIKA: スキップされる顧客データ（エラー）[/title]
-  ${strFileDetails}
 
-  詳しくは添付のファイルをダウンロードしてください。[/info]`;
+  ${strFileDetails}
+  [hr]
+  詳しくは添付のファイルをダウンロードしてください。
+  ※エクセルで開くと見やすいです。[/info]`;
 
   formData.append('message', message);
   formData.append('file', fs.createReadStream(filePath));
 
   const url = `https://api.chatwork.com/v2/rooms/${roomId}/files`;
-  /*
-  const options = {
-    method: 'post',
-    headers: {
-      'Accept': 'application/json',
-      'X-ChatWorkToken': cwToken,
-    },
-    body: formData,
-  };
-*/
+
+
   const headers = {
     'Accept': 'application/json',
-    'X-ChatWorkToken': cwToken,
+    'X-ChatWorkToken': process.env.CW_TOKEN,
   };
 
 

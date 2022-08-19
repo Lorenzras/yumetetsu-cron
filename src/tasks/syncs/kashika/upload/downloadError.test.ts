@@ -11,8 +11,8 @@ describe('downloadError', ()=>{
   it('should download error', async ()=>{
     const page = await openMockBrowserPage();
 
-    await downloadError(page, '1343' );
-
+    const result = await downloadError(page, '1343' );
+    console.log('result', result);
     page.browser().disconnect();
     expect(true);
   }, browserTimeOut);
@@ -25,6 +25,7 @@ describe('downloadError', ()=>{
     const text = decoder
       .decode(csvText);
 
-    await cleanCSV(text);
+    const result = await cleanCSV(text);
+    console.log(result);
   }, browserTimeOut);
 });

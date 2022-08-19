@@ -1,9 +1,12 @@
 import {Page} from 'puppeteer';
 import fs from 'fs';
 import path from 'path';
-import {KStoreSettings} from '../../../../config';
+import {KStoreSettings, storeSettings} from '../../../../config';
 import {logger, saveJSONToCSV} from '../../../../utils';
 import {parse} from 'fast-csv';
+import {summarizeErrors} from './summarizaErrors';
+import {sendFileToChatwork} from './sendFileToChatwork';
+import {cleanStoreName} from './cleanStoreName';
 
 /**
  * Remove empty columns
@@ -12,7 +15,6 @@ import {parse} from 'fast-csv';
  * @returns {json} json array
  */
 export const cleanCSV = async (csvString: string) => {
-  console.log(csvString);
   const rows: Record<string, string>[] = [];
   await new Promise((resolve, reject) => {
     const stream = parse({
@@ -48,8 +50,6 @@ export const cleanCSV = async (csvString: string) => {
     });
   });
 
-  console.log(rows);
-
   return rows;
 };
 
@@ -64,8 +64,13 @@ export const downloadError = async (
   page: Page,
   storeId: KStoreSettings,
 ) => {
+  await page.waitForSelector(
+    'a[href*="upload-csv/download-uploaded-csv"]',
+    {visible: true},
+  );
   const result = await page.evaluate(()=>{
     const requestURL = $('a[href*="error"]:first').prop('href');
+    if (!requestURL) return;
     return fetch(requestURL, {
       method: 'GET',
       credentials: 'include',
@@ -82,24 +87,34 @@ export const downloadError = async (
       });
   });
 
+
+  if (!result) {
+    logger.info('No error found.');
+    return;
+  }
+
   const downloadDir = path.join(__dirname, 'resultDir');
-
   fs.existsSync(downloadDir) || fs.mkdirSync(downloadDir, {recursive: true});
-
+  const storeName = cleanStoreName(storeSettings[storeId].name);
   const filePath = path
     .join(
       downloadDir,
-      `${storeId}-error`,
+      `${storeName}_エラー`,
     );
 
   logger.info(`Saving to ${filePath}`);
 
-  const csvObject = await cleanCSV(result);
+  const processedCSV = await cleanCSV(result);
 
-  await saveJSONToCSV(filePath, csvObject);
+  const csvFilePath = await saveJSONToCSV(filePath, processedCSV, 'utf8');
 
-  /*  fs.writeFileSync(
-    filePath,
-    iconv.encode(result, 'shift-jis'),
-  ); */
+  const errorSummary = summarizeErrors(processedCSV);
+
+  if (!csvFilePath) throw new Error('Failed to retrive filepath after saving.');
+  await sendFileToChatwork({
+    filePath: csvFilePath,
+    fileDetails: errorSummary,
+  });
+
+  return errorSummary;
 };

@@ -74,5 +74,5 @@ export const ocrWorker = (async () =>{
   });
   return w;
 }
-)();
+);
 

@@ -7,7 +7,6 @@ import path from 'path';
 import {format} from 'date-fns';
 import {APP_IDS} from '../../../../../api/kintone';
 import iconv from 'iconv-lite';
-// @ts-expect-error TS is looking for a workaround
 import {nanoid} from 'nanoid/non-secure';
 import {donetDownloadPath} from '../../../../syncs/doNet/config';
 

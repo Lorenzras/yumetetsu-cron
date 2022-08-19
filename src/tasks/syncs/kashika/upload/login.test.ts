@@ -14,7 +14,7 @@ describe('kashika', ()=>{
       loadImages: true,
     });
 
-    const worker = await ocrWorker;
+    const worker = await ocrWorker();
 
     for (const [store, auth] of Object.entries(kasikaAccounts)) {
       await login(

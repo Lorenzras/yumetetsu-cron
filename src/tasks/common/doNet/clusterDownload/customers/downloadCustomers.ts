@@ -36,6 +36,7 @@ export const downloadCustomers = async (cluster: TClusterPage, options?: IFormOp
   }
 
 
+  return dir;
   // await cluster.idle();
   // logger.info('Cluster is now idle.');
   // await cluster.close();

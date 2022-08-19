@@ -1,7 +1,9 @@
 /* eslint-disable max-len */
+import path from 'path';
 import {Page} from 'puppeteer';
-import {KStoreSettings, storeSettings, TStoreSettingsItem} from '../../../../config';
-import {selectByText} from '../../../../utils';
+import {KStoreSettings, storeSettings} from '../../../../config';
+import {logger} from '../../../../utils';
+import {downloadError} from './downloadError';
 import {mapField} from './mapField';
 
 export const uploadFile = async (
@@ -30,12 +32,14 @@ export const uploadFile = async (
   await uploadInput?.uploadFile(sourceFile);
 
   /** 「存在しない担当者が指定された場合も、顧客情報を登録する」にチェックを入れる */
+  await page.waitForSelector('label[for="userNotExistSkipUserRegistration"]', {visible: true});
   await page.$eval(
     'label[for="userNotExistSkipUserRegistration"]',
     (el)=> (el as HTMLElement)?.click(),
   );
 
   /** 「マッピング設定に進む」をクリック */
+  await page.waitForSelector('#submitBtn', {visible: true});
   await Promise.all([
     page.waitForNavigation(),
     page.$eval('#submitBtn', (el)=> (el as HTMLElement)?.click()),
@@ -57,5 +61,27 @@ export const uploadFile = async (
   });
 
   /** 「データをインポートする」をクリック */
-  await page.click('#submitButton');
+  logger.info('Confirming upload.');
+  await page.waitForSelector('#submitButton', {visible: true});
+  await Promise.all([
+    page.waitForNavigation({waitUntil: 'domcontentloaded'}),
+    page.$eval('#submitButton', (el)=> (el as HTMLElement)?.click()),
+  ] );
+
+  /** エラーをダウンロードし、chatworkに送信する。 */
+
+
+  /** 「インポート確定」をクリック */
+  logger.info('Confirming upload.');
+  await Promise.all([
+    page.waitForNavigation({waitUntil: 'domcontentloaded'}),
+    page.$eval('button.jsSubmitBtn', (el)=> (el as HTMLElement)?.click()),
+  ] );
+
+  await page.screenshot({
+    fullPage: true,
+    path: path.join(__dirname, 'resultDir', `${storeId}.png`),
+  });
+
+  await downloadError(page, storeId);
 };

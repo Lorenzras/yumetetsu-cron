@@ -15,10 +15,10 @@ import {KStoreSettings, storeSettings, TStoreSettings, TStoreSettingsItem} from 
  * 1. Group by storeId
  * 2. Remove duplicate 反響媒体
  * 3.
+ * @param dir
  * @returns {Object} records grouped by storeId
  */
-export const processCSV = async () => {
-  const dir = downloadDir;
+export const processCSV = async (dir = downloadDir) => {
   const csvFiles = (await fsPromise.readdir(dir))
     .filter((file) => file.split('.').at(-1) === 'csv' );
 

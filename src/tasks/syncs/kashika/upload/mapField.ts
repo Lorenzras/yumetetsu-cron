@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import {Page} from 'puppeteer';
+import {cleanStoreName} from './cleanStoreName';
 
 /**
  * マッピング設定
@@ -21,7 +22,7 @@ export const mapField = async ({
   await page.waitForSelector(`input[value="${csvField}"]`);
 
 
-  const cleanStore = store.replaceAll(/(ハウスドゥ[!！]?(\s+)?)|店/g, '');
+  const cleanStore = cleanStoreName(store);
 
   await page.evaluate((
     csvField: string,

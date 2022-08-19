@@ -62,6 +62,9 @@ declare global {
       KASIKA_OGAKI_EMAIL?: string,
       KASIKA_OGAKI_PASS?: string,
 
+      // Chatwork
+      CW_TOKEN : string,
+      CW_TOKEN_TEST : string,
 
       // Common
 

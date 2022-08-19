@@ -14,19 +14,7 @@ export const login = async (
   }
 
   let isSuccess = false;
-  /* const worker = createWorker({
-    logger: (m) => console.log(m),
-  });
 
-  await worker.load();
-  await worker.loadLanguage('jpn');
-  await worker.initialize('jpn');
-  await worker.setParameters({
-    preserve_interword_spaces: '0',
-    // tessedit_char_whitelist: 'ぁあぃいぅうぇえぉおかがきぎくぐけげこごさざしじすずせぜそぞただちぢっつづてでとどなにぬねのはばぱひびぴふぶぷへべぺほぼぽまみむめもゃやゅゆょよらりるれろゎわゐゑをんゔゕゖ',
-    tessedit_char_whitelist: 'あいうえおかがきぎくぐけげこごさざしじすずせぜそぞただちぢつづてでとどなにぬねのはばぱひびぴふぶぷへべぺほぼぽまみむめもやゆよらりるれろわをん',
-  });
- */
   do {
     console.log('Starting login to Kashika.');
     await page.goto('https://kasika.io/login.php', {waitUntil: 'domcontentloaded'});
