@@ -17,8 +17,13 @@ export const resultCSVPath = path.join(csvPath, appName);
 export const resolveResultDir = (
   saveToNetWorkDrive = true,
 ) => path.join(
+
   saveToNetWorkDrive ?
-    path.join('\\\\192.168.11.150', 'Data01', '★サポート共有', '【ポータル新着物件】') :
+    path.join(
+      '\\\\192.168.11.150',
+      'Data01',
+      '★サポート共有',
+      '【ポータル新着物件】') :
     path.join(excelPath, appName),
   `${format(new Date(), 'yyyy.MM.dd')}新着物件情報`);
 
