@@ -1,20 +1,16 @@
-import {
-  KStoreSettings,
-  storeSettings,
-} from '../../../config';
+
 import {logger} from '../../../utils';
 import {initCluster} from '../../common/browser';
 import {TClusterPage} from '../../common/browser/config';
-
+import {downloadDir} from '../../common/doNet/clusterDownload/customers/config';
 
 import {
   downloadCustomers,
 } from '../../common/doNet/clusterDownload/customers/downloadCustomers';
-import {ocrWorker, TKasikaAccount} from './config';
+import {initialFormOptions} from './config';
 import {processCSV} from './fileProcessing/processCSV';
 import {saveTransformedCSV} from './fileProcessing/saveTransformedCSV';
-import {login} from './upload/login';
-import {uploadFile} from './upload/uploadFile';
+
 import {uploadFiles} from './upload/uploadFiles';
 
 
@@ -23,7 +19,7 @@ export const syncDonetToKasika = async () => {
     maxConcurrency: 5,
   });
 
-  const rawCSVDir = await downloadCustomers(cluster);
+  const rawCSVDir = await downloadCustomers(cluster, initialFormOptions);
   const groupedByStoreJSON = await processCSV(rawCSVDir);
   const storeFiles = await saveTransformedCSV(groupedByStoreJSON);
 

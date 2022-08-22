@@ -1,4 +1,3 @@
-import {openBrowserPage} from '../../common/browser';
 import {browserTimeOut} from '../../common/browser/config';
 import {syncDonetToKasika} from './syncDonetToKasika';
 

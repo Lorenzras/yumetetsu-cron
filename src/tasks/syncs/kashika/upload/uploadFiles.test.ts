@@ -17,12 +17,17 @@ describe('files', () => {
     }[] = ['157', '270', '403'].map((el) => {
       return {
         storeId: el,
-        filePath: path.join(__dirname, '__TEST__', `${el}.csv`),
+        filePath: path.join(
+          __dirname,
+          '..',
+          'fileProcessing', 'csv', `${el}.csv`),
       };
     });
 
     const result = await uploadFiles(cluster, test );
     // console.log('Rows : ' + result.length);
+    await cluster.idle();
+    await cluster.close();
     expect(result).toMatchSnapshot();
   }, browserTimeOut);
 });

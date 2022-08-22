@@ -34,6 +34,8 @@ export const setCustomerForm = async (
 
   // await page.waitForTimeout(230000);
 
+  // throw new Error('Status: '+ status);
+
 
   /* Set status */
   await page.evaluate((status: TCustStatus[])=>{

@@ -123,18 +123,16 @@ export const deleteFile = async (file: string) => {
  * This action is not recoverable.
  * @param dir directory where files will be deleted
  */
-export const deleteFilesInFolder = (dir: string) =>{
+export const deleteFilesInFolder = async (dir: string) =>{
 // Still thinking if I will include this as it is damaging.
-
-  fs.readdir(dir, (err, files) => {
-    if (err) throw err;
-
+  try {
+    const files = await asyncFs.readdir(dir);
     for (const file of files) {
-      fs.unlink(path.join(dir, file), (err) => {
-        if (err) throw err;
-      });
+      await asyncFs.unlink(path.join(dir, file));
     }
-  });
+  } catch (err: any) {
+    logger.error(`Failed to delete all files from ${dir}. ${err.message}`);
+  }
 };
 
 /**

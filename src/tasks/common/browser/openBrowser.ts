@@ -99,10 +99,14 @@ export const openMockBrowserPage = async () => {
 };
 
 
-export const initCluster = (options: {
-  maxConcurrency: number
-}) => {
-  const {maxConcurrency} = options;
+export const initCluster = (options: Parameters<typeof Cluster.launch>[0]) => {
+  const {
+    maxConcurrency,
+    puppeteerOptions: {
+      slowMo = 0,
+      headless = process.env.BROWSER_TYPE === 'HEADLESS',
+    } = {},
+  } = options;
 
   return Cluster.launch({
     puppeteer: getExtraPuppeteer(),
@@ -112,8 +116,8 @@ export const initCluster = (options: {
     workerCreationDelay: 100,
 
     puppeteerOptions: {
-    // slowMo: 100,
-      headless: process.env.BROWSER_TYPE === 'HEADLESS',
+      slowMo: slowMo,
+      headless: headless,
     // args: minimalArgs,
     },
     retryLimit: 2,

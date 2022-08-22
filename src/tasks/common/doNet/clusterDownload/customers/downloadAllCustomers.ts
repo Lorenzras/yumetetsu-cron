@@ -16,12 +16,16 @@ import {saveMeta} from './helper/saveMeta';
  * Download all customers
  *
  * @param cluster
+ * @param options Donetwork form options
  */
 export const downloadAllCustomers = async (
   cluster: TClusterPage,
+  options?: IFormOptions,
 ) => {
-  // const stores: AsyncReturnType<typeof getDonetStores> = await cluster
-  //  .execute(({page}) => getDonetStores(page));
+  const {
+    status = [],
+  } = options ?? {};
+
   const stores = Object.entries(storeSettings)
     .filter(([, setting]) => ('email' in setting))
     .map(([key, {name}]) => {
@@ -37,7 +41,13 @@ export const downloadAllCustomers = async (
   const dlPerStoreResult = await Promise.all(stores
     .map<ReturnType<typeof downloadProcess>>(
     ({storeId}) => cluster
-      .execute(({page, worker: {id}}) => downloadProcess(page, {storeId: storeId, workerId: id})),
+      .execute(({page, worker: {id}}) => downloadProcess(
+        page,
+        {
+          ...options,
+          storeId: storeId,
+          workerId: id,
+        })),
   ));
 
   await saveMeta('perStores', dlPerStoreResult.map(({count, options}) => ({count, options})));
@@ -52,15 +62,20 @@ export const downloadAllCustomers = async (
       ))
       .flat(),
   );
-  await saveMeta('perStores', dlPerAgent.map(({count, options}) => ({count, options})));
+  await saveMeta('perAgents', dlPerAgent.map(({count, options}) => ({count, options})));
 
-  /* Download per status that exceeded 4000 when downloaded by agent */
-  logger.info('Starting to download per store.');
-  const dlPerStatus = await Promise.all(
-    dlPerAgent
-      .filter(({count}) => count > dlLimit)
-      .map(({options}) => downloadPerStatus(cluster, options))
-      .flat(),
-  );
-  await saveMeta('perStatus', dlPerStatus.map(({count, options}) => ({count, options})));
+  /* Download per status that exceeded 4000 when downloaded by agent.
+     ※Only if status is not defined. Usefull if the requirement is to download specific
+     Statused only. (e.g.
+  */
+  if (!status.length) {
+    logger.info('Starting to download per store.');
+    const dlPerStatus = await Promise.all(
+      dlPerAgent
+        .filter(({count}) => count > dlLimit)
+        .map(({options}) => downloadPerStatus(cluster, options))
+        .flat(),
+    );
+    await saveMeta('perStatus', dlPerStatus.map(({count, options}) => ({count, options})));
+  }
 };

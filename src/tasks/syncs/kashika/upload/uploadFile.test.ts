@@ -6,16 +6,17 @@ import {uploadFile} from './uploadFile';
 
 
 describe('upload', ()=>{
-  it('should be able to login kasika and upload csv', async ()=>{
+  it('should single csv', async ()=>{
     const page = await openMockBrowserPage();
     const storeId = '1343';
     const sourceFile = path
-      .join(__dirname, '__TEST__', `${storeId}.csv`);
+      .join(__dirname, '..', 'fileProcessing', 'csv', `${storeId}.csv`);
 
     await uploadFile({
       page,
       sourceFile: sourceFile,
       storeId: storeId,
+      totalCount: 50,
     });
 
 

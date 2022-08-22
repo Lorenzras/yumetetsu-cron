@@ -59,10 +59,12 @@ export const cleanCSV = async (csvString: string) => {
  *
  * @param page
  * @param storeId
+ * @param totalCount total number of records.
  */
 export const downloadError = async (
   page: Page,
   storeId: KStoreSettings,
+  totalCount: number,
 ) => {
   await page.waitForSelector(
     'a[href*="upload-csv/download-uploaded-csv"]',
@@ -115,6 +117,8 @@ export const downloadError = async (
   await sendFileToChatwork({
     filePath: csvFilePath,
     fileDetails: errorSummary,
+    storeName: storeSettings[storeId].name,
+    totalCount,
   });
 
   return errorSummary;

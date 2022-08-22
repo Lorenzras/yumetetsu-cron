@@ -1,6 +1,12 @@
 /* eslint-disable max-len */
 import {createWorker} from 'tesseract.js';
 
+export const initialFormOptions: IFormOptions = {
+  storeId: '',
+  status: ['追客中'],
+};
+
+/*
 export const kasikaAccounts = {
   豊田中央:
   {
@@ -55,7 +61,7 @@ export type TKasikaAccounts = typeof kasikaAccounts
 export type KeyOfKasikaAccounts = keyof TKasikaAccounts
 export type TKasikaAccount = TKasikaAccounts[KeyOfKasikaAccounts]
 
-
+ */
 /**
  * OCR Worker
  */

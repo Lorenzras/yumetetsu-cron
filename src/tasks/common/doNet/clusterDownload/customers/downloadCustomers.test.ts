@@ -9,7 +9,10 @@ describe('customers', ()=>{
       maxConcurrency: 5,
     });
 
-    await downloadCustomers(cluster);
+    await downloadCustomers(cluster, {
+      storeId: '',
+      status: ['追客中'],
+    });
 
 
     await cluster.idle();

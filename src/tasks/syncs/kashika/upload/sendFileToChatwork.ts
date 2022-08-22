@@ -8,14 +8,20 @@ import {logger} from '../../../../utils';
 // rpachat = 213232379
 // yumetetsu = 6732051
 
-const roomId = '225800073';
+const roomId = '6732051';
 
 export const sendFileToChatwork = async ({
-  filePath, fileDetails, cwToken = process.env.CW_TOKEN,
+  storeName,
+  filePath,
+  fileDetails,
+  totalCount,
+  cwToken = process.env.CW_TOKEN,
 }:
 {
   fileDetails: Record<string, number>,
   filePath: string,
+  totalCount: number,
+  storeName: string,
   cwToken?: string
 },
 ) => {
@@ -23,14 +29,18 @@ export const sendFileToChatwork = async ({
 
   const formData = new FormData();
   const strFileDetails = Object.entries(fileDetails).map(([key, val]) => {
+    console.log(key);
     return `${key}： ${val}件`;
-  }).join('\n\n');
-  const message = `[info][title]KASIKA: スキップされる顧客データ（エラー）[/title]
-
-  ${strFileDetails}
-  [hr]
-  詳しくは添付のファイルをダウンロードしてください。
-  ※エクセルで開くと見やすいです。[/info]`;
+  }).join('\n');
+  console.log(strFileDetails);
+  const message = [
+    `[info][title]${storeName} → KASIKA: スキップされる顧客データ（エラー）[/title]`,
+    `${totalCount ?? 0}件の中、以下はスキップされました。\n`,
+    `${strFileDetails}\n`,
+    `[hr]`,
+    `詳しくは添付のファイルをダウンロードしてください。`,
+    `※エクセルで開くと見やすいです。[/info]`,
+  ].join('\n');
 
   formData.append('message', message);
   formData.append('file', fs.createReadStream(filePath));

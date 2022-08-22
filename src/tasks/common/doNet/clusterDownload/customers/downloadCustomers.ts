@@ -14,14 +14,15 @@ export const downloadCustomers = async (cluster: TClusterPage, options?: IFormOp
     updatedFrom,
     updateUntil,
     dir = downloadDir,
+
   } = options ?? {};
 
   /** Clear cookies
    * Reason: Donet has a bug where no error is thrown but a part of the site's data is unaccesible with expired cookies.
   */
-  deleteFilesInFolder(cookiesPath);
+  await deleteFilesInFolder(cookiesPath);
   /** Clear download dir */
-  deleteFilesInFolder(dir);
+  await deleteFilesInFolder(dir);
 
   /**
    * Download all based on following condition
@@ -32,7 +33,7 @@ export const downloadCustomers = async (cluster: TClusterPage, options?: IFormOp
     });
     logger.info(`Filtered by dates ${updatedFrom} ~ ${updateUntil} : ${count}件`);
   } else {
-    await downloadAllCustomers(cluster);
+    await downloadAllCustomers(cluster, options);
   }
 
 

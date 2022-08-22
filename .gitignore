@@ -134,6 +134,9 @@ cli-kintone*
 **.csv
 **/errImg/**.png
 **/errImg/**.html
+**/resultDir/*
+**/meta/*
+**/__TEST__/*
 **/data/json/**.json
 **/data/excel/**/**.xlsx
 **/cookies/**.json

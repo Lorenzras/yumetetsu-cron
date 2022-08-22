@@ -1,7 +1,7 @@
 
-import path from 'path';
-import {openBrowserPage, openMockBrowserPage} from '../../../common/browser';
-import {kasikaAccounts, ocrWorker} from '../config';
+import {storeSettings, TStoreSettingsItem} from '../../../../config';
+import {openBrowserPage} from '../../../common/browser';
+import {ocrWorker} from '../config';
 
 import {login} from './login';
 
@@ -16,16 +16,15 @@ describe('kashika', ()=>{
 
     const worker = await ocrWorker();
 
-    for (const [store, auth] of Object.entries(kasikaAccounts)) {
+    for (const [store, auth] of Object.entries(storeSettings)) {
       await login(
         await (await page.browser().createIncognitoBrowserContext())
           .newPage(),
         worker,
-        auth,
+        auth as TStoreSettingsItem,
       );
       console.log('Success', store);
     }
-    // await login(page, kasikaAccounts['豊川中央']);
 
     // await page.click('button[type=submit]');
     // await page.waitForNavigation();

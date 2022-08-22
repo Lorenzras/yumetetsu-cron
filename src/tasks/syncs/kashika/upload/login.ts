@@ -1,13 +1,18 @@
 /* eslint-disable max-len */
 import path from 'path';
 import {Page} from 'puppeteer';
-import {Worker} from 'tesseract.js';
-import {TKasikaAccount} from './../config';
+import {Scheduler} from 'tesseract.js';
+import {TStoreSettingsItem} from '../../../../config';
+
 
 export const login = async (
   page: Page,
-  worker: Worker,
-  {email, pass}: TKasikaAccount,
+  scheduler: Scheduler,
+  {
+    email,
+    pass,
+  }: TStoreSettingsItem,
+  workerId: number,
 ) => {
   if (!email || !pass) {
     throw new Error('Please provide email and password. Check .env file.');
@@ -22,13 +27,18 @@ export const login = async (
 
     console.log('Taking captcha screenshot.');
     const testImg = await page.waitForSelector('form img');
+    const testImgPath = path.join(__dirname, '__TEST__', `${workerId}.png`);
     await testImg?.screenshot({
-      path: path.join(__dirname, 'test.png'),
+      path: testImgPath,
     });
 
 
-    const {data: {text, confidence, tsv}} = await worker
-      .recognize(path.join(__dirname, 'test.png'));
+    // const {data: {text, confidence, tsv}} = await worker
+    //  .recognize(path.join(__dirname, 'test.png'));
+
+    const {data: {text, confidence, tsv}} = await scheduler
+      .addJob('recognize', testImgPath);
+
 
     console.log(text, 'conf: ' + confidence, 'tsv:\n' + tsv);
     cleanText = text.trim().replaceAll(' ', '');

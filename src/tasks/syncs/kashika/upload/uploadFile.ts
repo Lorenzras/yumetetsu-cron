@@ -8,13 +8,17 @@ import {mapField} from './mapField';
 
 export const uploadFile = async (
   {
-    page, sourceFile, storeId,
+    page,
+    sourceFile,
+    storeId,
+    totalCount,
   }: {
     page: Page,
     sourceFile: string,
     storeId: KStoreSettings,
-
+    totalCount: number
   }) => {
+  await page.setDefaultNavigationTimeout(120000);
   const account = storeSettings[storeId];
 
   /** 普段「 顧客一括登録・変更」ボタンを押したて、
@@ -83,5 +87,5 @@ export const uploadFile = async (
     path: path.join(__dirname, 'resultDir', `${storeId}.png`),
   });
 
-  await downloadError(page, storeId);
+  await downloadError(page, storeId, totalCount);
 };
