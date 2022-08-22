@@ -142,3 +142,4 @@ cli-kintone*
 **/cookies/**.json
 **/downloads/**/**.*
 **/*.debug*
+*.traineddata
