@@ -101,6 +101,7 @@ export const saveFile = async (
   try {
     const dir = path.dirname(filePath);
     fs.existsSync(dir) || fs.mkdirSync(dir, {recursive: true});
+
     fs.writeFileSync(filePath, data);
   } catch (err: any) {
     logger.error('Failed to save file ' + err.message);

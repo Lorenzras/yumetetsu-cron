@@ -1,4 +1,5 @@
 
+import {createScheduler} from 'tesseract.js';
 import {storeSettings, TStoreSettingsItem} from '../../../../config';
 import {openBrowserPage} from '../../../common/browser';
 import {ocrWorker} from '../config';
@@ -17,12 +18,21 @@ describe('kashika', ()=>{
     const worker = await ocrWorker();
 
     for (const [store, auth] of Object.entries(storeSettings)) {
+      const scheduler = createScheduler();
+
+      for (let i = 0; i < 5; i++ ) {
+        scheduler.addWorker(await ocrWorker());
+      }
+
       await login(
         await (await page.browser().createIncognitoBrowserContext())
           .newPage(),
-        worker,
+        scheduler,
         auth as TStoreSettingsItem,
+        99,
       );
+
+
       console.log('Success', store);
     }
 

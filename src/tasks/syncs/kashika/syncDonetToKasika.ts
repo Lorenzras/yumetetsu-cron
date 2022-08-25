@@ -18,7 +18,7 @@ export const syncDonetToKasika = async () => {
   const cluster : TClusterPage = await initCluster({
     maxConcurrency: 5,
     puppeteerOptions: {
-      headless: true,
+      headless: false,
     },
 
   });

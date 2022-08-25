@@ -20,20 +20,16 @@ export const uploadFiles = async (
 ) => {
   const scheduler = createScheduler();
 
-  for (let i = 0; i < +process.env.CLUSTER_MAXCONCURRENCY; i++ ) {
-    try {
-      scheduler.addWorker(await ocrWorker());
-    } catch (err: any) {
-      logger.error(`Failed to addWorder.${err.message}`);
-    }
+  for (let i = 0; i < 5; i++ ) {
+    scheduler.addWorker(await ocrWorker());
   }
 
 
   /** Upload to Kasika */
   await Promise.all(
     storeFiles.map(({storeId, filePath, totalCount}) => {
-      logger.info(`Uploading ${storeId} ${filePath}`);
       return cluster.execute(async ({page, worker: {id}}) => {
+        logger.info(`Uploading ${storeId} ${filePath} ${id}`);
         await page.setDefaultNavigationTimeout(0);
         await login(
           page,

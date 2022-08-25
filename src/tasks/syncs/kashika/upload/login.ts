@@ -3,6 +3,7 @@ import path from 'path';
 import {Page} from 'puppeteer';
 import {Scheduler} from 'tesseract.js';
 import {TStoreSettingsItem} from '../../../../config';
+import fs from 'fs';
 
 
 export const login = async (
@@ -25,15 +26,23 @@ export const login = async (
     await page.goto('https://kasika.io/login.php', {waitUntil: 'domcontentloaded'});
     let cleanText = '';
 
-    console.log('Taking captcha screenshot.');
-    const testImg = await page.waitForSelector('form img');
+    console.log('Waiting for captcha selector.');
+    const testImg = await page.waitForSelector('form img', {visible: true});
+
+    console.log('Saving captcha.');
     const testImgPath = path.join(__dirname, '__TEST__', `${workerId}.png`);
+    const dir = path.dirname(testImgPath);
+    fs.existsSync(dir) || fs.mkdirSync(dir, {recursive: true});
+
     await page.waitForTimeout(1000); // throttle by 1 second.
 
+    console.log('Taking captcha screenshot.');
     await testImg?.screenshot({
       path: testImgPath,
+
     });
 
+    console.log('Done taking screenshot.');
 
     // const {data: {text, confidence, tsv}} = await worker
     //  .recognize(path.join(__dirname, 'test.png'));
