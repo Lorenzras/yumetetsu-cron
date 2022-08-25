@@ -9,18 +9,19 @@ describe('files', () => {
   it('should combine', async () => {
     const cluster = await initCluster({
       maxConcurrency: 5,
+      puppeteerOptions: {
+        headless: false,
+      },
     });
 
-    const test: {
-      storeId: string
-      filePath: string
-    }[] = ['157', '270', '403'].map((el) => {
+    const test = ['157', '270', '403'].map((el) => {
       return {
         storeId: el,
         filePath: path.join(
           __dirname,
           '..',
           'fileProcessing', 'csv', `${el}.csv`),
+        totalCount: 500,
       };
     });
 

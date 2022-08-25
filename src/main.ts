@@ -13,9 +13,9 @@ import {syncDonetToKasika} from './tasks/syncs/kashika/syncDonetToKasika';
 
 /**
  * Sync donet customers to kasika
- * everyday at 7am
+ * everyday at 6:30am
  */
-cron.schedule('0 7 * * *', syncDonetToKasika, cronOptions);
+cron.schedule('30 6 * * *', syncDonetToKasika, cronOptions);
 
 /**
  * Reminds about longterm customers every day at 9:30 am

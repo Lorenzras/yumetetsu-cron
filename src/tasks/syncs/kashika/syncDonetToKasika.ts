@@ -17,6 +17,9 @@ import {uploadFiles} from './upload/uploadFiles';
 export const syncDonetToKasika = async () => {
   const cluster : TClusterPage = await initCluster({
     maxConcurrency: 5,
+    puppeteerOptions: {
+      headless: false,
+    },
 
   });
 
