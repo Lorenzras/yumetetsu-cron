@@ -28,6 +28,8 @@ export const login = async (
     console.log('Taking captcha screenshot.');
     const testImg = await page.waitForSelector('form img');
     const testImgPath = path.join(__dirname, '__TEST__', `${workerId}.png`);
+    await page.waitForTimeout(1000); // throttle by 1 second.
+
     await testImg?.screenshot({
       path: testImgPath,
     });
