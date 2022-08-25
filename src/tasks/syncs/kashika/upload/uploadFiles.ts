@@ -32,7 +32,9 @@ export const uploadFiles = async (
   /** Upload to Kasika */
   await Promise.all(
     storeFiles.map(({storeId, filePath, totalCount}) => {
+      logger.info(`Uploading ${storeId} ${filePath}`);
       return cluster.execute(async ({page, worker: {id}}) => {
+        await page.setDefaultNavigationTimeout(0);
         await login(
           page,
           scheduler,

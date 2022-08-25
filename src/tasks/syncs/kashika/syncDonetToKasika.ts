@@ -18,17 +18,21 @@ export const syncDonetToKasika = async () => {
   const cluster : TClusterPage = await initCluster({
     maxConcurrency: 5,
     puppeteerOptions: {
-      headless: false,
+      headless: true,
     },
 
   });
 
   const rawCSVDir = await downloadCustomers(cluster, initialFormOptions);
+  logger.info('Done: downloadCustomers');
   const groupedByStoreJSON = await processCSV(rawCSVDir);
+  logger.info('Done: processCSV');
   const storeFiles = await saveTransformedCSV(groupedByStoreJSON);
+  logger.info('Done: saveTransformedCSV');
 
   /** Upload to Kasika */
   await uploadFiles(cluster, storeFiles);
+  logger.info('Done: uploadFiles');
 
 
   await cluster.idle();

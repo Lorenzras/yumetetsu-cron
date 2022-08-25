@@ -18,7 +18,7 @@ export const uploadFile = async (
     storeId: KStoreSettings,
     totalCount: number
   }) => {
-  await page.setDefaultNavigationTimeout(120000);
+  // await page.setDefaultNavigationTimeout(120000);
   const account = storeSettings[storeId];
 
   /** 普段「 顧客一括登録・変更」ボタンを押したて、
