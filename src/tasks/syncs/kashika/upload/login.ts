@@ -4,6 +4,7 @@ import {Page} from 'puppeteer';
 import {Scheduler} from 'tesseract.js';
 import {TStoreSettingsItem} from '../../../../config';
 import fs from 'fs';
+import {logger} from '../../../../utils';
 
 
 export const login = async (
@@ -54,7 +55,8 @@ export const login = async (
     console.log(text, 'conf: ' + confidence, 'tsv:\n' + tsv);
     cleanText = text.trim().replaceAll(' ', '');
 
-    if (cleanText.length === 4 && confidence >= 92) {
+    if (cleanText.length === 4 && confidence >= 90) {
+      logger.info(`Possible match ${text}`);
       await page.$('input[type=email]').then(async (input)=>{
         await input?.click({clickCount: 3});
         await input?.type(email);
@@ -69,6 +71,8 @@ export const login = async (
         await input?.click({clickCount: 3});
         await input?.type(cleanText);
       });
+
+      logger.info('Clicking submit');
 
       await Promise.all([
         page.waitForNavigation(),
