@@ -16,9 +16,9 @@ test('actions', async () => {
   const cluster = await initCluster();
   const actions = [
     // ...actionsHOMES(),
-    ...actionsAtHome(),
+    // ...actionsAtHome(),
     // ...actionsSUUMO(),
-    // ...actionsYahoo(),
+    ...actionsYahoo(),
   ];
 
   const result = await handleActions(cluster, _.shuffle(actions), false);

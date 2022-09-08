@@ -1,3 +1,5 @@
+import {Page} from 'puppeteer';
+import {Cluster} from 'puppeteer-cluster';
 
 export const browserURL = 'http://127.0.0.1:9222';
 export const optionsTest = () => ({
@@ -21,5 +23,7 @@ export const minimalArgs = [
   '--no-sandbox', // meh but better resource comsuption
   '--disable-setuid-sandbox', // same
 ];
+
+export type TClusterPage = Cluster<{page: Page}>
 
 

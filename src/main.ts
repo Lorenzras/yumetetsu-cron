@@ -9,6 +9,7 @@ import {
 } from './tasks/syncs/portalCheck/portalCheckMainTask';
 import {logger} from './utils';
 import {cronOptions} from './config/index';
+import {syncDonetToKasika} from './tasks/syncs/kashika/syncDonetToKasika';
 
 
 /**
@@ -38,6 +39,13 @@ cron.schedule('*/30 8-19 * * 1-6', () => syncDoNetCust());
  * At 0:30.
  */
 cron.schedule('30 0 * * *', () => portalCheckMainTask(), cronOptions);
+
+
+/**
+ * Sync donet customers to kasika
+ * everyday at 6:30am
+ */
+cron.schedule('20 9 * * *', syncDonetToKasika, cronOptions);
 
 
 logger.info('MAIN CRON PROCESS RUNNING.');

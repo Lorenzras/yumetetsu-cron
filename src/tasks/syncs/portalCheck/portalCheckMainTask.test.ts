@@ -33,7 +33,7 @@ import {saveScrapeMeta} from './helpers/saveScrapeMeta';
 
 describe('portalCheckMainProcess', () => {
   it('mainTest', async () => {
-    await portalCheckMainTask();
+    await portalCheckMainTask(true);
     expect(true);
   }, browserTimeOut);
 

@@ -8,6 +8,12 @@ interface Options {
   dateStr?: string
 }
 
+/**
+ *
+ * @param page
+ * @param options
+ * @deprecated Use setCustomerForm instead
+ */
 export const setCustForm = async (
   page: Page,
   options: Options = {chkStatus: false}) => {

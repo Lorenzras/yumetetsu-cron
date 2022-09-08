@@ -1,6 +1,7 @@
 import {Page} from 'puppeteer';
 import {logger} from '../../../../utils';
 import {homeSelectors} from '../config';
+import {login} from '../login';
 
 
 /* Must be on homepage after loging in. */
@@ -12,13 +13,14 @@ import {homeSelectors} from '../config';
 
 export const navigateToCustPage = async (page: Page) => {
   logger.info('Navigating to customer page.');
+  await page.goto('https://manage.do-network.com/customer', {waitUntil: 'domcontentloaded'});
 
+  const isSuccess = await Promise.race([
+    page.waitForSelector('table.error_navi').then(()=>false),
+    page.waitForSelector(homeSelectors.custNav).then(()=>true),
+  ]);
 
-  await page.waitForSelector(homeSelectors.custNav),
-  await page.click(homeSelectors.custNav);
-  await page.waitForNetworkIdle();
-
-  return page;
+  return isSuccess;
 };
 
 

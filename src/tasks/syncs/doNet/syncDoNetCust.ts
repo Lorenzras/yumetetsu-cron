@@ -58,6 +58,12 @@ export const handleDownloadCust = async (page: Page) => {
   }
 };
 
+
+/**
+ * Sync donetcust to kintone.
+ *
+ * @param isFullSync
+ */
 export const syncDoNetCust = async (isFullSync = false) => {
 /*   const watcher = chokidar.watch(donetDownloadPath, {
     ignored: /(^|[/\\])\../, // ignore dotfiles

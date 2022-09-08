@@ -18,7 +18,7 @@ describe('Stores', () => {
 describe('Search', () => {
   it('is downloaded', async () => {
     const page = await openMockBrowserPage();
-    const res = await selectStoreThenSearch(page, '');
+    const res = await selectStoreThenSearch(page, '403');
 
     page.browser().disconnect();
     expect(res);

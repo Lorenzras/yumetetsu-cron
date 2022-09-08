@@ -27,6 +27,47 @@ declare global {
       REINS_USER?: string,
       REINS_PASS?: string,
 
+      // KASIKA
+
+      KASIKA_TOYOTACHUO_EMAIL?: string,
+      KASIKA_TOYOTACHUO_PASS?: string,
+
+      KASIKA_TOYOTAOBAYASHI_EMAIL?: string,
+      KASIKA_TOYOTAOBAYASHI_PASS?: string,
+
+      KASIKA_TAKAHAMACHUO_EMAIL?: string,
+      KASIKA_TAKAHAMACHUO_PASS?: string,
+
+      KASIKA_TOYOKAWACHUO_EMAIL?: string,
+      KASIKA_TOYOKAWACHUO_PASS?: string,
+
+      KASIKA_TOYOKAWAYAWATA_EMAIL?: string,
+      KASIKA_TOYOKAWAYAWATA_PASS?: string,
+
+      KASIKA_GAMAGORI_EMAIL?: string,
+      KASIKA_GAMAGORI_PASS?: string,
+
+      KASIKA_TOYOHASHIMUKAIYAMA_EMAIL?: string,
+      KASIKA_TOYOHASHIMUKAIYAMA_PASS?: string,
+
+      KASIKA_TOYOHASHIFUJISAWA_EMAIL?: string,
+      KASIKA_TOYOHASHIFUJISAWA_PASS?: string,
+
+      KASIKA_CHIKUSA_EMAIL?: string,
+      KASIKA_CHIKUSA_PASS?: string,
+
+      KASIKA_YAGUMA_EMAIL?: string,
+      KASIKA_YAGUMA_PASS?: string,
+
+      KASIKA_OGAKI_EMAIL?: string,
+      KASIKA_OGAKI_PASS?: string,
+
+      // Chatwork
+      CW_TOKEN : string,
+      CW_TOKEN_TEST : string,
+
+      // Common
+
       CLUSTER_MAXCONCURRENCY: number
 
       BROWSER_TYPE?: 'NORMAL' | 'HEADLESS',

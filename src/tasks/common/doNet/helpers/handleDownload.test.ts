@@ -1,3 +1,4 @@
+import path from 'path';
 import {openMockBrowserPage} from '../../browser';
 import {browserTimeOut} from '../../browser/config';
 import {dlPathDonetProperty} from '../pages/properties/config';
@@ -11,8 +12,10 @@ describe('Download', ()=> {
       {
         page,
         appId: '111',
-        downloadDir: dlPathDonetProperty,
-        requestURL: 'https://manage.do-network.com/estate/ListCsvDownload',
+        downloadDir: path.join(__dirname, '__snapshots__' ),
+        encoding: 'shift_jis',
+        // requestURL: 'https://manage.do-network.com/estate/ListCsvDownload',
+        requestURL: 'https://manage.do-network.com/customer/ListCsvDownload',
       },
     );
 

@@ -1,4 +1,5 @@
-import fs from 'fs';
+import fs, {createReadStream} from 'fs';
+import asyncFs from 'fs/promises';
 import {logger} from './logger';
 import path from 'path';
 import {dumpPath} from './paths';
@@ -7,6 +8,7 @@ import rmfr from 'rmfr';
 import {json2csvAsync} from 'json-2-csv';
 import {nanoid} from 'nanoid';
 import format from 'date-fns/format';
+import {createInterface} from 'readline';
 
 export const getCSVFiles = (dir: string, appId: string) => {
   const result = fs.readdirSync(dir)
@@ -23,15 +25,20 @@ export const getCSVFiles = (dir: string, appId: string) => {
  *
  * @param filePath
  * @param data comma delimited csv. See conventions.
+ * @param encoding
  * @returns {string} path of saved file.
  */
-export const saveCSV = (filePath: string, data: string) => {
+export const saveCSV = (
+  filePath: string,
+  data: string,
+  encoding: 'utf8' | 'Shift_JIS' = 'Shift_JIS',
+) => {
   fs.writeFileSync(filePath, '');
 
   const fd = fs.openSync( filePath, 'w');
   const buff = iconv.encode(
     data.replace(/²/g, '2'),
-    'Shift_JIS',
+    encoding,
   );
 
   fs.writeSync( fd, buff);
@@ -44,14 +51,22 @@ export const saveCSV = (filePath: string, data: string) => {
  * Save json to csv
  * @param filePath
  * @param json
+ * @param encoding
  * @returns {string} file path
  */
 export const saveJSONToCSV = async (
   filePath: string,
   json: {[k: string]: any}[],
+  encoding: 'utf8' | 'Shift_JIS' = 'Shift_JIS',
 ) =>{
   if (!json.length) return;
-  return saveCSV(filePath + '.csv', await json2csvAsync(json));
+  const dir = path.dirname(filePath);
+  fs.existsSync(dir) || fs.mkdirSync(dir, {recursive: true});
+  return saveCSV(
+    filePath + '.csv',
+    await json2csvAsync(json),
+    encoding,
+  );
 };
 
 /**
@@ -63,11 +78,15 @@ export const saveJSONToCSV = async (
 export const saveJSON = async (
   filePath: string,
   data: {[k: string]: any}[],
+
 ) => {
   try {
+    const dir = path.dirname(filePath);
+    fs.existsSync(dir) || fs.mkdirSync(dir, {recursive: true});
+
     fs.writeFileSync(filePath + '.json', JSON.stringify(data));
-  } catch (err) {
-    logger.error('Failed to save json file.');
+  } catch (err: any) {
+    logger.error(`Failed to save json file. ${err.message}`);
   }
 };
 
@@ -80,10 +99,12 @@ export const saveJSON = async (
 export const saveFile = async (
   filePath: string,
   data: string,
+
 ) => {
   try {
     const dir = path.dirname(filePath);
     fs.existsSync(dir) || fs.mkdirSync(dir, {recursive: true});
+
     fs.writeFileSync(filePath, data);
   } catch (err: any) {
     logger.error('Failed to save file ' + err.message);
@@ -106,8 +127,18 @@ export const deleteFile = async (file: string) => {
  * This action is not recoverable.
  * @param dir directory where files will be deleted
  */
-export const deleteFilesInFolder = (dir: string) =>{
+export const deleteFilesInFolder = async (dir: string) =>{
 // Still thinking if I will include this as it is damaging.
+  try {
+    fs.existsSync(dir) || fs.mkdirSync(dir, {recursive: true});
+
+    const files = await asyncFs.readdir(dir);
+    for (const file of files) {
+      await asyncFs.unlink(path.join(dir, file));
+    }
+  } catch (err: any) {
+    logger.error(`Failed to delete all files from ${dir}. ${err.message}`);
+  }
 };
 
 /**
@@ -141,4 +172,14 @@ export const getFileName = (
       .filter(Boolean)
       .join('-')}`,
   );
+};
+
+export const readFirstLine = async (path: string) => {
+  const inputStream = createReadStream(path, 'utf8');
+  try {
+    for await (const line of createInterface(inputStream)) return line;
+    return ''; // If the file is empty.
+  } finally {
+    inputStream.destroy(); // Destroy file stream.
+  }
 };
