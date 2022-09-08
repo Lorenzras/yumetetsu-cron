@@ -97,6 +97,7 @@ export const downloadError = async (
 
   const downloadDir = path.join(__dirname, 'resultDir');
   fs.existsSync(downloadDir) || fs.mkdirSync(downloadDir, {recursive: true});
+
   const storeName = cleanStoreName(storeSettings[storeId].name);
   const filePath = path
     .join(

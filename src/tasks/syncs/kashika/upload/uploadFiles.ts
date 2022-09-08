@@ -19,35 +19,41 @@ export const uploadFiles = async (
   }[],
 ) => {
   const scheduler = createScheduler();
+  try {
+    for (let i = 0; i < 5; i++ ) {
+      scheduler.addWorker(await ocrWorker());
+    }
 
-  for (let i = 0; i < 5; i++ ) {
-    scheduler.addWorker(await ocrWorker());
-  }
 
+    /** Upload to Kasika */
+    await Promise.all(
+      storeFiles.map(({storeId, filePath, totalCount}) => {
+        return cluster.execute(async ({page, worker: {id}}) => {
+          logger.info(`Uploading ${storeId} ${filePath} ${id}`);
+          await page.setDefaultNavigationTimeout(120000);
+          await login(
+            page,
+            scheduler,
+            storeSettings[storeId as KStoreSettings] as TStoreSettingsItem,
+            id,
+          );
 
-  /** Upload to Kasika */
-  await Promise.all(
-    storeFiles.map(({storeId, filePath, totalCount}) => {
-      return cluster.execute(async ({page, worker: {id}}) => {
-        logger.info(`Uploading ${storeId} ${filePath} ${id}`);
-        await page.setDefaultNavigationTimeout(0);
-        await login(
-          page,
-          scheduler,
-          storeSettings[storeId as KStoreSettings] as TStoreSettingsItem,
-          id,
-        );
+          logger.info(`Logging in ${storeId}`);
 
-        await uploadFile({
-          page,
-          sourceFile: filePath,
-          storeId: storeId as KStoreSettings,
-          totalCount,
+          await uploadFile({
+            page,
+            sourceFile: filePath,
+            storeId: storeId as KStoreSettings,
+            totalCount,
+          });
         });
-      });
-    }),
-  );
+      }),
+    );
 
-  // await worker.terminate();
-  await scheduler.terminate();
+    // await worker.terminate();
+  } catch (err : any) {
+    logger.error(`Kasika RPA terminated with errors. ${err.message}`);
+  } finally {
+    await scheduler.terminate();
+  }
 };

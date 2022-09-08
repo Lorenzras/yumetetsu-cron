@@ -82,10 +82,5 @@ export const uploadFile = async (
     page.$eval('button.jsSubmitBtn', (el)=> (el as HTMLElement)?.click()),
   ] );
 
-  await page.screenshot({
-    fullPage: true,
-    path: path.join(__dirname, 'resultDir', `${storeId}.png`),
-  });
-
   await downloadError(page, storeId, totalCount);
 };

@@ -8,7 +8,7 @@ import {logger} from '../../../../utils';
 // rpachat = 213232379
 // yumetetsu = 6732051
 
-const roomId = '225800073';
+const roomId = '6732051';
 
 export const sendFileToChatwork = async ({
   storeName,

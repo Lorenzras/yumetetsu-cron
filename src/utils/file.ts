@@ -81,6 +81,9 @@ export const saveJSON = async (
 
 ) => {
   try {
+    const dir = path.dirname(filePath);
+    fs.existsSync(dir) || fs.mkdirSync(dir, {recursive: true});
+
     fs.writeFileSync(filePath + '.json', JSON.stringify(data));
   } catch (err: any) {
     logger.error(`Failed to save json file. ${err.message}`);
@@ -127,6 +130,8 @@ export const deleteFile = async (file: string) => {
 export const deleteFilesInFolder = async (dir: string) =>{
 // Still thinking if I will include this as it is damaging.
   try {
+    fs.existsSync(dir) || fs.mkdirSync(dir, {recursive: true});
+
     const files = await asyncFs.readdir(dir);
     for (const file of files) {
       await asyncFs.unlink(path.join(dir, file));
