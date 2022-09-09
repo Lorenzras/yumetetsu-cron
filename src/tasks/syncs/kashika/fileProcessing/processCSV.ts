@@ -22,6 +22,7 @@ export const processCSV = async (dir = downloadDir) => {
   const csvFiles = (await fsPromise.readdir(dir))
     .filter((file) => file.split('.').at(-1) === 'csv' );
 
+  // Stores grouped record per store.
   const record: Record<string, Record<string, string>[]> = Object.create(null);
 
   /** Create the parse. Magic happens here including Filter. */
@@ -45,14 +46,14 @@ export const processCSV = async (dir = downloadDir) => {
           // Initialize record[storeId] if empty
           if (!record[storeId]) record[storeId] = [];
 
-          // Filter here
-
-          record[storeId].push({
-            ...row,
-            店舗営業担当者: email,
-            メール禁止フラグ: +Boolean(row['メール禁止フラグ']),
-            タグ: `${row['店舗名']}_${row['顧客種別']}`,
-          });
+          if ([row['電話番号'], row['メールアドレス']].some(Boolean)) {
+            record[storeId].push({
+              ...row,
+              店舗営業担当者: email,
+              メール禁止フラグ: +Boolean(row['メール禁止フラグ']),
+              タグ: `${row['店舗名']}_${row['顧客種別']}`,
+            });
+          }
         })
         .on('end', (rowCount: number) => console.log(`Parsed ${rowCount} rows. ${csvFile}`));
 
@@ -61,7 +62,6 @@ export const processCSV = async (dir = downloadDir) => {
       stream.end(resolve);
     });
   }
-
 
   return record;
 };
