@@ -8,7 +8,7 @@ import {
   downloadDir,
 } from '../../../common/doNet/clusterDownload/customers/config';
 import {parse} from '@fast-csv/parse';
-import {KStoreSettings, storeSettings, TStoreSettings, TStoreSettingsItem} from '../../../../config';
+import {KStoreSettings, storeSettings, TStoreSettingsItem} from '../../../../config';
 
 /**
  * Requirements
@@ -42,10 +42,8 @@ export const processCSV = async (dir = downloadDir) => {
       })
         .on('error', (error) => console.error(error, csvFile ))
         .on('data', (row) => {
+          // Initialize record[storeId] if empty
           if (!record[storeId]) record[storeId] = [];
-
-          // Extract the store name from row[店舗名], then remove 店.
-          // const cleanStoreName: string = row['店舗名'].replaceAll(/(ハウスドゥ[!！]?(\s+)?)|店/g, '');
 
           record[storeId].push({
             ...row,
