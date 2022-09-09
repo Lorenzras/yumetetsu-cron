@@ -8,7 +8,7 @@ import {
   downloadDir,
 } from '../../../common/doNet/clusterDownload/customers/config';
 import {parse} from '@fast-csv/parse';
-import {KStoreSettings, storeSettings, TStoreSettings, TStoreSettingsItem} from '../../../../config';
+import {KStoreSettings, storeSettings, TStoreSettingsItem} from '../../../../config';
 
 /**
  * Requirements
@@ -24,7 +24,7 @@ export const processCSV = async (dir = downloadDir) => {
 
   const record: Record<string, Record<string, string>[]> = Object.create(null);
 
-  /** Create the parse. Magic happens here. */
+  /** Create the parse. Magic happens here including Filter. */
   for (const csvFile of csvFiles) {
     const csvString = await readFile(path.join(dir, csvFile), 'utf-8');
     // Get the store id is in the filename. Note: This should match format of the filename when saving.
@@ -44,8 +44,7 @@ export const processCSV = async (dir = downloadDir) => {
         .on('data', (row) => {
           if (!record[storeId]) record[storeId] = [];
 
-          // Extract the store name from row[店舗名], then remove 店.
-          // const cleanStoreName: string = row['店舗名'].replaceAll(/(ハウスドゥ[!！]?(\s+)?)|店/g, '');
+          // Filter here
 
           record[storeId].push({
             ...row,
