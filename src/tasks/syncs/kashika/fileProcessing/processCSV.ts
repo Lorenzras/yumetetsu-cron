@@ -42,6 +42,7 @@ export const processCSV = async (dir = downloadDir) => {
       })
         .on('error', (error) => console.error(error, csvFile ))
         .on('data', (row) => {
+          // Initialize record[storeId] if empty
           if (!record[storeId]) record[storeId] = [];
 
           // Filter here
