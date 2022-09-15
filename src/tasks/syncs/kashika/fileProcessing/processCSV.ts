@@ -9,6 +9,7 @@ import {
 } from '../../../common/doNet/clusterDownload/customers/config';
 import {parse} from '@fast-csv/parse';
 import {KStoreSettings, storeSettings, TStoreSettingsItem} from '../../../../config';
+import {sendResultToChatWork} from '../upload/sendResultToChatWork';
 
 /**
  * Requirements
@@ -62,6 +63,8 @@ export const processCSV = async (dir = downloadDir) => {
       stream.end(resolve);
     });
   }
+
+  await sendResultToChatWork(record);
 
   return record;
 };
