@@ -1,5 +1,4 @@
 import axios from 'axios';
-import FormData from 'form-data';
 import {storeSettings} from '../../../../config';
 
 const roomId = '6732051';
