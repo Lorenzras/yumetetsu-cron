@@ -32,7 +32,7 @@ export const sendFileToChatwork = async ({
     console.log(key);
     return `${key}： ${val}件`;
   }).join('\n');
-  console.log(strFileDetails);
+
   const message = [
     `[info][title]${storeName} → KASIKA: スキップされる顧客データ（エラー）[/title]`,
     `${totalCount ?? 0}件の中、以下はスキップされました。\n`,

@@ -9,6 +9,7 @@ import {
 } from '../../../common/doNet/clusterDownload/customers/config';
 import {parse} from '@fast-csv/parse';
 import {KStoreSettings, storeSettings, TStoreSettingsItem} from '../../../../config';
+import {sendResultToChatWork} from '../upload/sendResultToChatWork';
 
 /**
  * Requirements
@@ -22,9 +23,10 @@ export const processCSV = async (dir = downloadDir) => {
   const csvFiles = (await fsPromise.readdir(dir))
     .filter((file) => file.split('.').at(-1) === 'csv' );
 
+  // Stores grouped record per store.
   const record: Record<string, Record<string, string>[]> = Object.create(null);
 
-  /** Create the parse. Magic happens here. */
+  /** Create the parse. Magic happens here including Filter. */
   for (const csvFile of csvFiles) {
     const csvString = await readFile(path.join(dir, csvFile), 'utf-8');
     // Get the store id is in the filename. Note: This should match format of the filename when saving.
@@ -45,12 +47,14 @@ export const processCSV = async (dir = downloadDir) => {
           // Initialize record[storeId] if empty
           if (!record[storeId]) record[storeId] = [];
 
-          record[storeId].push({
-            ...row,
-            店舗営業担当者: email,
-            メール禁止フラグ: +Boolean(row['メール禁止フラグ']),
-            タグ: `${row['店舗名']}_${row['顧客種別']}`,
-          });
+          if ([row['電話番号'], row['メールアドレス']].some(Boolean)) {
+            record[storeId].push({
+              ...row,
+              店舗営業担当者: email,
+              メール禁止フラグ: +Boolean(row['メール禁止フラグ']),
+              タグ: `${row['店舗名']}_${row['顧客種別']}`,
+            });
+          }
         })
         .on('end', (rowCount: number) => console.log(`Parsed ${rowCount} rows. ${csvFile}`));
 
@@ -60,6 +64,7 @@ export const processCSV = async (dir = downloadDir) => {
     });
   }
 
+  await sendResultToChatWork(record);
 
   return record;
 };
