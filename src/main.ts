@@ -25,7 +25,7 @@ cron.schedule('30 9 * * *', remindOnLongtermCust, cronOptions);
 cron.schedule('0 20 * * Sun', () => syncDoNetCust(true), cronOptions);
 
 /**
- * Full sync donet customers to kintone.
+ * Diff sync donet customers to kintone.
  *
  * At every 30th minute past
  * every hour from 8 through 19

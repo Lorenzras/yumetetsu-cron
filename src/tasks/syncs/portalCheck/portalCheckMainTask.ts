@@ -30,7 +30,7 @@ export const initCluster = () => Cluster.launch({
   },
   retryLimit: 2,
   retryDelay: 20000,
-  timeout: 1000 * 60 * 8,
+  timeout: 1000 * 60 * 5,
 });
 
 
