@@ -1,1 +1,3 @@
-npm run build && node build/main.js
+start cmd /k node build/cron/kashika.js
+start cmd /k node build/cron/portalCheck.js
+start cmd /k node build/cron/syncDoNetCust.js
