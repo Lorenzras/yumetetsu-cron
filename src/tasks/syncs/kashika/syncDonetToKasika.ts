@@ -19,6 +19,7 @@ export const syncDonetToKasika = async () => {
     maxConcurrency: 5,
     puppeteerOptions: {
       headless: false,
+      defaultViewport: null,
     },
 
   });

@@ -119,6 +119,7 @@ export const initCluster = (options: Parameters<typeof Cluster.launch>[0]) => {
     workerCreationDelay: 100,
 
     puppeteerOptions: {
+      ...options.puppeteerOptions,
       slowMo: slowMo,
       headless: headless,
     // args: minimalArgs,

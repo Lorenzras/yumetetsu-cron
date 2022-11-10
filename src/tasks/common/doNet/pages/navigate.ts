@@ -2,6 +2,7 @@ import {Page} from 'puppeteer';
 import {logger, sleep} from '../../../../utils';
 import {homeSelectors} from '../config';
 import {login} from '../login';
+import {selectors} from './customer';
 
 
 /* Must be on homepage after loging in. */
@@ -13,19 +14,28 @@ import {login} from '../login';
 
 export const navigateToCustPage = async (page: Page) => {
   logger.info('Navigating to customer page.');
-  await page.goto('https://manage.do-network.com/customer', {waitUntil: 'domcontentloaded'});
 
-  console.log('Dom content has been loaded.');
+  await Promise.all([
+    page.waitForNavigation(),
+    page.click(selectors.custNav),
+  ]);
+
+  // Donetwork started throttling direct access to links. 2022.11.09 ~ ras
+  /*  await page.goto('https://manage.do-network.com/customer',
+    {
+      waitUntil: 'domcontentloaded',
+      timeout: 1000 * 60 * 5,
+    }); */
 
   const isSuccess = await Promise.race([
     page.waitForSelector('table.error_navi').then(()=>false),
-    page.waitForSelector(homeSelectors.custNav).then(()=>true),
+    page.waitForSelector(homeSelectors.custNav, {timeout: 1000 * 60 * 2})
+      .then(()=>true),
   ]);
 
-
-  await sleep(1000 * 60 * 60 *60);
-
   if (!isSuccess) throw new Error('Failed to navigate to customer page.');
+
+  console.log('Customer page has been loaded.');
 
   return page;
 };
