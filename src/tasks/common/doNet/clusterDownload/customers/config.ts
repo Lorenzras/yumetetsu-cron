@@ -1,6 +1,6 @@
 import path from 'path';
 
-export const dlLimit = 4000;
+export const dlLimit = 2000;
 export const downloadDir = path.join(__dirname, 'csv');
 export const metaDir = path.join(__dirname, 'meta');
 

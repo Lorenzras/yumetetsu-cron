@@ -7,7 +7,7 @@ import {IConcurrentData, TPropTypes, TPropStatusText} from './../types';
 import {Cluster} from 'puppeteer-cluster';
 
 /**
- * DoNet has 4000 limit so we need to limit the filter should this exeed.
+ * DoNet has download limit
  * For now, I will filter by the following.
  * - Search by store,
  * - Search by type,

@@ -16,7 +16,7 @@ export const homeSelectors = {
   propNav: '.sidebar-estate a',
 };
 
-export const downloadLimit = 4000;
+export const downloadLimit = 2000;
 
 export const custDlDir = rootPath.resolve('/dump/customers');
 

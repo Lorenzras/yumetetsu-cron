@@ -7,7 +7,7 @@ import {openBrowserPage} from './../../../../browser/openBrowser';
 
 
 /**
- * DoNet has 4000 limit so have to limit search should this exeed.
+ * DoNet has a variable limit.
  * Here is the filter.
  * - Search by store,
  * - Search by type,

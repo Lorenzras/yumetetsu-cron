@@ -5,6 +5,7 @@ import {login} from '../../../login';
 import {selectStoreThenSearch} from '../../../pages/customer/downloadPerStore';
 import {setCustomerForm} from '../../../pages/customer/setCustomerForm';
 import {navigateToCustPage} from '../../../pages/navigate';
+import {dlLimit} from '../config';
 
 export const downloadSingleStore = async (
   page: Page,
@@ -19,13 +20,13 @@ export const downloadSingleStore = async (
 
     const result = await clickSearch(page);
 
-    if (result <= 4000) {
+    if (result <= dlLimit) {
       logger.info(`Starting to download ${storeId}`);
       // Download here
     }
 
     return {
-      isDone: result <= 4000,
+      isDone: result <= dlLimit,
       total: result,
       store: storeId,
     };

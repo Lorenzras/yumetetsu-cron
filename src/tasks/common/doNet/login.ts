@@ -28,4 +28,5 @@ export const login = async (page: Page ) => {
     page.waitForNavigation(),
     page.click(selectors.login),
   ]);
+  console.log('Login done.');
 };

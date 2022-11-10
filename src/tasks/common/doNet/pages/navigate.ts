@@ -1,5 +1,5 @@
 import {Page} from 'puppeteer';
-import {logger} from '../../../../utils';
+import {logger, sleep} from '../../../../utils';
 import {homeSelectors} from '../config';
 import {login} from '../login';
 
@@ -15,12 +15,19 @@ export const navigateToCustPage = async (page: Page) => {
   logger.info('Navigating to customer page.');
   await page.goto('https://manage.do-network.com/customer', {waitUntil: 'domcontentloaded'});
 
+  console.log('Dom content has been loaded.');
+
   const isSuccess = await Promise.race([
     page.waitForSelector('table.error_navi').then(()=>false),
     page.waitForSelector(homeSelectors.custNav).then(()=>true),
   ]);
 
-  return isSuccess;
+
+  await sleep(1000 * 60 * 60 *60);
+
+  if (!isSuccess) throw new Error('Failed to navigate to customer page.');
+
+  return page;
 };
 
 

@@ -56,7 +56,7 @@ export const downloadProcess = (
     }
     const count = await clickSearch(page);
 
-    // Donet has a 4000 limit.
+    // Donet has a variable limit see config.
     if (count > 0 && count <= dlLimit ) {
       await handleDownload({
         page,

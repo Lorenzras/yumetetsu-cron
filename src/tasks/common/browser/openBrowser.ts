@@ -65,6 +65,8 @@ export const openBrowserPage = async (opt?: OpenBrowserParam) => {
   });
   const page = await getPage(browser);
 
+  console.log('Loading browser with: ', opt);
+
   const newUserAgent = userAgent.data.userAgent;
 
   // eslint-disable-next-line max-len
@@ -73,6 +75,7 @@ export const openBrowserPage = async (opt?: OpenBrowserParam) => {
 
   console.log(opt?.loadImages);
   if (opt && !opt.loadImages) {
+    console.log('Prevent image download.');
     await page.setRequestInterception(true);
     page.on('request', (req) => {
       if (req.resourceType() === 'image') {

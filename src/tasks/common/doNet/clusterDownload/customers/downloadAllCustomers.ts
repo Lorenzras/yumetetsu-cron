@@ -64,7 +64,7 @@ export const downloadAllCustomers = async (
   );
   await saveMeta('perAgents', dlPerAgent.map(({count, options}) => ({count, options})));
 
-  /* Download per status that exceeded 4000 when downloaded by agent.
+  /* Download per status that exceeded limit when downloaded by agent.
      ※Only if status is not defined. Usefull if the requirement is to download specific
      Statused only. (e.g.
   */
