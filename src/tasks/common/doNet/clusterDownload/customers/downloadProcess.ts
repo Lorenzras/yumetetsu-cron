@@ -39,8 +39,8 @@ export const downloadProcess = (
     logger.info(`processing: ${storeId} ${agentId}`);
 
 
-    if (!isWithCookie || !await navigateToCustPage(page)) {
-      logger.info('Logging in to customer page.');
+    if (!isWithCookie || !await navigateToCustPage(page, isWithCookie)) {
+      logger.info('Logging in to customer page.', workerId);
       await loginToCustomerPage(page);
     }
     await saveBrowserCookie(page, workerId);

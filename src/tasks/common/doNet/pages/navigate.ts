@@ -12,20 +12,33 @@ import {selectors} from './customer';
   return page;
 }; */
 
-export const navigateToCustPage = async (page: Page) => {
+export const navigateToCustPage = async (
+  page: Page, isWithCookie?: boolean) => {
   logger.info('Navigating to customer page.');
 
-  await Promise.all([
-    page.waitForNavigation(),
-    page.click(selectors.custNav),
-  ]);
 
-  // Donetwork started throttling direct access to links. 2022.11.09 ~ ras
-  /*  await page.goto('https://manage.do-network.com/customer',
-    {
-      waitUntil: 'domcontentloaded',
-      timeout: 1000 * 60 * 5,
-    }); */
+  if (!isWithCookie) {
+    /**
+     * Donetwork started throttling direct access to links,
+     * unless cookie is defined.s
+     * 2022.11.09 ~ ras
+     */
+
+    await page.waitForSelector(
+      selectors.custNav,
+      {visible: true, timeout: 60000});
+
+    await Promise.all([
+      page.waitForNavigation(),
+      page.click(selectors.custNav),
+    ]);
+  } else {
+    await page.goto('https://manage.do-network.com/customer',
+      {
+        waitUntil: 'domcontentloaded',
+        timeout: 1000 * 60 * 5,
+      });
+  }
 
   const isSuccess = await Promise.race([
     page.waitForSelector('table.error_navi').then(()=>false),

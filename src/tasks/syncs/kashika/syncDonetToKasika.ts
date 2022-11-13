@@ -2,7 +2,6 @@
 import {logger} from '../../../utils';
 import {initCluster} from '../../common/browser';
 import {TClusterPage} from '../../common/browser/config';
-import {downloadDir} from '../../common/doNet/clusterDownload/customers/config';
 
 import {
   downloadCustomers,
