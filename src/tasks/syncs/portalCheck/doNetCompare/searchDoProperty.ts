@@ -126,6 +126,7 @@ export const searchDoProperty = async ({
         page.click('#btn_search'),
       ]);
 
+
       logger.info(`${logSuffix} is comparing data.`);
       const comparedData = await compareData(page, inputData);
       logger.info(`${logSuffix} is done comparing against ${comparedData.length} properties`);

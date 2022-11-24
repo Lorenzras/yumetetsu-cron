@@ -25,6 +25,16 @@ const errTransport : DailyRotateFile = new DailyRotateFile({
   level: 'warn',
 });
 
+const combinedTransport : DailyRotateFile = new DailyRotateFile({
+  filename: 'combined-%DATE%.log',
+  dirname: logsPath,
+  datePattern: 'YYYY-MM-DD',
+  zippedArchive: true,
+  maxSize: '20m',
+  maxFiles: '14d',
+  level: 'warn',
+});
+
 export const logsDatedPath = path.join(
   logsPath,
   dateFormat(new Date(), 'yyyy.MM.dd'),
@@ -39,7 +49,7 @@ export const logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({filename: 'combined.log'}),
+    combinedTransport,
     errTransport,
   ],
   exceptionHandlers: [
