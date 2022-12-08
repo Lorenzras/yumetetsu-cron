@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import {TCompanyContact} from '../../types';
 import {Page} from 'puppeteer';
 import {extractTel, getHTML, logger} from '../../../../../utils';
@@ -113,7 +114,17 @@ const fetchCompanyPage = async (urlPart: string) =>{
   logger.info(
     `Trying to fetch contact from the actual company page. ${fullUrl}`,
   );
-  const html = await axios.post(fullUrl).then((resp)=> resp.data);
+  const html = await axios.get(fullUrl, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36 RuxitSynthetic/1.0 v1200050525968528225 t6331743126571670211',
+    },
+  })
+    .then((resp)=> resp.data)
+    .catch((e) => {
+      console.log(e.message);
+      throw new Error('Failed to retrieve company html page');
+    });
+
   const $ = load(html);
   return $('#item-est_outline li div:contains(電話)').next().text().trim();
 };
@@ -121,7 +132,6 @@ const fetchCompanyPage = async (urlPart: string) =>{
 export const getContactByLinkFast = async (url: string) =>{
   logger.info(`Trying to fetch html ${url}`);
   const html = await getHTML({url, method: 'post'});
-
 
   const $ = load(html);
 
@@ -139,6 +149,7 @@ export const getContactByLinkFast = async (url: string) =>{
   let dirtyContact = $('th:contains("TEL/FAX") ~ td').text().trim();
 
   const companyLink = $('.company-data_name-flex a').attr('href');
+
 
   // If there is company link, crawl it.
   if (companyLink) {
