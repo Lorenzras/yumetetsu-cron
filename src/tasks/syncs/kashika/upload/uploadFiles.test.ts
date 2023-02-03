@@ -1,5 +1,5 @@
 import path from 'path';
-import {KStoreSettings} from '../../../../config';
+// import {KStoreSettings} from '../../../../config';
 import {initCluster} from '../../../common/browser';
 import {browserTimeOut} from '../../../common/browser/config';
 import {uploadFiles} from './uploadFiles';

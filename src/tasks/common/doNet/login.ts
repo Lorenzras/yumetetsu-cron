@@ -28,5 +28,14 @@ export const login = async (page: Page ) => {
     page.waitForNavigation(),
     page.click(selectors.login),
   ]);
-  console.log('Login done.');
+
+  const subdirectory = !!page.url().split('/').at(-1);
+  console.log(`Login done. ${subdirectory}`);
+  if (subdirectory) {
+    // Probably not home page
+    await Promise.all([
+      page.waitForNavigation(),
+      page.click(`a[href="/"]`),
+    ]);
+  }
 };

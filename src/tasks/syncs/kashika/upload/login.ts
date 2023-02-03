@@ -24,7 +24,8 @@ export const login = async (
 
   do {
     console.log('Starting login to Kashika.');
-    await page.goto('https://kasika.io/login.php', {waitUntil: 'domcontentloaded'});
+    // await page.goto('https://kasika.io/login.php', {waitUntil: 'domcontentloaded'});
+    await page.reload({waitUntil: 'domcontentloaded'});
     let cleanText = '';
 
     console.log('Waiting for captcha selector.');
@@ -82,8 +83,9 @@ export const login = async (
       console.log('Done waiting for navigation.');
 
       isSuccess = await Promise.race([
-        page.waitForSelector('div#kasika-table', {visible: true}).then(()=>true),
+        page.waitForSelector('div#kasika-table', {visible: false}).then(()=>true),
         page.waitForSelector('div[role=alert]', {visible: true}).then(()=>false),
+        page.waitForSelector('label[for="userNotExistSkipUserRegistration"]', {visible: true}).then(()=>true),
       ]);
     } else {
       isSuccess = false;

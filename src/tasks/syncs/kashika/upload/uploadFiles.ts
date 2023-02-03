@@ -30,13 +30,24 @@ export const uploadFiles = async (
       storeFiles.map(({storeId, filePath, totalCount}) => {
         return cluster.execute(async ({page, worker: {id}}) => {
           logger.info(`Uploading ${storeId} ${filePath} ${id}`);
-          await page.setDefaultNavigationTimeout(120000);
-          await login(
-            page,
-            scheduler,
-            storeSettings[storeId as KStoreSettings] as TStoreSettingsItem,
-            id,
-          );
+          page.setDefaultNavigationTimeout(120000);
+
+          /** 普段「 顧客一括登録・変更」ボタンを押したて、
+           * やっと「一括アップロード」をクリックしますが、
+           * ここでは直接アップロード画面に移行します。
+          */
+          await page.goto('https://kasika.io/customer-csv-upload?step=upload', {waitUntil: 'domcontentloaded'});
+          if (page.url().includes('login.php')) {
+            await login(
+              page,
+              scheduler,
+              // storeSettings[storeId as KStoreSettings] as TStoreSettingsItem,
+              // 一つのアカウントアップロードしてもよさそう
+              storeSettings['270'] as TStoreSettingsItem,
+              id,
+            );
+          }
+
 
           logger.info(`Logging in ${storeId}`);
 

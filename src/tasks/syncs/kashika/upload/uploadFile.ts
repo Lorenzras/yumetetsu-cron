@@ -21,12 +21,6 @@ export const uploadFile = async (
   // await page.setDefaultNavigationTimeout(120000);
   const account = storeSettings[storeId];
 
-  /** 普段「 顧客一括登録・変更」ボタンを押したて、
-   * やっと「一括アップロード」をクリックしますが、
-   * ここでは直接アップロード画面に移行します。
-  */
-  await page.goto('https://kasika.io/customer-csv-upload?step=upload', {waitUntil: 'domcontentloaded'});
-
 
   /** ファイルをアップロード */
   const uploadInput = await page.waitForSelector('input[type="file"]')
