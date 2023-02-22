@@ -26,11 +26,13 @@ export const compareData = async (
   // await page.waitForFunction('jQuery');
   const result = await page.evaluate(
     (data: IProperty) : TSearchResult[]=>{
+      const priceCellIndex = $('th:contains("価格")').index();
       const rows = Array.from(document.querySelectorAll('.ui-sortable tr'));
       const rowCount = rows.length.toString();
+
       const evalResult = rows.map<TSearchResult>((r) => {
         const col = $(r).children('td');
-        const doPriceText = col.eq(8).find('span').text();
+        const doPriceText = col.eq(priceCellIndex).find('span').text();
         const priceDiff = +data.比較用価格 - +doPriceText;
         return {
           DOステータス: col.eq(7).text(),
