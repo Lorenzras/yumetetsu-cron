@@ -43,8 +43,9 @@ cron.schedule('0 12 * * *', () => portalCheckMainTask(), cronOptions);
 /**
  * Sync donet customers to kasika
  * everyday at 6:30am
+ * @deprecated 全店舗Kasikaをやめることになった 2023.03.04
  */
-cron.schedule('20 9 * * *', syncDonetToKasika, cronOptions);
+// cron.schedule('20 9 * * *', syncDonetToKasika, cronOptions);
 
 
 logger.info('MAIN CRON PROCESS RUNNING.');
