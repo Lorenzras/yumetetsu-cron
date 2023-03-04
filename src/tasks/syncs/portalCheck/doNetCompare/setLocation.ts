@@ -38,7 +38,7 @@ export const setLocation = async (
 
   if (town) {
     // On slow or laggy computers, donet's town API takes a very long time to respond so
-    // I addressing it with the following lines
+    // I am addressing it with the following lines
 
     logger.info(`${logSuffix} is waiting for town list reponse. `);
     await Promise.all([
