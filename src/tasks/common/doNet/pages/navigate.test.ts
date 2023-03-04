@@ -1,6 +1,7 @@
 
 import {openBrowserPage} from '../../browser';
 import {browserTimeOut} from '../../browser/config';
+import {login} from '../login';
 import {navigateToCustPage, navigateToPropertyPage} from './navigate';
 
 describe('navigate', ()=> {
@@ -17,8 +18,9 @@ describe('navigate', ()=> {
     const page = await openBrowserPage({
       headless: false,
     });
+    await login(page);
     const res = await navigateToPropertyPage(page);
-    res.browser().disconnect();
+    await page.browser().close();
     expect(res);
   }, browserTimeOut);
 });

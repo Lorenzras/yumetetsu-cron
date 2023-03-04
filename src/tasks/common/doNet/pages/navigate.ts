@@ -25,12 +25,12 @@ export const navigateToCustPage = async (
      */
 
     await page.waitForSelector(
-      selectors.custNav,
+      homeSelectors.custNav,
       {visible: true, timeout: 60000});
 
     await Promise.all([
       page.waitForNavigation(),
-      page.click(selectors.custNav),
+      page.click(homeSelectors.custNav),
     ]);
   } else {
     await page.goto('https://manage.do-network.com/customer',
@@ -54,19 +54,30 @@ export const navigateToCustPage = async (
 };
 
 
-export const navigateToPropertyPage = async (page: Page) => {
+export const navigateToPropertyPage = async (
+  page: Page,
+) => {
   logger.info('Navigating to property page.');
 
-  await page.waitForSelector(homeSelectors.propNav,
-    {
-      visible: true,
-    }),
+  await page.waitForSelector(
+    homeSelectors.propNav,
+    {visible: true, timeout: 60000});
+
+
   await Promise.all([
     page.waitForNavigation(),
     page.click(homeSelectors.propNav),
-
-  ]);
-
+  ])
+    .catch(() => {
+      return page.goto('https://manage.do-network.com/estate',
+        {
+          waitUntil: 'domcontentloaded',
+          timeout: 1000 * 60 * 3,
+        })
+        .catch(() => {
+          throw new Error('Failed to navigate to property page.');
+        });
+    });
 
   return page;
 };
