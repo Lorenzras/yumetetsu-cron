@@ -104,6 +104,9 @@ export const searchDoProperty = async ({
       await setLotArea(page, area);
 
       logger.info(`${logSuffix} clicked search.`);
+
+      await page.waitForSelector('#btn_search');
+
       await Promise.all([
         page.waitForNavigation(),
         page.click('#btn_search'),
@@ -120,6 +123,7 @@ export const searchDoProperty = async ({
 
       onRetry: async (e, attempt) => {
         logger.warn(`${logSuffix} retried ${attempt} times to compare data.  ${e.message}`);
+        await navigateToPropertyPage(page);
       },
     });
   } catch (err: any) {
