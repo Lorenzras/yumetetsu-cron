@@ -2,7 +2,7 @@
 import {Page} from 'puppeteer';
 import retry from 'async-retry';
 import {logger} from '../../../../utils';
-import {selectByText} from './searchDoProperty';
+import {selectByText} from './selectByText';
 
 export const setLocation = async (
   {page, data, logSuffix}:
@@ -28,14 +28,17 @@ export const setLocation = async (
     await page.waitForSelector('#select_button_city1');
     await page.click('#select_button_city1'),
 
-
     logger.info(`${logSuffix} is setting prefecture.`);
-    await selectByText(page, '#select_pref_id', pref ),
+    await selectByText(page, `#simplemodal-data select`, pref ),
     await page.waitForNetworkIdle({idleTime: 500}),
 
     logger.info(`${logSuffix} is setting city`);
-    await page.click('#modal_city_name_autocomplete', {clickCount: 3});
-    await page.type('#modal_city_name_autocomplete', city);
+    // click option with text containing name
+    const [option] = await page.$x('//th[contains(text(), "市区")]/following-sibling::td/select/option[contains(text(), "岐阜市")]');
+    await option.click();
+
+    // await page.click('#modal_city_name_autocomplete', {clickCount: 3});
+    // await page.type('#modal_city_name_autocomplete', city);
 
     // throw new Error('test');
     if (town) {

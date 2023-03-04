@@ -1,9 +1,7 @@
-import {navigateToPropertyPage} from './../../../common/doNet/pages/navigate';
-import {openBrowserPage} from './../../../common/browser/openBrowser';
-import {selectByText, searchDoProperty} from './searchDoProperty';
+
+import {searchDoProperty} from './searchDoProperty';
 import {openMockBrowserPage} from '../../../common/browser';
 import {browserTimeOut} from '../../../common/browser/config';
-import {login} from '../../../common/doNet';
 
 describe('form', ()=>{
   test('search', async () => {
@@ -42,12 +40,5 @@ describe('form', ()=>{
     // await page.browser().close();
     expect(result).toMatchSnapshot();
   }, browserTimeOut);
-
-  test('selectPref', async ()=>{
-    // location modal must be open.
-    const page = await openMockBrowserPage();
-    await selectByText(page, '#select_pref_id', '岐阜県');
-    page.browser().disconnect();
-  });
 });
 

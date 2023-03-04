@@ -13,6 +13,7 @@ import {cityLists} from '../config';
 import {logErrorScreenshot} from '../helpers/logErrorScreenshot';
 import {IHouse, ILot, IMansion, IProperty, TProperty, TPropertyConvert} from '../types';
 import {compareData, TSearchResult} from './compareData';
+import {selectByText} from './selectByText';
 import {setLocation} from './setLocation';
 
 export interface IPropSearchData {
@@ -28,27 +29,6 @@ const doPropTypes: TPropertyConvert<TPropTypes> = {
   中古マンション: 'used_mansion',
 };
 
-export const selectByText = async (
-  page: Page,
-  selector: string,
-  text: string,
-) => {
-  await page.waitForSelector(`${selector} option`);
-  // await page.waitForTimeout(2000);
-  logger.info(`${selector} appeared.`);
-  const prefId = await page.$eval(selector, (el, text) => {
-    const prefId = $(el)
-      .children(`option:contains(${text})`).val() as string;
-    (el as HTMLInputElement).value = prefId;
-    // $(el).val(prefId);
-    $(el).trigger('change');
-    return prefId;
-  }, text);
-
-
-  // await page.select(selector, prefId);
-  logger.info(`Selected  ${prefId} at ${selector}.`);
-};
 
 const setLotArea = async (page: Page, area: string) => {
   await page.evaluate((area)=> {
