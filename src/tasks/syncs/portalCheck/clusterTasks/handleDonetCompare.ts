@@ -42,6 +42,7 @@ export const setCookie = async (page: Page, workerId: number) => {
   }
 };
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Split properties into chunks then compare each item to donet.
  * This was designed to reuse the browser for each chunk.
@@ -54,18 +55,20 @@ export const setCookie = async (page: Page, workerId: number) => {
  *
  * @param cluster Cluster object
  * @param dtArr unprocessed IProperty[]
+ * @param processAll process regardless if already done
  * @returns {IProperty[]} Processed properties.
  */
 export const handleDonetCompare = async (
   cluster: Cluster<{page: Page}>,
   dtArr: IProperty[],
+  processAll = false,
 ) => {
   const dtArrLength = dtArr.length;
 
   const newDtArr = await Promise.all(dtArr.map(async (prop, idx) => {
     try {
       // For retries, if already processed, ignore.
-      if (prop.DO管理有無?.trim()) return prop;
+      if (!processAll && prop.DO管理有無?.trim()) return prop;
 
       // Actual process
       return await cluster.execute(async ({page, worker}) => {
