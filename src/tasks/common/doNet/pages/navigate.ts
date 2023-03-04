@@ -61,7 +61,7 @@ export const navigateToPropertyPage = async (
 
   await page.waitForSelector(
     homeSelectors.propNav,
-    {visible: true, timeout: 60000});
+    {visible: false, timeout: 60000});
 
 
   await Promise.all([

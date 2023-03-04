@@ -26,8 +26,8 @@ export const setLocation = async (
 
 
     /* Open modal */
-    retry(async () => {
-      await page.waitForSelector('#select_button_city1');
+    await retry(async () => {
+      await page.waitForSelector('#select_button_city1', {visible: false});
     },
     {
       retries: 3,
