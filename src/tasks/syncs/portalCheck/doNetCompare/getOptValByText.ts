@@ -11,8 +11,6 @@ export const getOptValByText = async (
         (option as HTMLOptionElement).innerText.includes(text as string);
       });
 
-    if (!optionElement) throw new Error(`No option found for ${text}`);
-
-    return (optionElement as HTMLOptionElement).value;
+    return (optionElement as HTMLOptionElement)?.value ?? '';
   }, text);
 };
