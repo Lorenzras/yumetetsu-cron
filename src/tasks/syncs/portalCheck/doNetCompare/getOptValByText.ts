@@ -8,7 +8,7 @@ export const getOptValByText = async (
     const optionElement = el
       .find((option) => {
         return option &&
-        (option as HTMLOptionElement).innerText === text;
+        (option as HTMLOptionElement).innerText.includes(text as string);
       });
 
     if (!optionElement) throw new Error(`No option found for ${text}`);
