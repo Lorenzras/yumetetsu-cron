@@ -35,12 +35,8 @@ export const setLocation = async (
     logger.info(`${logSuffix} is setting city`);
     // click option with text containing name
     const [option] = await page.$x('//th[contains(text(), "市区")]/following-sibling::td/select/option[contains(text(), "岐阜市")]');
-    await option.click();
+    await option.click(); // Town fetching will not trigger unless a city is clicked. So click here.
 
-    // await page.click('#modal_city_name_autocomplete', {clickCount: 3});
-    // await page.type('#modal_city_name_autocomplete', city);
-
-    // throw new Error('test');
     if (town) {
       // On slow or laggy computers, donet's town API takes a very long time to respond so
       // I addressing it with the following lines
