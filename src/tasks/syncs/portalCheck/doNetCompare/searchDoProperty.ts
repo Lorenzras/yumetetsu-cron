@@ -71,9 +71,12 @@ export const searchDoProperty = async ({
       await Promise.race([
         page.waitForSelector('.btn_login'),
         page.waitForSelector('#m_estate_filters_fc_shop_id option'),
-        page.waitForSelector('body div', {hidden: true}),
+        page.waitForSelector('body div', {hidden: true}).catch(),
         page.waitForSelector('.error_navi td#error_area'),
-      ]);
+      ]).catch((error) => {
+        logger.error(`Race failed to identify page. ${error}`);
+      });
+
 
       logger.info(`${logSuffix} is starting donet compare.`);
       if (!await page.$('#m_estate_filters_fc_shop_id option')) {

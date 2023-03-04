@@ -3,6 +3,7 @@ import {Page} from 'puppeteer';
 import retry from 'async-retry';
 import {logger} from '../../../../utils';
 import {selectByText} from './selectByText';
+import {navigateToPropertyPage} from '../../../common/doNet/pages/navigate';
 
 export const setLocation = async (
   {page, data, logSuffix}:
@@ -25,7 +26,17 @@ export const setLocation = async (
 
 
     /* Open modal */
-    await page.waitForSelector('#select_button_city1');
+    retry(async () => {
+      await page.waitForSelector('#select_button_city1');
+    },
+    {
+      retries: 3,
+      onRetry: async (e, tries) => {
+        logger.warn(`${logSuffix} retried ${tries} time/s in retrying to open modal. ${e.message}`);
+        await navigateToPropertyPage(page);
+      },
+    });
+
     await page.click('#select_button_city1'),
 
     logger.info(`${logSuffix} is setting prefecture.`);
