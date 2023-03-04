@@ -6,8 +6,9 @@ import {setLocation} from './setLocation';
 
 test('location', async () => {
   const page = await openMockBrowserPage();
-  // await page.screenshot({path: 'C:\\Users\\owner\\Pictures\\Camera Roll\\test.png'});
-  await navigateToPropertyPage(page);
+
+
+  // Must be in property page.
   await setLocation({
     logSuffix: '',
     page, data: {
