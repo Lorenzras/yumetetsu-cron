@@ -29,12 +29,13 @@ export const setLocation = async (
     await page.click('#select_button_city1'),
 
     logger.info(`${logSuffix} is setting prefecture.`);
+    await page.waitForSelector('#simplemodal-data select');
     await selectByText(page, `#simplemodal-data select`, pref ),
     await page.waitForNetworkIdle({idleTime: 500}),
 
     logger.info(`${logSuffix} is setting city`);
     // click option with text containing name
-    const [option] = await page.$x('//th[contains(text(), "市区")]/following-sibling::td/select/option[contains(text(), "岐阜市")]');
+    const [option] = await page.$x(`//th[contains(text(), "市区")]/following-sibling::td/select/option[contains(text(), "${city}")]`);
     await option.click(); // Town fetching will not trigger unless a city is clicked. So click here.
 
     if (town) {

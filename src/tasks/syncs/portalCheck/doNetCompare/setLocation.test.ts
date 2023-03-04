@@ -1,7 +1,6 @@
 /* eslint-disable max-len */
-import {openBrowserPage, openMockBrowserPage} from '../../../common/browser';
+import {openMockBrowserPage} from '../../../common/browser';
 import {browserTimeOut} from '../../../common/browser/config';
-import {navigateToPropertyPage} from '../../../common/doNet/pages/navigate';
 import {setLocation} from './setLocation';
 
 test('location', async () => {

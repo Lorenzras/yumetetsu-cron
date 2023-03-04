@@ -1,4 +1,4 @@
-import {logger, select} from '../../../../utils';
+import {logger} from '../../../../utils';
 import {Page, ElementHandle} from 'puppeteer';
 import {getOptValByText} from './getOptValByText';
 
