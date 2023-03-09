@@ -33,9 +33,6 @@ export const login = async (page: Page ) => {
   console.log(`Login done. ${subdirectory}`);
   if (subdirectory) {
     // Probably not home page
-    await Promise.all([
-      page.waitForNavigation(),
-      page.click(`a[href="/"]`),
-    ]);
+    await page.goto('https://manage.do-network.com/');
   }
 };
